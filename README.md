@@ -1,5 +1,7 @@
 # FlowKit
 
+> **📝 博客深度解读**: [FlowKit: AI 原生工作流编排工具集](https://michaelmaomao.github.io/2026/05/05/FlowKit-AI%E5%8E%9F%E7%94%9F%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%BC%96%E6%8E%92%E5%B7%A5%E5%85%B7%E9%9B%86/) —— 设计动机、核心架构、设计决策与踩坑经验详解
+
 > AI 原生工作流编排工具集 —— 从任务分析到验证交付的结构化管道。
 
 **[English](README_EN.md)** | 中文
