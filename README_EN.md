@@ -46,7 +46,7 @@ Working with AI coding agents (Claude Code, Cursor, etc.) revealed a gap: **agen
 | **[flow](skills/flow/SKILL.md)** | Lightweight orchestration | Parameter-controlled pipeline — enable only what you need |
 | **[flow-deep](skills/flow-deep/SKILL.md)** | Full-depth orchestration | All quality gates forced ON — for high-stakes tasks |
 | **[multi-agent](skills/multi-agent/SKILL.md)** | Agent team coordination | tmux-split parallel execution with phase-aware scheduling |
-| **[prompt](skills/prompt/skill.md)** | Prompt scoring & optimization | Johari Window + 3S Principles quantitative evaluation |
+| **[prompt](skills/prompt/SKILL.md)** | Prompt scoring & optimization | Johari Window + 3S Principles quantitative evaluation |
 
 ## Design Highlights
 
@@ -210,7 +210,23 @@ When execution hits unexpected issues, the first question is not "how do I fix t
 
 ## Quick Start
 
-This toolkit is designed for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI:
+This toolkit is designed for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI.
+
+### One-line install (recommended)
+
+Install all modules at once via [skills.sh](https://skills.sh) (Vercel Labs' package manager for Agent Skills):
+
+```bash
+npx skills add FrizzleFur/flowkit -a claude-code
+```
+
+Install a single module:
+
+```bash
+npx skills add https://github.com/FrizzleFur/flowkit/tree/main/skills/flow
+```
+
+### Manual install (fallback without Node)
 
 ```bash
 # Copy individual modules you need

@@ -44,7 +44,7 @@
 | **[flow](skills/flow/SKILL.md)** | 轻量编排引擎 | 按需启用 —— 通过参数控制管道阶段 |
 | **[flow-deep](skills/flow-deep/SKILL.md)** | 全量深度引擎 | 强制全开 —— 所有关卡不可跳过 |
 | **[multi-agent](skills/multi-agent/SKILL.md)** | 多 Agent 协作 | tmux 分屏并行 + 阶段间复用 |
-| **[prompt](skills/prompt/skill.md)** | Prompt 评分 | 乔哈里视窗 + 3S 原则量化评估 |
+| **[prompt](skills/prompt/SKILL.md)** | Prompt 评分 | 乔哈里视窗 + 3S 原则量化评估 |
 
 ## 设计亮点
 
@@ -201,7 +201,23 @@ GSD、GStack 等社区框架均无此能力。
 
 ## 快速上手
 
-本工具集为 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI 设计：
+本工具集为 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI 设计。
+
+### 一行安装（推荐）
+
+通过 [skills.sh](https://skills.sh)（Vercel Labs 的 Agent Skills 包管理器）一行安装全部模块：
+
+```bash
+npx skills add FrizzleFur/flowkit -a claude-code
+```
+
+只安装单个模块：
+
+```bash
+npx skills add https://github.com/FrizzleFur/flowkit/tree/main/skills/flow
+```
+
+### 手动安装（无 Node 环境备选）
 
 ```bash
 # 复制所需模块到 Claude Code skills 目录
