@@ -9,12 +9,53 @@
 ```
 ### CID: skill-name
 - 类型: 必需/可选/增强/领域
+- 层级: orchestrate/discipline（默认 discipline，见下方"层级二分"）
 - 触发条件: 何时自动启用
 - 适用 Stage: 0-5.5
 - 路由指令: Agent 注入内容（或引用 skill-routing.md）
 - 依赖: 需要的前置能力
 - 互斥: 与哪些能力冲突
 ```
+
+---
+
+## 层级二分（Orchestrate vs Discipline）
+
+> 灵感来自 Matt Pocock 的 user-invoked / model-invoked 二分。约束 Stage 间调用方向，避免编排入口互相耦合、避免纪律反向劫持控制流。对应 flow-deep 设计宪法的"编排层与纪律层职责不混"铁律。
+
+每个能力属于两层之一：
+
+- **orchestrate（编排层）** — 在 flow-deep 中承担子控制流的能力：决定 plan 结构、决定并发执行、决定迭代循环。它们是"子编排器"。
+- **discipline（纪律层）** — 在 Stage 内部被注入给 Agent、或作为工具被调用的复用能力（怎么写测试、怎么审查、怎么思考、领域规范、安全护栏、协议引导）。
+
+调用方向约束：
+
+- `orchestrate → discipline`：允许
+- `orchestrate → orchestrate`：禁止直接互调，只能由 flow-deep 主线程按 Stage 顺序调度
+- `discipline → orchestrate`：禁止反向劫持控制流
+
+> 诚实说明：以上是**描述性归类**，指导新增能力时的归类与调用方向，不自动强制——实际约束靠 flow-deep 主线程的调度设计。主要价值是"新增能力时提醒归类"，非运行时拦截。
+
+现有能力层级映射：
+
+| CID | 能力 | 层级 |
+|-----|------|------|
+| C01 | using-superpowers | discipline（协议引导） |
+| C02 | /prompt | discipline |
+| C03 | Sequential Thinking | discipline（思考工具） |
+| C04 | /mermaid | discipline |
+| C05 | planning-with-files | orchestrate |
+| C06 | /multi-agent | orchestrate |
+| C10 | TDD | discipline |
+| C11 | writing-plans | discipline |
+| C12 | code-review | discipline |
+| C13 | auto-iterate | orchestrate（迭代控制流） |
+| C14 | verification-before-completion | discipline |
+| C15 | systematic-debugging | discipline |
+| C30-C33 | 领域能力 | discipline |
+| C40-C42 | 安全防护 | discipline |
+
+> 新增能力时在此表登记层级；未登记默认 discipline。
 
 ---
 

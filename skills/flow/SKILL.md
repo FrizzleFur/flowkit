@@ -45,6 +45,21 @@ allowed-tools:
 - 用户描述的任务涉及 3 个以上步骤
 - 用户提及多个技能的组合使用（如"先 /prompt 再 plan 再 multi-agent"）
 
+## 选型指南：何时用 flow vs flow-deep vs grill-me
+
+> flow 是轻量编排。更轻用 grill-me，更重用 flow-deep。完整决策依据、组合用法、误用案例见 `references/selection-guide.md`。
+
+**口诀**：小澄清 grill-me，大工程 flow-deep，中间 flow。拿不准问"做错了多难恢复"。
+
+| 场景 | 入口 |
+|------|------|
+| 中等特性（3-5 步、单模块、可回滚） | **flow** |
+| 核心重构 / 支付 / 认证 / 对外 / 安全 | **flow-deep** |
+| 只想澄清、产出 design tree | **grill-me** |
+| 方向都没定 | 自由对话 / brainstorming |
+
+升级/降级信号、组合用法、三种误用 → 详见 `references/selection-guide.md`。交互式路由可用 `/ask-matt`（路由 mattpocock 体系，不覆盖 flow/flow-deep）。
+
 ## 必需依赖
 
 | 依赖项 | 类型 | 用于阶段 |
@@ -184,7 +199,7 @@ Plan 质量:                          superpowers 技能:
   --plan-review  Stage 3.5 审查
                  (两个 Claude 模式)
 迭代增强:                           配置:
-  --iterate N     Stage 5.5 迭代     --plan-dir <dir>  规划目录
+  --iterate N     Stage 5.5 迭代     --plan-dir <dir>  规划目录（多 feature 用 .plan-feat-<name>/）
   --guard <cmd>   迭代防回归         --agents <types>  Agent 类型
   --ralph         Stage 5.7 Ralph    --lang <zh|en>    输出语言
   --ralph-max N   Ralph 轮数(默认10) --dry-run         仅计划不执行

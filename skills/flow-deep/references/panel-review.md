@@ -34,18 +34,26 @@ Panel Review 在 Stage 3.5（快速审查）通过后、Stage 3.7（代码级细
 
 ### 自动选择规则
 
-默认选择 3 个角色（`--panel-depth basic`），`advanced` 选 5 个：
+> **原生对标**: 本面板评审对应 Claude Code 原生 `/code-review <level>` 多智能体审查；`--panel-depth` 即 level 参数（工作量分级）。Stage 3.5（单 Agent 快速审查）对应原生 `/review` 快速单次审查。两者构成「单次快速 vs 分级多智能体」的二分心智模型，与原生 review 命令职责一致。
 
-| 任务类型 | basic (3) | advanced (5) |
-|---------|-----------|--------------|
-| 纯后端/架构 | Architect + Performance + QA | + Security + Domain |
-| 安全敏感 | Security + Architect + QA | + Domain + DevOps |
-| 前端/全栈 | Architect + Frontend + Domain | + QA + Performance |
-| 数据密集 | Data Engineer + Architect + QA | + Performance + Domain |
-| 基础设施 | DevOps + Architect + Security | + Performance + QA |
-| 默认/不确定 | Architect + QA + Domain | + Security + Performance |
+三档深度，按工作量分级：
 
-用户可通过 `--panel-roles "R02,R03,R06"` 覆盖自动选择。
+| 档位 | 角色数 | 适用场景 | 对标 level |
+|------|--------|---------|-----------|
+| `quick` | 1 | 已有明确方案、只需关键维度把关 | 低 |
+| `basic` | 3 | 常规任务，多维交叉验证（默认） | 中 |
+| `advanced` | 5 | 高风险/跨系统任务，全面深度评审 | 高 |
+
+| 任务类型 | quick (1) | basic (3) | advanced (5) |
+|---------|-----------|-----------|--------------|
+| 纯后端/架构 | Architect | Architect + Performance + QA | + Security + Domain |
+| 安全敏感 | Security | Security + Architect + QA | + Domain + DevOps |
+| 前端/全栈 | Architect | Architect + Frontend + Domain | + QA + Performance |
+| 数据密集 | Data Engineer | Data Engineer + Architect + QA | + Performance + Domain |
+| 基础设施 | DevOps | DevOps + Architect + Security | + Performance + QA |
+| 默认/不确定 | Architect | Architect + QA + Domain | + Security + Performance |
+
+默认 `basic`。用户可通过 `--panel-roles "R02,R03,R06"` 覆盖自动选择（角色数不受档位限制）。
 
 ## Agent Prompt 模板
 

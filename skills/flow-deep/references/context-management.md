@@ -6,7 +6,9 @@
 
 ### 概念
 
-STATE.md 是 flow-deep 管道的跨会话持久化文件，存放在 `.plan/STATE.md`。它解决的核心问题: 当对话上下文被 `/clear` 或因 token 溢出重置时，flow-deep 能从精确位置恢复，而不是从头开始。
+STATE.md 是 flow-deep 管道的跨会话持久化文件，存放在 `<plan-dir>/STATE.md`（默认 `.plan/STATE.md`；多 feature 项目用 `.plan-feat-<name>/STATE.md` 隔离上下文）。它解决的核心问题: 当对话上下文被 `/clear` 或因 token 溢出重置时，flow-deep 能从精确位置恢复，而不是从头开始。
+
+**Run ID 与 Workflow Name（借鉴 OTel workflow.run_id / workflow.name 语义）**: 每次工作流运行分配唯一 Run ID（如 `flow-deep-20260707-1430-pay-refactor`），用于：① 跨会话恢复时明确"这是哪个 run" ② Stage 5.8 经验沉淀时标注来源 run，便于回溯 ③ 多 feature 并行时（.plan-feat-<name>/）避免运行串台。这是文件层的命名空间，不依赖 OTel 基础设施——原生 OTel 属性面向配了 OpenTelemetry 后端的用户，skill 层只在 STATE.md 借鉴其"运行实例可追溯"的思路。
 
 **设计借鉴**: 源自 GSD 的 STATE.md 模式 -- 一个精简的 (< 80 行) 活记忆文件。
 
@@ -16,8 +18,10 @@ STATE.md 是 flow-deep 管道的跨会话持久化文件，存放在 `.plan/STAT
 # Flow-Deep State
 
 ## Task Reference
+Run ID: flow-deep-[YYYYMMDD-HHMM]-[slug]  # 唯一运行标识（借鉴 OTel workflow.run_id；溯源+多feature隔离）
+Workflow Name: [任务简短标识]  # 对应 OTel workflow.name
 Task: [任务表述]
-Plan Dir: .plan/
+Plan Dir: .plan/  # 或 .plan-feat-<name>/（多 feature 项目，参见 planning-with-files）
 
 ## Current Position
 Stage: [0-5 / completed]

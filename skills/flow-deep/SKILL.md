@@ -32,11 +32,29 @@ allowed-tools:
 
 `/flow` 的深度版本，默认启用全部阶段，适用于复杂、重要、高风险任务。
 
+## 设计宪法（Design Constitution）
+
+> 灵感来自 Matt Pocock 的 skill 哲学：skill 应 small / composable / adaptable，不应"接管流程"（owning the process）到剥夺用户控制、使流程 bug 难以修复。重型引擎最大的内在风险是持续膨胀导致接管过度。
+
+flow-deep 用以下自检守住"用户控制"。每次新增 Stage / 检查点 / 强制步骤前，逐条过一遍，并在 plan 或 PR 描述里显式记录回答（使自检可追溯，非走形式）：
+
+1. **必要性** — 这个步骤解决的问题，是否无法用已有的可复用纪律（capability-registry 里的条目）覆盖？
+2. **可拆性** — 它能否从强制 Stage 降级为按需启用的 model-invoked 纪律？
+3. **可跳过性** — 用户是否有清晰的 `--no-xxx` 逃生阀？
+4. **控制权** — 它是在帮用户决策，还是在替用户决策？
+
+三条铁律：
+
+- 编排层只做"决定调用什么、管理 Stage 间控制流"；纪律层做"被注入或被调用的复用能力"。两层职责不混（详见 `references/capability-registry.md` 的"层级二分"）。
+- 宁可把能力做成 registry 里"可用但默认不启用"的条目，也不要默认塞进管道。
+- 任何"强制不可跳过"的 Stage 必须在该 Stage 说明里写清 why，否则默认可跳过。
+
 ## 必需依赖
 
 | 依赖项 | 类型 | 用于阶段 |
 |--------|------|---------|
 | `using-superpowers` | Skill | Stage 0: 前置检查 |
+| `auto-skill` | Skill | Stage -1: 跨会话经验召回 + Stage 5.8: 经验沉淀 |
 | `/prompt` | Skill | Stage 1: Prompt 优化 |
 | Sequential Thinking | **MCP** (不是 Skill) | Stage 2: 深度思考 |
 | `/mermaid` | Skill | Stage 2: Mermaid 可视化 |
@@ -98,17 +116,33 @@ allowed-tools:
 - 使用关键词：flow-deep、深度编排、全量管道、复杂任务深度分析
 - 任务明确标注为复杂/重要/高风险
 
+## 选型指南：何时用 flow-deep vs flow vs grill-me
+
+> flow-deep 是重型管道，不是所有需求都该上。先判断入口，避免杀鸡用牛刀。完整决策依据见 `~/.claude/skills/flow/references/selection-guide.md`。呼应设计宪法——不接管流程。
+
+**口诀**：小澄清 grill-me，大工程 flow-deep，中间 flow。拿不准问"做错了多难恢复"——难恢复就 flow-deep。
+
+| 场景 | 入口 |
+|------|------|
+| 核心重构 / 支付 / 认证 / 对外 / 安全 | **flow-deep** |
+| 中等特性（3-5 步、可回滚） | **flow** |
+| 只想澄清、产出 design tree | **grill-me** |
+| 方向都没定 | 自由对话 / brainstorming |
+
+组合用法、三种误用、升级/降级信号 → 详见 `~/.claude/skills/flow/references/selection-guide.md`。交互式路由可用 `/ask-matt`（路由 mattpocock 体系，不覆盖 flow-deep）。
+
 ## 核心架构
 
 ```
-Stage 0: Superpowers 检查 (强制) → Stage 1: Prompt 优化 (--no-prompt)
+Stage -1: 跨会话经验召回 → Stage 0: Superpowers 检查 (强制) → Stage 0.5: Goal Contract (目标契约)
+  → Stage 1: Prompt 优化 (--no-prompt)
   → Stage 2: 深度思考 (全开: ST+Mermaid+三角色+技能匹配)
     → Stage 3: 确定性规划 (Plan Mode 强制 + plan-quality 标准)
       → Stage 3.5: Plan Review (独立 Agent 审查，强制)
         → Stage 3.6: 多角色面板评审 (--no-panel 可跳过)
           → Stage 3.7: 代码级细化 (条件触发)
-            → Stage 4: 智能执行 (/multi-agent + TDD + 退回Plan协议 + Phase 间产出确认)
-              → Stage 5: 完成验证 (强制) → [Stage 5.5: 迭代优化 (--iterate N)] → [Stage 5.7: Ralph Loop 强制持续 (自动触发)]
+            → Stage 4: Execution Router (串行 / multi-agent / Workflow)
+              → Stage 5: Goal Verification (按目标契约逐条验证) → [Stage 5.5: 迭代优化 (--iterate N)] → [Stage 5.7: Ralph Loop 强制持续 (自动触发)] → Stage 5.8: 跨会话经验沉淀 (验证通过后)
 ```
 
 ## 与 /flow 的核心差异
@@ -139,11 +173,16 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
 ### 前置处理
 
 1. **解析参数**: 从用户输入中提取 `--` 参数和任务表述
-2. **恢复检查**: 检查 `--plan-dir` (默认 `.plan`) 下是否存在 `STATE.md`:
-   - 若存在 → 读取 STATE.md，向用户展示上次中断位置，询问"恢复上次进度"还是"重新开始"
+2. **复杂度闸门 (Complexity Gate)**: 判断任务是否真的适合全量 flow-deep（与选型指南分工：选型指南是用户入口决策，本闸门是入口后执行级确认——用户若已按选型指南选定，仅确认不重复判断）:
+   - 若任务是单文件、单点、低风险、可逆改动 → 提示降级为 `/flow` 或轻量串行处理
+   - 若用户坚持继续使用 `/flow-deep` → 仅保留 Goal Contract、Minimal Plan、Verification，不默认进入 Stage 2 全开、Plan Review、Panel Review 和 multi-agent
+   - 若任务复杂、重要、高风险、跨模块、多步骤或需要审查/验证闭环 → 继续完整流程
+3. **恢复检查**: 检查 `--plan-dir` (默认 `.plan`；多 feature 项目用 `.plan-feat-<name>/`) 下是否存在 `STATE.md`:
+   - **多 feature 检测**: 若项目根有多个 `.plan-feat-*/` 目录，询问用户本次属于哪个 feature，用对应目录作为 `--plan-dir`（参见 planning-with-files 的 Plan Directory Strategy；feature 名来源：用户指定 > git 分支名 > 任务关键词）
+   - 若存在 STATE.md → 读取 STATE.md，向用户展示上次中断位置，询问"恢复上次进度"还是"重新开始"
    - 若恢复 → 跳到 STATE.md 中记录的 `next_action` 对应的 Stage
    - 若重新开始 → 备份旧 STATE.md 为 `STATE.md.bak`，继续正常流程
-3. **确认任务**: 向用户展示解析结果，确认任务范围和参数配置
+4. **确认任务**: 向用户展示解析结果，确认任务范围、复杂度判断和参数配置
 
 ```
 /flow-deep --plan-dir docs/plan 重构支付系统，支持多币种
@@ -175,6 +214,49 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
 
 **不可跳过**
 
+### Stage -1: 跨会话经验召回（Cross-Session Recall）
+
+**调用**: auto-skill 的知识库/经验库读取机制
+
+**核心理念**: flow-deep 每次启动时强制做一次针对性经验召回，确保任务相关历史经验一定被加载，不依赖 auto-skill 的被动话题切换判断。这是跨会话 loop 的"读"端。
+
+**行为**:
+1. 从用户任务表述抽取 3-8 个核心关键词（去重、统一大小写）
+2. 读取 auto-skill 的 `knowledge-base/_index.json` 和 `experience/_index.json`
+3. 用关键词匹配所有分类/技能的 `keywords` 字段（不做优先级排序，匹配到多少读多少）
+4. 命中条目加载进当前会话（读对应 `.md` 文件全文）
+5. 在 Stage 0.5 Goal Contract 中增加 `Relevant History` 字段，记录召回经验摘要（来源文件 + 一句话精华）
+6. 向用户简报：召回了哪些经验条目，供后续规划参考
+
+**与 auto-skill 的关系**:
+- auto-skill 在会话开始时已被 CLAUDE.md 强制协议触发，但它的"话题切换"判断可能导致任务相关经验未被加载。
+- Stage -1 是 flow-deep 层面的强制补充：不管 auto-skill 是否已读，都重新做一次针对性匹配。
+- 命中已读条目去重，不重复加载。
+
+**STATE.md 写入**: 记录召回的经验条目（文件路径列表），供恢复时复用。
+
+**跳过条件**: `--no-recall`
+
+### Stage 0.5: Goal Contract（目标契约）
+
+在 Prompt 优化、深度思考和规划之前，先建立目标契约，防止高效执行但偏离用户真正目标。
+
+**目标契约必须包含**:
+- Objective：最终要达成什么
+- Success Criteria：可观察、可验证的成功标准
+- Constraints：约束、风险、不可触碰范围、需要保留的行为
+- Non-goals：明确不做的相邻任务，避免范围蔓延
+- Verification Plan：完成后如何证明达标（命令、检查点、人工确认项）
+- Execution Strategy：串行 / multi-agent / Workflow 的初步判断
+
+**行为**:
+1. 从用户原始任务中提取上述字段
+2. 若 Objective 或 Success Criteria 不清晰，优先使用 AskUserQuestion 澄清，不直接进入 Stage 1
+3. 将 Goal Contract 写入 `--plan-dir/spec.md` 或 findings.md 的开头，供后续 Stage 3/4/5 复用
+4. 后续计划、执行和验证必须回看该契约；如果目标变化，回到 Stage 0.5 更新契约后再继续
+
+**不可跳过**，但低风险小任务可使用最小 Goal Contract（1 个 Objective + 1-3 条 Success Criteria + Verification Plan）。
+
 ### Stage 1: Prompt 优化
 
 **调用**: `/prompt <任务表述>`
@@ -192,15 +274,19 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
 
 ### Stage 1.5: 需求探索（条件触发）
 
-**触发条件**: Stage 1 完成后，优化后的任务表述中存在 3+ 不确定项或明确度 < 7 的关键决策点。
+**触发条件（双路径）**: Stage 1 完成后，按认知状态走两路（详见 needs-exploration.md）：
+- **路径 A（主干明确）**: 任务表述含具体实现路径 / 技术选型 / 明确边界 → 轻量 Grilling（**不依赖 3+ 不确定项**，避免主干明确被跳过条件过滤、Grilling 沦为死代码）
+- **路径 B（模糊想法）**: 3+ 不确定项 或 明确度 < 7 → 选项式
+
+> 判断要点："主干明确"看有没有实现路径/技术选型，不是"不确定项少"。主干明确 + 细节未定仍属路径 A。
 
 > 完整协议（含触发条件、行为步骤、AskUserQuestion 示例）见 `~/.claude/skills/flow/references/needs-exploration.md`
 
-**核心行为**: 识别不确定项 → 评分明确度 → 主动追问 → 合并结果 → 记录到 findings.md
+**核心行为**: 认知状态分流 →（主干明确走 Grilling 模式 / 模糊想法走选项式）→ 合并结果 → 记录到 findings.md
 
-**追问要点**: 问题要具体（"支持哪些币种？" 而非 "还有其他需求？"），每个问题提供 3-4 选项含推荐默认值。
+**追问要点**: 详见 `~/.claude/skills/flow/references/needs-exploration.md`。Grilling 模式（一次一问 + 深度优先 + facts vs decisions）适合已有主干的用户；选项式（3-4 选项含推荐）适合模糊想法。误用会问爆用户或落入 choice architecture 陷阱。
 
-**跳过条件**: 不确定项 < 3 或所有不确定项明确度 >= 7
+**跳过条件**: 既非主干明确（无实现路径 / 技术选型 / 明确边界），且不确定项 < 3 且所有明确度 >= 7（任务已足够清晰）
 
 ### Stage 2: 深度思考（强制启用）
 
@@ -296,6 +382,8 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
 
 **核心理念**: 用独立 Agent（全新上下文）审查 plan，消除"沉没成本偏差"。
 
+> **原生对标**: 对应 Claude Code 原生 `/review` 快速单次审查语义（单 Agent、广度优先 sanity check）。与 Stage 3.6（对应 `/code-review <level>` 分级多智能体审查）构成「单次快速 vs 分级多智能体」的二分心智模型。
+
 **行为**:
 1. 读取 Stage 3 生成的 task_plan.md 全部内容
 2. 启动一个独立 Agent（subagent_type: general-purpose, name: plan-reviewer）
@@ -320,12 +408,13 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
 
 **核心理念**: "Design Review Board"——多视角交叉验证，消除单角色盲区。与 Stage 3.5 的分工：3.5 是广度优先的快速 sanity check，3.6 是深度优先的专业维度评审。通过 **Auto-Decide Layer** 自动处理 80% 常规发现，只上浮 **Taste Decisions** 给用户。
 
+> **原生对标**: 对应 Claude Code 原生 `/code-review <level>` 多智能体审查；`--panel-depth`（quick/basic/advanced）即 level 参数（工作量分级），与 Stage 3.5 的 `/review` 单次审查构成二分。
+
 **行为**:
 1. **角色选择**:
    - 读取 `references/panel-review.md` 中的角色目录（8 个角色）
-   - 根据任务类型自动选择 3 个最相关角色（`--panel-depth basic`，默认）
-   - `--panel-depth advanced` 选 5 个角色
-   - 用户可通过 `--panel-roles "R02,R03,R06"` 覆盖自动选择
+   - `--panel-depth quick` 选 1 个（关键维度把关）/ `basic` 选 3 个（默认）/ `advanced` 选 5 个
+   - 用户可通过 `--panel-roles "R02,R03,R06"` 覆盖自动选择（角色数不受档位限制）
 2. **并行评审**:
    - 在同一条消息中并行启动 3-5 个 review Agent（general-purpose，不需要 tmux）
    - 每个 Agent 使用角色特定的 prompt 模板 + plan 内容 + 代码库上下文
@@ -354,6 +443,10 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
 - 更新 `current_stage: 3.6`，记录角色选择、Auto-Decide 统计和综合结论
 - 设置 `next_action` 为 "Stage 3.7 代码级细化"
 
+**新增参考**:
+- `references/goal-contract.md` — Goal Contract 模板、模糊目标澄清问题、测试修复默认约束
+- `references/workflow-script-patterns.md` — Review / Execution / Verification / Loop-until-dry Workflow 模式
+
 ### Stage 3.7: 代码级细化（条件触发）
 
 **触发条件**: Stage 2 第6维（技能匹配）识别到 `code-implementation` 类型任务
@@ -363,12 +456,30 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
 
 > **注意**: 必须通过 Skill tool 加载 writing-plans 完整规范（包括 bite-sized 任务粒度、No Placeholders 规则、Self-Review checklist），而非自行简化。
 
-### Stage 4: 智能执行
+### Stage 4: Execution Router（智能执行路由）
 
-**调用**: `/multi-agent` 技能（注入 superpowers 技能指令）
+**核心理念**: Stage 4 不固定等于 `/multi-agent`。先根据 Goal Contract、task_plan.md 和并行收益选择执行后端，再启动执行。
+
+**执行后端选择**:
+
+| 条件 | 执行方式 |
+|---|---|
+| 单文件、单点、强顺序依赖或低风险改动 | 当前会话串行执行 |
+| 2+ 独立子任务可并行，但不需要复杂控制流 | `/multi-agent` |
+| 多维度审查、fan-out、loop-until-dry、发现→去重→验证→综合、或用户明确要求 Workflow | `Workflow` |
+| 并行编辑同一仓库且存在冲突风险 | Workflow + worktree isolation，或退回串行 |
+
+**Workflow Fit Gate**:
+- 适合 Workflow：性能/安全/架构等多维审查、批量迁移、并行研究、独立验证、需要确定性 pipeline/parallel 控制流的任务
+- 不适合 Workflow：简单单步修改、单文件错别字修正、需要连续人类判断的任务、编排成本明显高于收益的任务
+- 选择 Workflow 前，必须说明为什么 Workflow 比串行或 `/multi-agent` 更合适；若用户未明确授权大规模编排，先征询确认
+
+**默认调用**: `/multi-agent` 技能（注入 superpowers 技能指令）；当 Workflow Fit Gate 命中且用户授权时，使用 Workflow 作为执行后端。
+
+**规模档位（与 Claude Code 原生 `/config` 动态工作流规模对齐）**: 选择 `/multi-agent` 时，按 multi-agent SKILL.md 的规模档位表设定并发代理数 —— small(2-3) / medium(3-4，默认安全上限) / large(5-6，必须分批)。**硬约束**: 同一条消息并发 agent ≤ 4 防 429 速率限制（6 个并发实测会触发）；`large` 档必须分批（每批 ≤ 4），并为每个 agent 准备 fallback（API Error / 超时 → 主 Agent 用 Bash/grep/Tavily 接管）。
 
 **行为**:
-1. 读取 task_plan.md 中的任务分解
+1. 读取 Goal Contract、task_plan.md 中的任务分解
 2. 读取 Stage 3.7 生成的每个 Phase 的 `agent_hint`（定义见 `references/code-planning.md`）
 3. 识别可并行的子任务组
 4. 为每个子任务分配合适的 Agent 类型（`agent_hint.subagent`）
@@ -434,7 +545,7 @@ Phase 间不应销毁 team，应复用空闲 Agent。检测 TaskList + tmux list
 
 **跳过条件**: `--no-multi`
 
-### Stage 5: 完成验证
+### Stage 5: Goal Verification（按目标契约完成验证）
 
 **调用**: `superpowers:verification-before-completion`（通过 Skill tool 加载完整技能）
 
@@ -442,7 +553,23 @@ Phase 间不应销毁 team，应复用空闲 Agent。检测 TaskList + tmux list
 
 **铁律**: No completion claims without fresh verification evidence. 禁止 "should work"、"probably"。
 
-**STATE.md 写入**: 验证完成后设置 `current_stage: 5`，记录结果。若全部通过: `status: completed`。若有失败: `next_action` 为 "Stage 5.5 迭代修复"。
+Stage 5 不只验证命令是否通过，还必须逐条核对 Stage 0.5 Goal Contract 的 Success Criteria。最终总结前必须输出：
+
+| Success Criteria | Evidence | Status |
+|---|---|---|
+| 来自 Goal Contract 的成功标准 | 命令输出 / 文件路径 / 测试结果 / 人工检查点 | Pass / Fail / Needs Review |
+
+**完成状态只能使用**:
+- `DONE`：所有 Success Criteria 均有新鲜证据证明通过
+- `PARTIAL`：部分标准未完成，但剩余项、原因和下一步已明确列出
+- `BLOCKED`：需要用户输入、权限、外部系统或需求确认
+
+若任一 Success Criteria 为 `Fail` 或关键项为 `Needs Review`，不能声明 DONE，必须进入 Stage 5.5，或按失败类型回退：
+- 执行偏差 → 返回 Stage 4 最小修复
+- Plan 假设错误 → 返回 Stage 3 更新计划
+- 目标或成功标准不清 → 返回 Stage 0.5 更新 Goal Contract
+
+**STATE.md 写入**: 验证完成后设置 `current_stage: 5`，记录 Goal Verification 表。若全部通过: `status: completed`。若有失败: `next_action` 为 "Stage 5.5 迭代修复" 或对应回退 Stage。
 
 **不可跳过**
 
@@ -485,6 +612,31 @@ Phase 间不应销毁 team，应复用空闲 Agent。检测 TaskList + tmux list
 
 **跳过条件**: Stage 5.5 全部达标 | `--no-ralph` | Ralph Loop 插件未安装
 
+### Stage 5.8: 跨会话经验沉淀（Cross-Session Distillation）
+
+**触发条件**: Stage 5 Goal Verification 为 DONE（所有 Success Criteria 均有新鲜证据证明通过）
+**调用**: auto-skill 的记录机制（第 5 步）
+
+**核心理念**: 每次复杂任务不只产出代码/文档，还要把可复用经验沉淀回 auto-skill，形成跨会话 loop 的"写"端。只在验证通过后触发，避免把失败方案沉淀成误导。
+
+**行为**:
+1. 从 Goal Contract（Success Criteria + Constraints）+ 实际执行结果 + 过程中的关键决策中，提炼可复用经验
+2. 按 auto-skill 记录判断准则分流:
+   - 通用流程/决策逻辑/模板 → `knowledge-base/[category].md`
+   - 某技能的踩坑/参数/配置/模板 → `experience/skill-xxx.md`
+3. 判断价值: 这个经验下次能帮用户省时间吗？（满足 auto-skill "应该记录"准则才沉淀）
+4. 主动询问用户是否记录本次经验（复用 auto-skill 第 5 步询问机制）
+5. 用户同意后，按 auto-skill 条目格式写入并更新对应 `_index.json`
+
+**沉淀维度参考**:
+- 任务级经验（这类任务的最佳实践流程）→ knowledge-base
+- 技能级经验（用 flow-deep/某 skill 时踩的坑）→ experience
+- 不沉淀: 一次性操作、纯概念、已记录过的重复内容
+
+**STATE.md 写入**: 记录本次沉淀的经验条目（文件路径 + 一句话摘要），供 `STATE.md.bak` 追溯。
+
+**跳过条件**: `--no-distill` 或 Goal Verification 非 DONE
+
 Stage 5 验证通过后的收尾工作:
 
 1. **tmux 全局清理**（IN_TMUX 时）: shutdown 全部剩余 Agent → 倒序 kill 非 MAIN_PANE → 验证 → TeamDelete
@@ -500,10 +652,20 @@ Stage 5 验证通过后的收尾工作:
 /flow-deep 重构认证系统
 
 → Stage 0: Superpowers 前置检查 ✓
+→ Stage 0.5: Goal Contract（目标、成功标准、约束、验证计划）
 → Stage 1: Prompt 优化 → Stage 2: 深度思考 + 技能匹配(TDD+并行+审查)
 → Stage 3: Plan Mode → Stage 3.5: Plan Review → Stage 3.6: 多角色面板评审
-→ Stage 4: multi-agent 并发执行（auth-core[TDD] + token-mgr[TDD]）
-→ Stage 5: 完成验证 ✓
+→ Stage 4: Execution Router 选择 multi-agent（auth-core[TDD] + token-mgr[TDD]）
+→ Stage 5: Goal Verification（逐条核对 Success Criteria）✓
+```
+
+```
+/flow-deep 全面审查这个仓库的性能、安全和架构问题
+
+→ Stage 0.5: Goal Contract 明确审查范围和成功标准
+→ Stage 4: Execution Router 命中 Workflow Fit Gate
+→ Workflow: Review Workflow（性能 / 安全 / 架构 fan-out → 去重 → 验证 → 综合）
+→ Stage 5: Goal Verification 输出审查覆盖和证据表
 ```
 
 ## 参数速查
@@ -511,12 +673,12 @@ Stage 5 验证通过后的收尾工作:
 ```
 /flow-deep [options] <任务表述>
 
-阶段: --no-prompt | --no-plan | --no-multi(串行)
+阶段: --no-prompt | --no-plan | --no-multi(串行) | --no-recall
 思考: --think-hard(10K) | --no-think | --no-mermaid | --no-discuss | --no-skill-match
-执行: --no-tdd | --tdd-dual | --no-review | --no-panel | --panel-roles "R01,R02" | --panel-depth basic|advanced
-迭代: --iterate N | --guard <cmd> | --ralph-max N | --no-ralph
+执行: --no-tdd | --tdd-dual | --no-review | --no-panel | --panel-roles "R01,R02" | --panel-depth quick|basic|advanced
+迭代: --iterate N | --guard <cmd> | --ralph-max N | --no-ralph | --no-distill
 调试: --dry-run(仅计划)
-配置: --plan-dir <dir> | --agents <types> | --lang <zh|en>
+配置: --plan-dir <dir>（多 feature 用 .plan-feat-<name>/） | --agents <types> | --lang <zh|en>
 ```
 
 ## 注意事项

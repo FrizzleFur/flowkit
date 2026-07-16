@@ -45,6 +45,22 @@ direction: higher 或 lower（根据指标语义推断）
 
 每 5 轮迭代打印进度摘要，N 轮用完后打印最终总结
 
+## 迭代终止语义
+
+呼应 planning-with-files 的 `Completion Semantics`：**未达标的 plan 是合法中间态，不是错误**。迭代用尽本身不是失败信号，而是决策点 —— 默认不无限重试。
+
+迭代到 `max_iterations` 仍未达标时，按验证值趋势判断（而非机械停止或机械续跑）：
+
+| 情形 | 判定 | 动作 |
+|------|------|------|
+| 验证值持续改善、接近 target | 收敛中 | 报告进度，询问用户是否追加 `--iterate` 或启用 `--ralph`（Stage 5.7）继续 |
+| 验证值停滞或来回震荡（stall） | plan bug 假设 | **退回 Stage 3 重新规划**，而非暴力重试 |
+| 验证值恶化 | 方向错误 | 立即 revert 最后变更，退回 Stage 3 |
+
+> 铁律：连续多轮验证无改善时，默认怀疑 plan 而非继续重试。这与 planning-with-files「verification repeatedly failing = plan bug, not a willpower problem」一致 —— 反复失败说明 plan 假设有误，不是意志力问题。
+
+注：`--ralph`（Stage 5.7）是用户显式启用的「明知故犯」强制循环，专门对抗「中间态合法就停」；它不属于本节的误锁范畴，无需此处处理。
+
 ## 跳过条件
 
 不使用 `--iterate` 参数且 Stage 5 全部达标

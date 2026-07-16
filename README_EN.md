@@ -258,6 +258,22 @@ Invoke in Claude Code:
 - Ralph Loop integration (stop-hook + auto-iterate dual-layer iteration)
 - Johari Window-based prompt scoring
 
+## Changelog
+
+### 2026-07-16
+
+**flow-deep**
+- Added **Goal Contract** — prevents the agent from doing correct-looking work that misses the user's actual outcome; provides Objective / Success Criteria / Non-goals / Verification Plan template
+- Added **Workflow Script Patterns** — Review Workflow / Execution Workflow patterns for when Stage 4 Execution Router selects the Workflow backend
+- Major `SKILL.md` update (532 → 694 lines); capability-registry / context-management / panel-review enhancements
+
+**flow**
+- Added **Selection Guide** — decision criteria for flow-deep vs flow vs grill-me, upgrade/downgrade signals, composition patterns, and three misuse cases
+- `SKILL.md` update; cleanup-procedure / needs-exploration / stage55-iteration enhancements
+
+**multi-agent**
+- `SKILL.md` update (315 → 328 lines)
+
 ## License
 
 MIT

@@ -249,6 +249,22 @@ cp -r skills/prompt ~/.claude/skills/
 - Ralph Loop 集成（Stop Hook + auto-iterate 双层迭代）
 - 乔哈里视窗 Prompt 量化评分
 
+## 更新日志 (Changelog)
+
+### 2026-07-16
+
+**flow-deep**
+- 新增 **Goal Contract（目标契约）** —— 防止 agent 做大量"看起来正确但偏离用户真实目标"的工作；提供 Objective / Success Criteria / Non-goals / Verification Plan 模板
+- 新增 **Workflow Script Patterns（工作流脚本模式）** —— Stage 4 选 Workflow 后端时的 Review Workflow / Execution Workflow 模式参考
+- `SKILL.md` 大幅更新（532 → 694 行）；capability-registry / context-management / panel-review 同步增强
+
+**flow**
+- 新增 **选型指南（selection-guide）** —— flow-deep vs flow vs grill-me 的入口决策依据、升级/降级信号、组合用法与三种误用
+- `SKILL.md` 更新；cleanup-procedure / needs-exploration / stage55-iteration 同步增强
+
+**multi-agent**
+- `SKILL.md` 更新（315 → 328 行）
+
 ## License
 
 MIT
