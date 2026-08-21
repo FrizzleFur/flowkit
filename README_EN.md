@@ -260,6 +260,13 @@ Invoke in Claude Code:
 
 ## Changelog
 
+### v1.2.1 (2026-08-21)
+
+**multi-agent / flow / flow-deep**
+- **Softened the hard tmux dependency** — execution mode is now environment-adaptive dual-mode: with tmux it runs the tmux-split team layout; without tmux it **silently degrades** to same-message concurrent agents (no install prompt, no retry request)
+- The degraded mode keeps the scale-tier hard constraint (≤ 4 concurrent per message against 429) and the Delegate coordination protocol; pane cleanup steps are skipped automatically
+- Why: tmux is a visualization enhancement, not a capability prerequisite — most environments simply don't have it, and forcing a prompt interrupts the task flow
+
 ### v1.2.0 (2026-08-21)
 
 **flow**

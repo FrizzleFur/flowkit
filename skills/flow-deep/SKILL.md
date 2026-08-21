@@ -495,13 +495,13 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
 6. 代码实现任务启用双 Agent TDD 模式（测试编写 Agent → 实现验证 Agent）
 7. 并发启动 Agent 执行
 
-#### Agent 分发方式（tmux 分屏优先）
+#### Agent 分发方式（tmux 分屏优先，无 tmux 自动降级）
 
 > 完整规则（含 CRITICAL 检查清单、工具调用模板、Delegate 模式）见 `~/.claude/skills/flow/references/agent-dispatch.md`
 
-适用于 Stage 0~5 所有阶段。首次使用前检测 `[ -n "$TMUX" ]`，若不在 tmux 中则提示用户启动。
+适用于 Stage 0~5 所有阶段。检测 `[ -n "$TMUX" ]`: 在 tmux 中 → tmux-split 团队模式；不在 → **静默降级**为同消息无分屏并发（不提示安装、不重试；Delegate 协议与规模档位不变）。
 
-核心约束: tmux-split 唯一模式 → TeamCreate + team_name → 禁止 run_in_background → 完成后即时清理
+核心约束: IN_TMUX → TeamCreate + team_name + 禁止 run_in_background + 即时清理 | NO_TMUX → 同消息并发 ≤ 4 + Delegate 协调不变
 
 #### 技能路由规则（详细指令见 references/skill-routing.md）
 

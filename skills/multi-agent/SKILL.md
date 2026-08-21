@@ -1,9 +1,10 @@
 ---
 name: multi-agent
 description: >
-  Agent Teams 方案生成与执行引擎。通过 TeamCreate + Agent(team_name) 工具链在 tmux 分屏中创建多 agent 团队。
+  Agent Teams 方案生成与执行引擎。有 tmux 时通过 TeamCreate + Agent(team_name) 工具链在 tmux 分屏中创建多 agent 团队；
+  无 tmux 自动静默降级为同消息无分屏并发（无需安装任何前置依赖）。
   当用户说 /MultiAgent、"多agent"、"团队协作"、"并行处理"、"teammate"、"创建agent团队" 时使用。
-  支持项目上下文感知、协作式方案生成，仅 tmux-split 模式。
+  支持项目上下文感知、协作式方案生成，环境自适应双模式。
 ---
 
 # MultiAgent Skill
@@ -164,15 +165,26 @@ project_context:
 [ -n "$TMUX" ] && echo "IN_TMUX" || echo "NO_TMUX"
 ```
 
-### tmux-split 模式（唯一执行模式）
+### tmux-split 团队模式（IN_TMUX 时）
 
-执行前必须先启动 tmux（`tmux new -s work`）。所有 Agent 通过 tmux 分屏运行，不接受 in-process 模式。
+所有 Agent 通过 tmux 分屏运行，可实时观察各 agent 执行。
 
 ```
 CRITICAL 规则:
   必须 → TeamCreate + Agent(team_name=...)
   禁止 → Agent(run_in_background) 或 Agent() 不带 team_name
-  若不在 tmux 中 → 提示用户先启动 tmux，然后重试
+```
+
+### 无分屏并发模式（NO_TMUX 时，静默降级）
+
+不在 tmux 环境时自动切换，**不提示用户安装/启动 tmux、不要求重试**——tmux 只是可视化增强，不是能力前提；多数环境本就没有 tmux，提示安装会打断任务流。
+
+```
+规则:
+  无依赖的 Agent 在同一条消息中并行调用（不带 team_name，不用 TeamCreate）
+  并发数遵守规模档位硬约束（同一条消息 ≤ 4 防 429）
+  TaskCreate/TaskUpdate 照常用于任务追踪（不绑定 pane）
+  结果由 Agent 返回值直接汇总；无 pane 清理步骤
 ```
 
 **执行步骤**:
@@ -314,10 +326,10 @@ Bug 修复 → 1 个 fixer(frontend-developer) + 1 个 reviewer(code-reviewer)�
 ## Quick Reference
 
 ```
-/MultiAgent [任务描述]    tmux-split 分屏模式（唯一模式）
+/MultiAgent [任务描述]    有 tmux → tmux-split 分屏团队；无 tmux → 同消息无分屏并发（自动降级）
 ```
 
-> 前置条件: 必须在 tmux 环境中运行（`tmux new -s work`）。若未在 tmux 中，提示用户先启动。
+> 环境自适应: 在 tmux 中则分屏执行；不在则静默降级为无分屏并发，无需任何前置条件。
 
 | 复杂度 | 队友数 | 确认项 |
 |--------|--------|--------|

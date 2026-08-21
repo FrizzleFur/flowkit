@@ -251,6 +251,13 @@ cp -r skills/prompt ~/.claude/skills/
 
 ## 更新日志 (Changelog)
 
+### v1.2.1 (2026-08-21)
+
+**multi-agent / flow / flow-deep**
+- **弱化 tmux 硬依赖** —— 执行模式改为环境自适应双模式：有 tmux 走 tmux-split 团队分屏；无 tmux **静默降级**为同消息无分屏并发（不提示安装、不要求重试）
+- 降级模式保留规模档位硬约束（同消息 ≤ 4 防 429）与 Delegate 协调协议；pane 清理步骤自动跳过
+- why: tmux 只是可视化增强而非能力前提，多数环境本就没有 tmux，强制提示会打断任务流
+
 ### v1.2.0 (2026-08-21)
 
 **flow**
