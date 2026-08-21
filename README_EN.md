@@ -260,6 +260,16 @@ Invoke in Claude Code:
 
 ## Changelog
 
+### v1.2.0 (2026-08-21)
+
+**flow**
+- Grilling adds **anti-interrogation rules** — incremental disclosure (state what judgment the last answer updated before each question), conclusion-changing criterion (only ask questions whose answers could change the conclusion), explicit stopping (stop as soon as information suffices, never pad the count); absorbed from Socratic questioning to fix "endless grilling exhausts the user"
+- Requirements exploration closing adds a **six-part consultation summary** — original question / real problem / confirmed facts / unverified assumptions / key variables / an accurate actionable new question, handing later Stages a clarified question instead of scattered Q&A
+- Three-role discussion upgraded — each role states four items (adding a **falsifiability declaration**: what new evidence would change its judgment); round two surfaces the **disagreement triad** (shared facts / real disagreements / underlying assumptions) before synthesizing; unresolved disagreements are recorded explicitly instead of being prematurely smoothed over
+
+**prompt**
+- Added **interaction pacing control** checklist (multi-turn conversational prompts) — delayed conclusions / one question at a time / anti-formalism / information-density criterion, covering the multi-turn quality dimension beyond Johari+3S
+
 ### v1.1.0 (2026-08-21)
 
 **flow-deep**
