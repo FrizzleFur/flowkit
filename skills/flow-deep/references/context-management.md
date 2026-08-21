@@ -68,6 +68,7 @@ Next Action: [specific action to resume — must be actionable without reading o
 | Stage 3.7 完成 | Phase Progress (agent_hints 摘要) | 仅代码任务触发 |
 | Stage 4 每个 Phase 完成 | Current Position, Phase Progress, Decisions Log | 记录该 Phase 的关键决策 |
 | Stage 5 完成 | Current Position (status), Blockers | 记录未通过项 |
+| Context Guard 保存（选项 a/b） | Session Continuity, Phase Progress | 必须写 Next Action；选项 b 额外生成 HANDOFF.md |
 | 执行后处理 | Current Position (completed), 清空 Next Action | 最终状态 |
 | 暂停/中断 | Session Continuity | 必须写 Next Action |
 
@@ -75,14 +76,15 @@ Next Action: [specific action to resume — must be actionable without reading o
 
 当 flow-deep 启动时检测到 `.plan/STATE.md` 存在:
 
-1. **读取** STATE.md 的 Current Position 和 Session Continuity
-2. **展示** 给用户: "上次停在 Stage X Phase Y: [last action]。是否恢复?"
-3. **恢复路径**:
+1. **HANDOFF 入口**: 若用户以 HANDOFF.md 内容（或"读 .plan/HANDOFF.md"）开场，按其指引进入下述流程；恢复完成后可删除 HANDOFF.md（STATE.md 才是持久锚点）
+2. **读取** STATE.md 的 Current Position 和 Session Continuity
+3. **展示** 给用户: "上次停在 Stage X Phase Y: [last action]。是否恢复?"
+4. **恢复路径**:
    - Stage 0-2 中断 → 从中断的 Stage 重新开始 (这些阶段快速且依赖上下文)
    - Stage 3 中断 → 重新规划 (规划依赖思考上下文)
    - Stage 4 中断 → 从 STATE.md 的 Phase Progress 继续 (执行结果已 git commit)
    - Stage 5 中断 → 直接重新验证
-4. **重新开始**: 备份 STATE.md → STATE.md.bak，重新走全流程
+5. **重新开始**: 备份 STATE.md → STATE.md.bak，重新走全流程
 
 ### 大小控制
 
@@ -99,9 +101,93 @@ STATE.md 必须 < 80 行。如果超过:
 
 | 条件 | 检测方式 | 优先级 |
 |------|---------|--------|
-| System warning "context exceeds N%" | 系统提示 | P0 |
-| 阶段完成后预估使用 > 70% | 人工判断 | P1 |
+| Stage/Phase 边界脚本实测 > 70% | `scripts/check_context.py`（transcript usage 真值） | P0 |
+| System warning "context exceeds N%" | 系统提示（出现时通常已晚，兜底信号） | P1 |
 | Agent 返回 usage > 100K tokens | 工具返回 | P2 |
+
+> 模型无法自感 context 占用，百分比必须来自脚本实测，不做"人工判断"式预估。
+
+## 主动 Checkpoint 与 Handoff 协议（Context Guard）
+
+> 目的：在 auto-compact / context 溢出**之前**，把进度锚定到文件系统，让下一个 agent 能无损续接。
+> 与被动压缩的区别：压缩是"继续本会话"的续命手段；checkpoint 是"可控交接"的存档手段。两者互补，弹窗决策先于压缩。
+
+### 检测方法
+
+每个 Stage / Phase 完成点运行（Stage 3 起与下方「更新规则」表的 STATE.md 更新时机同步；Stage 0-2 边界单独执行，此时尚无 STATE.md）：
+
+```bash
+python3 ~/.claude/skills/flow-deep/scripts/check_context.py --threshold 70
+```
+
+- 原理：读取当前会话 transcript（`~/.claude/projects/<cwd-key>/<session>.jsonl`）最后一条 assistant 消息的 usage（input + cache_read + cache_creation + output），除以窗口大小。这是 Claude Code 汇报的真值，非估算。
+- exit code：`0` 正常（不弹窗）| `1` 超阈值（进入弹窗）| `2` 检测失败（**静默降级**为原压缩矩阵，不阻塞管道）。
+- 输出含 `session=` 和 `first_msg=`（会话首条消息摘要）——并行多会话时据此核对是否读对了会话。**注意**：skill 由框架注入前导时，first_msg 显示的是环境信息（如 "Base directory for this skill: ..."）而非任务本体，此时以两条信号判定：① `mtime` 与检测时刻接近（当前活跃会话持续写入）② 连续两次采样 tokens_used 单调上升。确认读错后用 `--session` 纠偏（接受纯文件名或绝对路径）。
+- 1M 窗口模型加 `--window 1000000`。
+- 限制：采样式检测，Stage 中间的 context 暴涨由 P1 系统警告兜底。
+
+### 三选项语义（超阈值时 AskUserQuestion）
+
+| 选项 | 动作 | 语义 |
+|------|------|------|
+| a) 保存并继续 | 更新 STATE.md / progress.md → 按压缩矩阵处理中间结果 → 继续本会话 | 还想在本会话跑完，只要存档保险 |
+| b) 保存并交接 | 更新五件套（STATE/task_plan/findings/progress/spec，spec.md 存在时）→ 生成 HANDOFF.md → 提示用户开新会话 | 主动换窗口，避免 context rot |
+| c) 跳过 | 仅记录本次跳过，不改文件 | 用户判断当前阶段收尾很快，不值得存档 |
+
+**节流**：同一 Stage 边界最多弹一次；选 c) 后下个边界重新检测再问（阈值未降则再弹，但同一 Stage 不重复）。
+
+**无交互降级**（子代理 / headless 场景 AskUserQuestion 不可用）：默认执行选项 a（保存并继续——可自主完成的最小破坏项），三选项文案与决策理由落盘到 progress.md 或执行日志，**不静默跳过、不杜撰用户选择**。HANDOFF.md 的交付同样以此为准：非交互场景以文件落盘为交付（终端展示仅交互场景执行）。
+
+### 保存动作清单（选项 a/b 共同部分）
+
+1. 更新 `<plan-dir>/STATE.md`：Current Position、Phase Progress、Session Continuity（Stopped At / **Next Action 必须具体可执行**，不依赖读其他文件）
+2. 更新 `progress.md`：本阶段完成项 + 证据（文件路径/测试结果）
+3. 更新 `task_plan.md`：Phase 状态标记（completed / in_progress / pending）
+4. （仅选项 b）同步刷新 findings.md 关键决策区，保证新会话单读文件即可还原决策脉络
+5. （仅选项 b）若 `spec.md` 存在（Goal Contract 所在，交接时最有价值），核对其中 Success Criteria 与实际进度是否同步
+
+### HANDOFF.md 模板（选项 b 生成，写入 `<plan-dir>/HANDOFF.md` 并在终端展示全文）
+
+> 遵循 claude-handoff 经验：**不复制五件套内容，只引导新 agent 按序去读**——重复内容会随进度过期，路径引用不会。
+
+```markdown
+# HANDOFF — flow-deep 衔接 prompt（Run ID: <run_id>）
+
+你是接续上一个会话的 agent。上一个会话在 context <N>% 处主动 checkpoint。
+
+## 任务
+<任务一句话>（详见 .plan/spec.md Goal Contract）
+
+## 当前进度
+- 已完成: <Stage/Phase 列表 + 一句话结果>
+- 进行中: <Phase + 停在哪一步>
+- 未开始: <Phase 列表>
+
+## 必读文件（按序）
+1. .plan/STATE.md — 恢复锚点（Stage/Phase/Next Action）
+2. .plan/task_plan.md — 后续 Phase 定义与完成标准
+3. .plan/findings.md — 关键决策与 Plan/Panel Review 结论
+
+## 建议
+- 先读 STATE.md，按恢复协议从 Next Action 继续
+- 建议技能: <按 agent_hint 匹配，如 TDD / code-review>
+- 注意事项: <未解决的 blocker / 需要用户确认的事项>
+
+（敏感信息勿写入——本文件会成为新会话的 prompt）
+```
+
+生成后提示用户：「已生成 `.plan/HANDOFF.md`。开新会话后粘贴该文件内容（或直接说『读 .plan/HANDOFF.md 按指引继续』）。」
+
+### 与恢复协议的衔接
+
+新会话从 HANDOFF.md 进入 → 被引导读 STATE.md → 走现有「恢复协议」（Stage 4 中断从 Phase Progress 继续）。HANDOFF.md 在恢复完成后可删除（一次性文件，STATE.md 才是持久锚点）。
+
+### 设计宪法自检记录（2026-08-20 新增本协议时）
+
+1. 必要性 ✓ — 替换不可靠的"P1 人工判断"；HANDOFF 生成无现有能力覆盖（claude-handoff 是立即后台交接且禁模型调用，语义不同）
+2. 可拆性 ✓ — 协议落在 references + 脚本，不新增 Stage，挂在现有边界检查点
+3. 可跳过性 ✓ — `--no-context-guard`；弹窗本身即询问
+4. 控制权 ✓ — 只询问不自动交接；检测失败静默降级不阻塞
 
 ## 压缩矩阵
 

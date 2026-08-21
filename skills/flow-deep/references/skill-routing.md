@@ -18,14 +18,21 @@
 
 根据 task_plan.md 中每个 Phase 的 `agent_hint.type` 字段，为 Agent 注入对应指令：
 
-| agent_hint.type | Skill tool 加载目标 | 注入增强内容 | subagent 推荐范围 |
-|----------------|--------------------|-------------|-----------------|
-| `code-implementation` | `superpowers:test-driven-development` | TDD 完整规范 + Iron Law | voltagent-core-dev:* |
-| `code-review` | `superpowers:requesting-code-review` | 审查流程 + severity 分级 | voltagent-qa-sec:code-reviewer |
-| `research` | 无额外加载 | 无额外注入 | voltagent-research:* |
-| `documentation` | 无额外加载 | 无额外注入 | voltagent-dev-exp:documentation-engineer |
-| `security-audit` | 无额外加载 | 安全审查指令 | voltagent-qa-sec:security-auditor |
-| `testing` | `superpowers:test-driven-development` | TDD 完整规范 | voltagent-qa-sec:test-automator |
+> **C34 自动路由规则**: 当 Stage 0 检测到 C34 (prime-agent) 可用时，`security-audit` 和 `code-verification` 类型**自动**路由到 prime-agent 执行（无需用户指定触发词）。
+> 理由：这两类任务的核心价值是"实际运行代码验证"，prime-agent 的 IPython kernel 能自动执行代码验证发现，这是 Claude Code 原生做不到的。
+> `--no-prime` 参数可禁用此自动路由，退回 Claude Code 原生 Agent。
+> C34 不可用时（未安装 / 无 API Key），自动降级为 Claude Code 原生 Agent，不报错。
+
+| agent_hint.type | 默认后端 | C34 可用时后端 | 注入增强内容 |
+|----------------|----------|---------------|-------------|
+| `code-implementation` | Claude Code Agent (TDD) | Claude Code Agent (TDD) | TDD 完整规范 + Iron Law |
+| `code-review` | Claude Code Agent | Claude Code Agent | 审查流程 + severity 分级 |
+| `research` | Claude Code Agent | Claude Code Agent | 无额外注入 |
+| `documentation` | Claude Code Agent | Claude Code Agent | 无额外注入 |
+| `security-audit` | Claude Code Agent | **prime-agent** ← 自动路由 | 安全审查 + IPython 运行验证 |
+| `testing` | Claude Code Agent (TDD) | Claude Code Agent (TDD) | TDD 完整规范 |
+| `code-verification` | Claude Code Agent | **prime-agent** ← 自动路由 | prime-agent CLI (--no-session --mode json) |
+| `autonomous-task` | Claude Code Agent | **prime-agent** ← 自动路由 | prime-agent --autonomous + gate |
 
 ## Agent Prompt 模板
 

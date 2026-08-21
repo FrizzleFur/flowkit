@@ -251,7 +251,15 @@ cp -r skills/prompt ~/.claude/skills/
 
 ## 更新日志 (Changelog)
 
-### 2026-07-16
+### v1.1.0 (2026-08-21)
+
+**flow-deep**
+- 新增 **Context Guard（上下文容量守卫）** —— Stage/Phase 边界用 `scripts/check_context.py` 从会话 transcript usage 真值检测 context 占用百分比（精确值，非模型自估），超 70% 时 AskUserQuestion 三选项：保存并继续 / 保存并交接（生成 HANDOFF.md 衔接 prompt 给下一个 agent）/ 跳过
+- 新增 **主动 Checkpoint 与 Handoff 协议** —— 保存动作清单、HANDOFF.md 模板（路径引用不复制内容）、同 Stage 节流、AskUserQuestion 不可用时的无交互降级、检测失败静默降级（exit 0/1/2 契约）
+- 新增 **prime-agent 集成（C34）** —— capability-registry 注册 + skill-routing 自动路由：`security-audit` / `code-verification` 任务在 C34 可用时自动走 prime-agent（IPython 实际运行代码验证），`--no-prime` 可禁用
+- 触发条件表 P0 升级为脚本实测，替换不可靠的"人工判断"预估
+
+### v1.0.0 (2026-07-16)
 
 **flow-deep**
 - 新增 **Goal Contract（目标契约）** —— 防止 agent 做大量"看起来正确但偏离用户真实目标"的工作；提供 Objective / Success Criteria / Non-goals / Verification Plan 模板

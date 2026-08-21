@@ -159,12 +159,19 @@ Stage -1: 跨会话经验召回 → Stage 0: Superpowers 检查 (强制) → Sta
 
 > 详细策略见 `references/context-management.md`
 
-| 检查点 | 阈值 | 自动动作 |
+**容量检测（Context Guard）**: 每个 Stage / Phase 完成点运行
+`python3 ~/.claude/skills/flow-deep/scripts/check_context.py --threshold 70`
+读取当前会话 transcript 的真实 usage 得到百分比（模型无法自感 context 占用，必须脚本实测；1M 窗口加 `--window 1000000`）。
+
+| 检查点 | 阈值 | 动作 |
 |--------|------|---------|
+| Stage / Phase 边界（脚本实测） | > 70% | AskUserQuestion: 保存并继续 / 保存并交接（生成 HANDOFF.md 给下一个 agent）/ 跳过 |
 | Stage 2 后 | > 65% | 压缩 ST 输出为摘要 |
 | Stage 3.7 后 | > 70% | 压缩代码级计划为 agent_hint 摘要 |
 | Stage 4 每个 Agent 后 | > 75% | 压缩中间结果 |
 | 任意时刻 | > 85% | 警告用户，建议 `/compact` |
+
+弹窗决策先于压缩：用户选「保存并继续」时先做 checkpoint（更新 STATE.md/progress.md/task_plan.md）再按压缩矩阵处理。同一 Stage 边界最多弹一次，选「跳过」则下个边界重新检测。保存与 HANDOFF.md 协议见 `references/context-management.md` 的「主动 Checkpoint 与 Handoff」。检测脚本失败（exit 2）时静默降级为原压缩矩阵，不阻塞管道。`--no-context-guard` 禁用。
 
 STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协议见 `references/context-management.md`。
 
@@ -307,6 +314,7 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
 - 2+ 独立模块可并行 → dispatching-parallel-agents (C06)
 - 实现完成后 → code-review (C12)
 - 验证失败 → auto-iterate (C13) + systematic-debugging (C15)
+- 安全审计 / 代码验证 → prime-agent (C34)，自动路由（见 skill-routing.md 的 C34 自动路由规则）
 
 完成后展示思考结论并记录到 findings.md。**禁用**: `--no-think`
 
@@ -673,9 +681,9 @@ Stage 5 验证通过后的收尾工作:
 ```
 /flow-deep [options] <任务表述>
 
-阶段: --no-prompt | --no-plan | --no-multi(串行) | --no-recall
+阶段: --no-prompt | --no-plan | --no-multi(串行) | --no-recall | --no-context-guard(禁用上下文容量检测弹窗)
 思考: --think-hard(10K) | --no-think | --no-mermaid | --no-discuss | --no-skill-match
-执行: --no-tdd | --tdd-dual | --no-review | --no-panel | --panel-roles "R01,R02" | --panel-depth quick|basic|advanced
+执行: --no-tdd | --tdd-dual | --no-review | --no-panel | --panel-roles "R01,R02" | --panel-depth quick|basic|advanced | --no-prime
 迭代: --iterate N | --guard <cmd> | --ralph-max N | --no-ralph | --no-distill
 调试: --dry-run(仅计划)
 配置: --plan-dir <dir>（多 feature 用 .plan-feat-<name>/） | --agents <types> | --lang <zh|en>
@@ -689,6 +697,6 @@ Stage 5 验证通过后的收尾工作:
 
 ### 通用参数行为
 
-`--dry-run` 仅预览 Stage 0-3 | `--agents <types>` 覆盖 Agent 类型 | `--lang <zh|en>` 输出语言 | `--no-tdd` 禁用 TDD | `--tdd-dual` 双 Agent TDD | `--no-review` 跳过代码审查
+`--dry-run` 仅预览 Stage 0-3 | `--agents <types>` 覆盖 Agent 类型 | `--lang <zh|en>` 输出语言 | `--no-tdd` 禁用 TDD | `--tdd-dual` 双 Agent TDD | `--no-review` 跳过代码审查 | `--no-prime` 禁用 prime-agent 自动路由（security-audit/code-verification 退回 Claude Code 原生）
 
 

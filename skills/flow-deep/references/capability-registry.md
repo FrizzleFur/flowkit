@@ -52,7 +52,7 @@
 | C13 | auto-iterate | orchestrate（迭代控制流） |
 | C14 | verification-before-completion | discipline |
 | C15 | systematic-debugging | discipline |
-| C30-C33 | 领域能力 | discipline |
+| C30-C34 | 领域能力 | discipline |
 | C40-C42 | 安全防护 | discipline |
 
 > 新增能力时在此表登记层级；未登记默认 discipline。
@@ -219,6 +219,19 @@
 - 检查: Skill `linear` 存在
 - 关键词: Linear, issue, ticket, project, 任务管理
 
+### C34: prime-agent
+- 类型: 领域（可选，C34 可用时自动路由）
+- 层级: discipline（外部工具调用）
+- 触发: C34 可用时，`security-audit` / `code-verification` / `autonomous-task` 类型**自动路由**（无需触发词）
+- Stage: 4（Execution Router 自动后端选择）
+- 检查: `which prime-agent` 存在 + Provider API Key 可用
+- 路由: 自动注入 prime-agent skill 调用指令（--no-session --mode json 模式）
+- 依赖: 外部安装（`curl -fsSL https://app.primeintellect.ai/prime-agent/install.sh | sh`）+ API Key
+- 禁用: `--no-prime` 退回 Claude Code 原生 Agent
+- 降级: C34 不可用时（未安装/无 Key），自动降级为 Claude Code 原生 Agent，不报错
+- 关键词: prime-agent, RLM, IPython 代码验证, 实际运行验证, Prime Agent, 代码执行验证, security-audit
+- 说明: RLM harness，通过持久 IPython kernel 实际运行代码验证分析。C34 可用时 security-audit / code-verification 自动路由到此后端
+
 ---
 
 ## L5: 安全防护能力（自动触发）
@@ -257,7 +270,7 @@ Stage 2 完成后，执行以下审计清单：
 L1 必需: [C01: ✓] [C02: ✓] [C03: ✓] [C04: ✓] [C05: ✓] [C06: ✓]
 L2 代码质量: [C10: ✓/✗] [C11: ✓/✗] [C12: ✓/✗] [C13: ✓/✗] [C14: ✓] [C15: ✓/✗]
 L3 思考增强: [C20: ✓] [C22: ✓] 或 [C23: ✓/✗]
-L4 领域: [C30: ✓/✗] [C31: ✓/✗] [C32: ✓/✗] [C33: ✓/✗]
+L4 领域: [C30: ✓/✗] [C31: ✓/✗] [C32: ✓/✗] [C33: ✓/✗] [C34: ✓/✗]
 L5 安全: [C40: ✓/✗] [C41: ✓/✗] [C42: ✓/✗]
 
 ### 任务匹配结果

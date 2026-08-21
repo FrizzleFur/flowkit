@@ -260,7 +260,15 @@ Invoke in Claude Code:
 
 ## Changelog
 
-### 2026-07-16
+### v1.1.0 (2026-08-21)
+
+**flow-deep**
+- Added **Context Guard** — detects real context usage at Stage/Phase boundaries via `scripts/check_context.py` (reads actual token usage from the session transcript, not model self-estimation); above 70% it prompts three options: save & continue / save & hand off (generates HANDOFF.md as the continuation prompt for the next agent) / skip
+- Added **Proactive Checkpoint & Handoff protocol** — save checklist, HANDOFF.md template (references plan files by path instead of duplicating), per-Stage throttling, non-interactive fallback when AskUserQuestion is unavailable, silent degradation on detection failure (exit 0/1/2 contract)
+- Added **prime-agent integration (C34)** — registered in capability-registry with auto-routing in skill-routing: `security-audit` / `code-verification` tasks route to prime-agent (IPython runs code for real verification) when available; disable with `--no-prime`
+- Context trigger table P0 upgraded to script-based measurement, replacing unreliable "manual estimation"
+
+### v1.0.0 (2026-07-16)
 
 **flow-deep**
 - Added **Goal Contract** — prevents the agent from doing correct-looking work that misses the user's actual outcome; provides Objective / Success Criteria / Non-goals / Verification Plan template
