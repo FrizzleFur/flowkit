@@ -222,7 +222,7 @@ CRITICAL 规则（2026-08 实测更新，TeamCreate/team_name 已废弃）:
 4. **监控协调**: TaskList 跟踪进度，SendMessage 协调，完成后 shutdown
 
 5. **清理**（Agent 完成/全部完成后）:
-   - **即时清理**: TaskList 检测 Agent completed 且不被后续复用 → `SendMessage shutdown` → 等 2s → 无响应则强制 kill pane（跳过 MAIN_PANE）
+   - **即时清理**: TaskList 检测 Agent completed 且不被后续复用 → **`TaskStop(task_id=name)` 终止 agent 本体** → kill pane（跳过 MAIN_PANE）。⚠️ SendMessage 主动 shutdown_request 已被 harness 拦截（仅允许被动 response）；只 kill pane 会残留 agent 本体（HUD 条目不消失）——**必须用 TaskStop**（2026-08-24 实测）
    - **孤儿清理**: Phase 切换前，检测进程已退出的残留 pane:
      ```bash
      W=$(tmux display-message -p '#{session_name}:#{window_index}')
