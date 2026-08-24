@@ -1,10 +1,10 @@
 ---
 name: multi-agent
 description: >
-  Agent Teams 方案生成与执行引擎。有 tmux 时通过 TeamCreate + Agent(team_name) 工具链在 tmux 分屏中创建多 agent 团队；
-  无 tmux 自动静默降级为同消息无分屏并发（无需安装任何前置依赖）。
+  Agent Teams 方案生成与执行引擎。通过 Agent(name) + SendMessage(to: name) 工具链并行分发多 agent 团队（subagent 后台运行）；
+  在 tmux 中且 pane 可用时自动获得分屏可视化，pane 故障或无 tmux 时静默降级为无分屏并发（无需任何前置依赖）。
   当用户说 /MultiAgent、"多agent"、"团队协作"、"并行处理"、"teammate"、"创建agent团队" 时使用。
-  支持项目上下文感知、协作式方案生成，环境自适应双模式。
+  支持项目上下文感知、协作式方案生成，环境自适应。
 ---
 
 # MultiAgent Skill
@@ -60,6 +60,7 @@ project_context:
   Plugins: settings.json → enabledPlugins
   Subagents: Agent tool 的 subagent_type 列表
   MCP: settings.json → mcpServers
+  tmux: "[ -n \"$TMUX\" ] && echo IN_TMUX || echo NO_TMUX"
 ```
 
 ## Step 2: 任务分析 + 角色匹配
@@ -95,13 +96,19 @@ project_context:
 
 > 以下为建议性指导（非强制限制）。用于在复杂度判断后，给出并发代理数量建议。
 
-| 档位 | 并发代理数 | 适用 | 429 风险控制 |
+| 档位 | 同消息并发代理数 | 适用 | 速率风险控制 |
 |------|----------|------|-------------|
-| `small` | 2-3 | 简单任务、单维度审查 | 无 |
-| `medium` | 3-4（默认安全上限） | 中等任务、多维审查 | 默认安全 |
-| `large` | 5-6（**必须分批**） | 复杂任务、跨系统 | 同消息并发 ≤ 4，超出分批启动；单 agent 失败自动重试 |
+| `small` | 1-2 | 简单任务、单维度审查 | 无 |
+| `medium` | 2（默认安全上限） | 中等任务、多维审查 | 默认安全 |
+| `large` | 3-4（**必须分批，每批 2**） | 复杂任务、跨系统 | 前批完成 ≥60% 再发下批；单 agent 失败自动重试 |
 
-> **硬约束（实测固化）**: 同一条消息并发 agent ≤ 3-4 为安全上限；**6 个并发会触发 429 速率限制**（部分 agent 失败需单独重试救回）。`large` 档必须分批（每批 ≤ 4），并为每个 agent 准备 fallback（API Error / 超时 → 主 Agent 用 Bash/grep/Tavily 接管，不死等）。
+> **硬约束（2026-08-24 二次校准：官方文档 + 两次实测）**:
+> - **官方口径**（docs.bigmodel.cn/cn/api/rate-limit）：限制对象是「同一时刻处理中的请求数」（账户+模型维度，无公开数字）；GLM Coding Plan 按套餐建议并发项目数——**Lite 1 / Pro 1-2 / Max 2+**（每项目内含 subagent 并发）；高峰期账户级动态限流；错误码 1302=账户并发达限（降并发/加队列）、1305=平台过载（退避重试）
+> - **实测**：6 并发触发 429（2026-08-21）；**4 并发 + 主会话同时持续工具调用同样触发限制（2026-08-24）**
+> - **并发预算公式**：有效并发 = 主会话（恒占 1 路）+ 运行中 subagent 数 + 其他活跃 Claude 会话数。**subagent 同消息分发默认 ≤ 2**；存在其他并行会话（tmux 多 tab / 多项目）时降为 1 或串行
+> - **启动前检查**：分发前确认无其他活跃 claude 会话（tmux list-panes / 进程观察）；有则压缩本批并发
+> - **触发 429/1302 后**：暂停分发新 agent（已跑的由平台限流重试，不死等）；主 Agent 用 Bash/grep/Tavily 接管关键路径；恢复分发需退避间隔，禁止固定间隔高频重试（官方明确反对）
+> - 为每个 agent 准备 fallback（API Error / 超时 → 主 Agent 接管），防单点卡死
 
 ## Step 3: 协作式方案生成
 
@@ -123,6 +130,7 @@ project_context:
 - 目标: [任务目标]
 - 复杂度: [级别]
 - 队友数量: [N]
+- 执行模式: [tmux-split | no-split]  ← Step 1 tmux 检测结果，随方案一并确认，勿留到执行阶段才判定
 
 ## 队友配置
 | 队友 | 角色 | subagent_type | 文件范围 | 依赖 |
@@ -159,46 +167,51 @@ project_context:
 
 ## Step 5: 执行模式
 
-### 环境检测（首先执行）
+### 环境检测（执行模式的唯一判定来源）
 
 ```bash
 [ -n "$TMUX" ] && echo "IN_TMUX" || echo "NO_TMUX"
 ```
 
-### tmux-split 团队模式（IN_TMUX 时）
+**判定规则（防跳过检测）**:
+- 方案（Step 3）已含「执行模式」行 → 按方案执行，不重复判定
+- 方案缺失模式行 → 启动任何 Agent 前必须先跑检测，并在回复中显式写出判定行：
+  `执行模式判定: IN_TMUX → tmux-split`（或 `NO_TMUX → no-split`）
+- **跳过检测 ≠ NO_TMUX**：未判定就按降级启动属于流程违规（实测踩坑 2026-08-21：跳过检测直接降级启动两个审计 agent，分屏可观察性丢失且启动后不可逆）
 
-所有 Agent 通过 tmux 分屏运行，可实时观察各 agent 执行。
+### tmux 分屏可视化模式（IN_TMUX 且 pane 正常时）
+
+在 tmux 中时，Agent 工具会自动为 subagent 分配 pane，可实时观察各 agent 执行。
 
 ```
-CRITICAL 规则:
-  必须 → TeamCreate + Agent(team_name=...)
-  禁止 → Agent(run_in_background) 或 Agent() 不带 team_name
+CRITICAL 规则（2026-08 实测更新，TeamCreate/team_name 已废弃）:
+  必须 → Agent(name=...) 会话内唯一命名 + SendMessage(to: name) 按名寻址
+  废弃 → TeamCreate/TeamDelete（工具已不存在）；Agent(team_name)（参数已废弃，传了也被忽略——session 有单一隐式 team）
+  pane 故障 → 首个 Agent 报 respawn pane 失败（如 Warp 环境 Device not configured）→ 立即按无分屏降级继续，不阻塞任务
 ```
 
-### 无分屏并发模式（NO_TMUX 时，静默降级）
+### 无分屏并发模式（NO_TMUX 或 pane 故障时，静默降级）
 
-不在 tmux 环境时自动切换，**不提示用户安装/启动 tmux、不要求重试**——tmux 只是可视化增强，不是能力前提；多数环境本就没有 tmux，提示安装会打断任务流。
+不在 tmux 环境时自动切换，**不提示用户安装/启动 tmux、不要求重试**——tmux 只是可视化增强，不是能力前提；多数环境本就没有 tmux，提示安装会打断任务流。静默的对象是「不提示用户装 tmux」，**不是免检测**——降级仅依据检测结果 NO_TMUX（或 IN_TMUX 下的 pane 故障实测）。
 
 ```
 规则:
-  无依赖的 Agent 在同一条消息中并行调用（不带 team_name，不用 TeamCreate）
-  并发数遵守规模档位硬约束（同一条消息 ≤ 4 防 429）
+  无依赖的 Agent 在同一条消息中并行调用（当前版本 subagent 默认后台运行，本模式即默认形态）
+  并发数遵守规模档位硬约束（同一条消息 ≤ 2，超出分批防 429/1302）
   TaskCreate/TaskUpdate 照常用于任务追踪（不绑定 pane）
-  结果由 Agent 返回值直接汇总；无 pane 清理步骤
+  结果由 Agent 返回值/完成通知直接汇总；无 pane 清理步骤
 ```
 
 **执行步骤**:
 
-1. **创建 Team**:
-   ```
-   TeamCreate({ team_name: "[task-name]", description: "[任务描述]" })
-   ```
+1. **记录主面板**（IN_TMUX 时）: `MAIN_PANE=$(tmux display-message -p '#{pane_index}')`，后续清理跳过该面板
 
 2. **并行启动 Teammates**（无依赖的在同一条消息中）:
    ```
-   Agent({ name: "agent-1", team_name: "[task-name]", subagent_type: "...", prompt: "[含项目上下文的完整任务描述]" })
-   Agent({ name: "agent-2", team_name: "[task-name]", subagent_type: "...", prompt: "[...]" })
+   Agent({ name: "agent-1", subagent_type: "...", prompt: "[含项目上下文的完整任务描述]" })
+   Agent({ name: "agent-2", subagent_type: "...", prompt: "[...]" })
    ```
+   name 会话内唯一，用于 SendMessage({ to: "agent-1" }) 寻址与多阶段复用；无需创建 team（TeamCreate 已废弃）。
 
 3. **创建和分配任务**:
    ```
@@ -219,7 +232,7 @@ CRITICAL 规则:
        tmux kill-pane -t "$pid" 2>/dev/null
      done
      ```
-   - **全局清理**: 所有 Phase 完成后，倒序 kill 非 MAIN_PANE → 验证仅剩主面板 → `TeamDelete`:
+   - **全局清理**: 所有 Phase 完成后，倒序 kill 非 MAIN_PANE → 验证仅剩主面板（TeamDelete 已废弃，无需调用）:
      ```bash
      W=$(tmux display-message -p '#{session_name}:#{window_index}')
      LAST=$(tmux list-panes -t "$W" -F '#{pane_index}' | tail -1)
@@ -252,7 +265,7 @@ Phase 间不应销毁 team，应复用空闲 Agent:
 绝对禁止:
   不管已有 pane 直接创建新 Agent（面板越开越多）
   全部 shutdown 再重建（浪费资源）
-  使用 Agent(run_in_background) 替代分屏 Agent
+  （原「禁止 run_in_background 替代分屏 Agent」条已过时：当前版本 subagent 默认后台运行，以 name 寻址复用即可）
 ```
 
 ### 冲突解决
@@ -308,11 +321,10 @@ Step 2: 任务分析 → 功能开发, 中等复杂度
 | test | test-automator | tests/auth/* | api |
 
 用户微调 → 确认 → 执行:
-  TeamCreate({ team_name: "auth-feature" })
-  Agent({ name: "api", team_name: "auth-feature",
+  Agent({ name: "api",
     subagent_type: "voltagent-core-dev:backend-developer",
     prompt: "实现用户认证: JWT token, 登录/注册/刷新接口...\n项目上下文: Node.js/Express..." })
-  Agent({ name: "test", team_name: "auth-feature",
+  Agent({ name: "test",
     subagent_type: "voltagent-qa-sec:test-automator",
     prompt: "为 auth 模块编写测试..." })
 ```
@@ -326,10 +338,10 @@ Bug 修复 → 1 个 fixer(frontend-developer) + 1 个 reviewer(code-reviewer)�
 ## Quick Reference
 
 ```
-/MultiAgent [任务描述]    有 tmux → tmux-split 分屏团队；无 tmux → 同消息无分屏并发（自动降级）
+/MultiAgent [任务描述]    Agent(name) 并行分发；有 tmux 且 pane 正常 → 自动分屏可视化；否则无分屏并发（自动降级）
 ```
 
-> 环境自适应: 在 tmux 中则分屏执行；不在则静默降级为无分屏并发，无需任何前置条件。
+> 环境自适应: 在 tmux 中则分屏执行；不在则静默降级为无分屏并发。无需安装 tmux，但必须先完成环境检测——跳过检测 ≠ NO_TMUX。
 
 | 复杂度 | 队友数 | 确认项 |
 |--------|--------|--------|

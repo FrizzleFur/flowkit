@@ -484,7 +484,7 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
 
 **默认调用**: `/multi-agent` 技能（注入 superpowers 技能指令）；当 Workflow Fit Gate 命中且用户授权时，使用 Workflow 作为执行后端。
 
-**规模档位（与 Claude Code 原生 `/config` 动态工作流规模对齐）**: 选择 `/multi-agent` 时，按 multi-agent SKILL.md 的规模档位表设定并发代理数 —— small(2-3) / medium(3-4，默认安全上限) / large(5-6，必须分批)。**硬约束**: 同一条消息并发 agent ≤ 4 防 429 速率限制（6 个并发实测会触发）；`large` 档必须分批（每批 ≤ 4），并为每个 agent 准备 fallback（API Error / 超时 → 主 Agent 用 Bash/grep/Tavily 接管）。
+**规模档位（与 Claude Code 原生 `/config` 动态工作流规模对齐）**: 选择 `/multi-agent` 时，按 multi-agent SKILL.md 的规模档位表设定并发代理数 —— small(1-2) / medium(2，默认安全上限) / large(3-4，必须分批每批 2)。**硬约束**（2026-08-24 二次校准，官方文档+两次实测）: 有效并发 = 主会话（恒 1 路）+ 运行中 subagent + 其他活跃会话，同一条消息并发 agent 默认 ≤ 2 防 429/1302（4 并发+主会话实测触发、6 并发必触发；GLM Coding Plan 套餐口径 Lite 1 项目 / Pro 1-2 / Max 2+）；触发后暂停分发新 agent、主 Agent 用 Bash/grep/Tavily 接管关键路径、退避恢复。
 
 **行为**:
 1. 读取 Goal Contract、task_plan.md 中的任务分解
