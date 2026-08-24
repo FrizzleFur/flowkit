@@ -60,7 +60,7 @@ project_context:
   Plugins: settings.json → enabledPlugins
   Subagents: Agent tool 的 subagent_type 列表
   MCP: settings.json → mcpServers
-  tmux: "[ -n \"$TMUX\" ] && echo IN_TMUX || echo NO_TMUX"
+  tmux: 两级检测——①[ -n "$TMUX" ] && echo IN_TMUX；②为空时再跑 tmux list-panes，能列出即判定 IN_TMUX（background job 的 Bash 上下文不继承 $TMUX，"变量为空"≠"不在 tmux"，2026-08-24 实测失真案例）
 ```
 
 ## Step 2: 任务分析 + 角色匹配
