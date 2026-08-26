@@ -393,7 +393,7 @@ Plan 质量:                          superpowers 技能:
 
 > 完整规则（含 CRITICAL 检查清单、工具调用模板、Delegate 模式）见 `references/agent-dispatch.md`
 
-核心约束: IN_TMUX → TeamCreate + team_name + 禁止 run_in_background + 即时清理 | NO_TMUX → 静默降级为同消息无分屏并发（≤ 4，不提示安装，Delegate 协议不变）
+首次分发前先跑 $TMUX 检测并显式写出判定行（跳过检测 ≠ NO_TMUX）。核心约束: Agent(name) 唯一命名 + 同消息并行 ≤ 4 + Delegate 协议不变（TeamCreate/team_name 已废弃）| IN_TMUX 且 pane 正常 → 自动分屏可视化 + 即时清理 pane；NO_TMUX 或 pane 故障 → 静默降级无分屏并发
 
 **串行替代**: 当 `--no-multi` 时，在当前会话中按 task_plan.md 顺序逐步执行，每完成一个 Phase 更新 progress.md。
 
@@ -456,7 +456,7 @@ Stage 4 完成后执行三层清理: 即时清理（Agent completed → shutdown
 
 **跳过条件**: 未使用 `--ralph` | Stage 5.5 全部达标 | Ralph Loop 插件未安装
 
-1. **tmux 全局清理**（IN_TMUX 时）: shutdown 全部剩余 Agent → 倒序 kill 非 MAIN_PANE → TeamDelete
+1. **tmux 全局清理**（IN_TMUX 时）: shutdown 全部剩余 Agent → 倒序 kill 非 MAIN_PANE → 验证（TeamDelete 已废弃，无需调用）
 2. 汇总所有 Agent 的执行结果
 3. 更新 progress.md 和 task_plan.md 状态
 4. 向用户展示最终结果和总结
