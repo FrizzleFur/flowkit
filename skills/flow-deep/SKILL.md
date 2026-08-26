@@ -17,8 +17,6 @@ allowed-tools:
   - WebSearch
   - AskUserQuestion
   - Agent
-  - TeamCreate
-  - TeamDelete
   - SendMessage
   - TaskList
   - TaskCreate
