@@ -214,7 +214,7 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
    e. **关键能力检测**: 显式检查以下能力并标记状态（每项用下方给定的确定性检测命令，禁止以目录猜测等替代方法——2026-08-26 实测不同检测方法曾得出相反结论）:
       - `auto-iterate` skill: `iterate_available: true/false` —— 检测 `test -f ~/.claude/skills/auto-iterate/SKILL.md`（影响 Stage 5.5 完整/降级模式）
       - `ralph-loop` 插件: `ralph_loop_available: true/false` —— 检测 `~/.claude/settings.json` 的 `enabledPlugins` 字段是否含 `"ralph-loop"`（影响 Stage 5.7 是否可用）
-      - `prime-agent` CLI: `prime_available: true/false`（影响 C34 自动路由；检测 `which prime-agent` 成功 且 Provider Key 可用——`ZAI_API_KEY` 在 env 或 settings.json env 中存在，二者都满足才为 true）
+      - `prime-agent` CLI: `prime_available: true/false`（影响 C34 自动路由；检测 `which prime-agent` 成功 且 Provider Key 可用——以下三渠道任一**非空**即视为有 Key：`ZAI_API_KEY` 环境变量、settings.json env、`~/.prime/agent/auth.json` 含 zai api_key（2026-08-26 起凭证权威存储，settings.json 被并发重写不影响）；空字符串不算——2026-08-26 实测空值会传给 API 返回 401 而非报无 Key）
 4. 向用户展示：必需依赖状态 ✓/✗ + 可用能力概览（含 iterate_available、ralph_loop_available 和 prime_available 状态；prime_available=false 时注明"security-audit/code-verification 将降级为原生 Agent"）
 5. 如有必需依赖不可用，报告缺失项并询问用户是否继续
 
