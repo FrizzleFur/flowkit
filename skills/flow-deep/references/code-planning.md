@@ -56,7 +56,7 @@ git add ... && git commit -m "feat: ..."
 
 ```yaml
 agent_hint:
-  type: code-implementation  # 或 code-review / research / documentation
+  type: code-implementation  # 共 7 种，见下方类型选择指引
   subagent: voltagent-core-dev:backend-developer  # 推荐的 subagent_type
   files:
     create: [path/to/new.py]
@@ -65,3 +65,17 @@ agent_hint:
   tdd: true  # 代码实现类必须为 true
   depends_on: [phase-1, phase-2]  # 依赖的前置 Phase
 ```
+
+**type 类型选择指引**（Stage 4 会按 skill-routing.md 路由表分发后端）:
+
+| type | 何时规划为此类型 | 后端路由 |
+|------|----------------|---------|
+| `code-implementation` | 写新功能/修 bug（默认） | Claude Code Agent (TDD) |
+| `code-review` | 审查已有代码变更 | Claude Code Agent |
+| `research` | 调研/方案对比/信息收集 | Claude Code Agent |
+| `documentation` | 文档撰写/整理 | Claude Code Agent |
+| `security-audit` | 审计代码安全行为、需要"实际运行观察行为"而非静态审读 | C34 可用时自动路由 prime-agent |
+| `code-verification` | 验证分析结论、需要"实际运行代码复现"验证 bug 假设 | C34 可用时自动路由 prime-agent |
+| `autonomous-task` | 长时自主批量任务（evals/批量迁移），有可机检的质量门控 | C34 可用时自动路由 prime-agent --autonomous |
+
+> 判断依据：任务的核心价值是否是"实际运行代码"？是 → security-audit / code-verification（prime-agent 的 IPython kernel 能执行验证，Claude Code 原生做不到）；任务是否需要数十轮自主迭代 + 机检 gate？是 → autonomous-task。仅当规划出这三种类型，C34 自动路由才会生效（详见 skill-routing.md）。

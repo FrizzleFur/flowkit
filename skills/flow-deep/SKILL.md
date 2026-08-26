@@ -216,7 +216,8 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
    e. **关键能力检测**: 显式检查以下能力并标记状态:
       - `auto-iterate` skill: `iterate_available: true/false`（影响 Stage 5.5 完整/降级模式）
       - `ralph-loop` 插件: `ralph_loop_available: true/false`（影响 Stage 5.7 是否可用）
-4. 向用户展示：必需依赖状态 ✓/✗ + 可用能力概览（含 iterate_available 和 ralph_loop_available 状态）
+      - `prime-agent` CLI: `prime_available: true/false`（影响 C34 自动路由；检测 `which prime-agent` 成功 且 Provider Key 可用——`ZAI_API_KEY` 在 env 或 settings.json env 中存在，二者都满足才为 true）
+4. 向用户展示：必需依赖状态 ✓/✗ + 可用能力概览（含 iterate_available、ralph_loop_available 和 prime_available 状态；prime_available=false 时注明"security-audit/code-verification 将降级为原生 Agent"）
 5. 如有必需依赖不可用，报告缺失项并询问用户是否继续
 
 **不可跳过**
@@ -484,7 +485,7 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
 
 **默认调用**: `/multi-agent` 技能（注入 superpowers 技能指令）；当 Workflow Fit Gate 命中且用户授权时，使用 Workflow 作为执行后端。
 
-**规模档位（与 Claude Code 原生 `/config` 动态工作流规模对齐）**: 选择 `/multi-agent` 时，按 multi-agent SKILL.md 的规模档位表设定并发代理数 —— small(1-2) / medium(2，默认安全上限) / large(3-4，必须分批每批 2)。**硬约束**（2026-08-24 二次校准，官方文档+两次实测）: 有效并发 = 主会话（恒 1 路）+ 运行中 subagent + 其他活跃会话，同一条消息并发 agent 默认 ≤ 2 防 429/1302（4 并发+主会话实测触发、6 并发必触发；GLM Coding Plan 套餐口径 Lite 1 项目 / Pro 1-2 / Max 2+）；触发后暂停分发新 agent、主 Agent 用 Bash/grep/Tavily 接管关键路径、退避恢复。
+**规模档位（与 Claude Code 原生 `/config` 动态工作流规模对齐）**: 选择 `/multi-agent` 时，按 multi-agent SKILL.md 的规模档位表设定并发代理数 —— small(2-3) / medium(3-4，默认安全上限) / large(5-6，必须分批)。**硬约束**: 同一条消息并发 agent ≤ 4 防 429 速率限制（6 个并发实测会触发）；`large` 档必须分批（每批 ≤ 4），并为每个 agent 准备 fallback（API Error / 超时 → 主 Agent 用 Bash/grep/Tavily 接管）。
 
 **行为**:
 1. 读取 Goal Contract、task_plan.md 中的任务分解
@@ -499,9 +500,9 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
 
 > 完整规则（含 CRITICAL 检查清单、工具调用模板、Delegate 模式）见 `~/.claude/skills/flow/references/agent-dispatch.md`
 
-适用于 Stage 0~5 所有阶段。检测 `[ -n "$TMUX" ]`: 在 tmux 中 → tmux-split 团队模式；不在 → **静默降级**为同消息无分屏并发（不提示安装、不重试；Delegate 协议与规模档位不变）。
+适用于 Stage 0~5 所有阶段。检测 `[ -n "$TMUX" ]` 并显式写出判定行后再分发（跳过检测 ≠ NO_TMUX）: Agent(name) 唯一命名并行分发（TeamCreate/team_name 已废弃）；在 tmux 且 pane 正常 → 自动分屏可视化；不在或 pane 故障 → **静默降级**为无分屏并发（不提示安装、不重试；Delegate 协议与规模档位不变）。
 
-核心约束: IN_TMUX → TeamCreate + team_name + 禁止 run_in_background + 即时清理 | NO_TMUX → 同消息并发 ≤ 4 + Delegate 协调不变
+核心约束: Agent(name) 唯一命名 + 同消息并发 ≤ 4 + Delegate 协调不变 | IN_TMUX 且 pane 正常 → 自动分屏可视化 + 即时清理 pane；NO_TMUX 或 pane 故障 → 静默降级无分屏并发
 
 #### 技能路由规则（详细指令见 references/skill-routing.md）
 
@@ -647,7 +648,7 @@ Stage 5 不只验证命令是否通过，还必须逐条核对 Stage 0.5 Goal Co
 
 Stage 5 验证通过后的收尾工作:
 
-1. **tmux 全局清理**（IN_TMUX 时）: shutdown 全部剩余 Agent → 倒序 kill 非 MAIN_PANE → 验证 → TeamDelete
+1. **tmux 全局清理**（IN_TMUX 时）: shutdown 全部剩余 Agent → 倒序 kill 非 MAIN_PANE → 验证（TeamDelete 已废弃，无需调用）
 2. 汇总所有 Agent 的执行结果
 3. 更新 progress.md 和 task_plan.md 状态
 4. **最终 STATE.md 写入**: 设置 `status: completed`，记录总结和后续建议，清空 `next_action`
