@@ -4,7 +4,8 @@ description: >
   Agent Teams 方案生成与执行引擎。通过 Agent(name) + SendMessage(to: name) 工具链并行分发多 agent 团队（subagent 后台运行）；
   在 tmux 中且 pane 可用时自动获得分屏可视化，pane 故障或无 tmux 时静默降级为无分屏并发（无需任何前置依赖）。
   当用户说 /MultiAgent、"fan out subagents"、"fan out"、"sends a team"、"多agent"、"团队协作"、"并行处理"、
-  "teammate"、"创建agent团队"、"派团队"、"扇出"、"并行深挖"、"派几个agent分头调研" 时使用——
+  "teammate"、"创建agent团队"、"派团队"、"扇出"、"并行深挖"、"派几个agent分头调研"、"digs deep"、"每个都深挖"、
+  "别漏掉任何东西" 时使用——
   即使只说一句 "fan out subagents" 也应触发本 skill（只读任务走 Fast Path 直接分发，写入任务走完整方案确认）。
   支持项目上下文感知、协作式方案生成、分片覆盖验收（nothing missed）、环境自适应。
 ---
@@ -62,6 +63,8 @@ graph TB
 5. **汇总核对（nothing gets missed 的验收落点）**：每个 agent 返回后逐项勾销分片清单；分片未覆盖或证据不足 → SendMessage 补查该分片，全部勾销才算完成
 
 ### Agent 深度要求（digs deep，写进每个 fan-out Agent 的 prompt）
+
+> 同款三要点亦内嵌于文末「Agent Prompt 模板」——两处内容保持一致，**改一处须同步另一处**（2026-08-28 审查标记的双份漂移风险）
 
 - **穷尽分片**：扫描分片内全部对象，不抽样；发现分片外相关线索要报告而非展开（避免越界重复劳动）
 - **证据锚点**：结论必须带 file:line / URL / 数据出处，无锚点的结论显式标注「推测」
