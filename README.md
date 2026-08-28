@@ -289,6 +289,7 @@ cp -r skills/prompt ~/.claude/skills/
 - 新增 **Fast Path 风险路由** —— 分发前按任务性质（只读 vs 写入）路由：一句话 fan-out（调研/审查/比对）走分片分解 + 告知式预告 + 直接分批分发 + 分片清单勾销核对，写入任务仍走 Step 0-5 完整流程；判定需显式锚点（`路由判定: 只读 → Fast Path`），并发 ≤2 硬约束不变
 - 触发词对齐官方 Tip 与中文口语（"fan out subagents"、"派团队"、"扇出"等）
 - agent 映射表重写为**动态发现优先**（旧 voltagent 插件映射已失效，不在可用列表一律降级 general-purpose），修复照抄旧表导致 Agent 调用直接失败的问题
+- 新增 **pane 生命周期自动化** —— `scripts/spawn-pane.sh` 一条命令开观察窗（自动命名、登记表、静默降级），watcher 检测输出静默 120s 自杀回收 pane，`reap-panes.sh` 登记表制兜底（绝不触碰主 pane）；修正"harness 自动分配 pane"的失效声明
 
 ### v1.2.1 (2026-08-21)
 

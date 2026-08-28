@@ -299,6 +299,7 @@ Invoke in Claude Code:
 - Added **Fast Path risk routing** — routes by task nature (read-only vs write) before dispatching: one-phrase fan-outs (research / review / comparison) go through shard decomposition + informational preview + direct batched dispatch + shard-checklist verification, while write tasks still run the full Step 0-5 flow; the routing decision requires an explicit anchor line (`路由判定: 只读 → Fast Path`), and the ≤2 concurrency hard cap stays unchanged
 - Trigger words aligned with official Tips and Chinese colloquial phrasing ("fan out subagents", "派团队", "扇出", etc.)
 - Agent mapping table rewritten to **dynamic-discovery-first** (the old voltagent plugin mappings are dead; anything not in the available list degrades to general-purpose) — fixing broken Agent calls caused by copying the old table
+- Added **pane lifecycle automation** — `scripts/spawn-pane.sh` opens a labeled watch pane in one command (auto-named, registry-tracked, silent degradation); the watcher self-exits after 120s of output silence, reclaiming the pane; `reap-panes.sh` provides registry-based cleanup that never touches the main pane; fixed the stale "Agent tool auto-assigns panes" claim
 
 ### v1.2.1 (2026-08-21)
 

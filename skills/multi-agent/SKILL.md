@@ -225,7 +225,23 @@ project_context:
 
 ### tmux 分屏可视化模式（IN_TMUX 且 pane 正常时）
 
-在 tmux 中时，Agent 工具会自动为 subagent 分配 pane，可实时观察各 agent 执行。
+> **不可依赖 harness 自动分屏**（旧文档声称"Agent 工具会自动为 subagent 分配 pane"，2026-08-28 实测异步 subagent 不再自动出 pane）。pane 可视化由本 skill 的脚本机制保证，生命周期全自动：
+
+**开启**（每个 Agent 调用返回后的下一动作立即执行；output_file 取自 Agent 返回值）:
+
+```bash
+bash ~/.claude/skills/multi-agent/scripts/spawn-pane.sh "<agent名>" "<output_file>"
+```
+
+- 两级 tmux 检测内置（$TMUX 空 ≠ 不在 tmux）；NO_TMUX / split 失败 → 静默 no-op，不阻塞分发
+- pane 自动命名（pane-border 显示 agent 名），登记入 `$TMPDIR/claude-watch-panes.reg`
+- 宽窗横分 / 窄窗竖分，新 pane ≤45%，主 pane 不被挤扁
+
+**关闭（零动作，自动）**: watcher 三重自杀——输出文件静默 >120s / 文件消失 / 进程被杀 → `remain-on-exit off` 下 pane 自动回收。遗留由 `reap-panes.sh` 兜底（登记表制，只清观察窗，绝不触碰主 pane）：
+
+```bash
+bash ~/.claude/skills/multi-agent/scripts/reap-panes.sh   # 已挂 Stop hook 每轮自动跑（2026-08-28）
+```
 
 ```
 CRITICAL 规则（2026-08 实测更新，TeamCreate/team_name 已废弃）:
@@ -248,7 +264,7 @@ CRITICAL 规则（2026-08 实测更新，TeamCreate/team_name 已废弃）:
 
 **执行步骤**:
 
-1. **记录主面板**（IN_TMUX 时）: `MAIN_PANE=$(tmux display-message -p '#{pane_index}')`，后续清理跳过该面板
+1. **主 pane 保护（内置于脚本）**: spawn-pane.sh / reap-panes.sh 采用登记表制，只操作登记在册的观察窗，主 pane 无需手动记录排除（2026-08-28 起）
 
 2. **并行启动 Teammates**（无依赖的在同一条消息中）:
    ```
@@ -266,22 +282,14 @@ CRITICAL 规则（2026-08 实测更新，TeamCreate/team_name 已废弃）:
 4. **监控协调**: TaskList 跟踪进度，SendMessage 协调，完成后 shutdown
 
 5. **清理**（Agent 完成/全部完成后）:
-   - **即时清理**: TaskList 检测 Agent completed 且不被后续复用 → **`TaskStop(task_id=name)` 终止 agent 本体** → kill pane（跳过 MAIN_PANE）。⚠️ SendMessage 主动 shutdown_request 已被 harness 拦截（仅允许被动 response）；只 kill pane 会残留 agent 本体（HUD 条目不消失）——**必须用 TaskStop**（2026-08-24 实测）
-   - **孤儿清理**: Phase 切换前，检测进程已退出的残留 pane:
+   - **观察窗: 自动为主** — watcher 静默自杀 + `remain-on-exit off` 自动回收 pane，模型无需手动 kill；遗留由 `reap-panes.sh` 兜底（登记表制，绝不触碰主 pane），已挂 Stop hook 每轮自动跑（2026-08-28）
+   - **agent 本体终止**: TaskList 检测 Agent completed 且不被后续复用 → **`TaskStop(task_id=name)` 终止 agent 本体**。⚠️ 只 kill pane 会残留 agent 本体（HUD 条目不消失）；SendMessage 主动 shutdown_request 已被 harness 拦截——**必须用 TaskStop**（2026-08-24 实测）
+   - **兜底孤儿清理**: Phase 切换前跑一次 `bash ~/.claude/skills/multi-agent/scripts/reap-panes.sh`（登记表制替代旧手写扫描循环，避免误杀非观察窗 pane）
+   - **全局清理**: 所有 Phase 完成后跑 reap 并验证仅剩主面板:
      ```bash
+     bash ~/.claude/skills/multi-agent/scripts/reap-panes.sh
      W=$(tmux display-message -p '#{session_name}:#{window_index}')
-     tmux list-panes -t "$W" -F '#{pane_index} #{pane_id} #{pane_current_command}' | while read idx pid cmd; do
-       [ "$idx" = "$MAIN_PANE" ] && continue
-       echo "$cmd" | grep -qiE 'claude|node' && continue
-       tmux kill-pane -t "$pid" 2>/dev/null
-     done
-     ```
-   - **全局清理**: 所有 Phase 完成后，倒序 kill 非 MAIN_PANE → 验证仅剩主面板（TeamDelete 已废弃，无需调用）:
-     ```bash
-     W=$(tmux display-message -p '#{session_name}:#{window_index}')
-     LAST=$(tmux list-panes -t "$W" -F '#{pane_index}' | tail -1)
-     for i in $(seq "$LAST" -1 0); do [ "$i" = "$MAIN_PANE" ] || tmux kill-pane -t "$W.$i" 2>/dev/null; done
-     [ "$(tmux list-panes -t "$W" | wc -l | tr -d ' ')" = "1" ] && echo "清理完成" || echo "警告: 仍有残留面板"
+     [ "$(tmux list-panes -t "$W" | wc -l | tr -d ' ')" = "1" ] && echo "清理完成" || echo "警告: 仍有残留面板（检查是否未登记的手动 pane）"
      ```
 
 ## Delegate 模式
