@@ -15,7 +15,17 @@ CWD=$(printf '%s' "$IN" | /usr/bin/python3 -c "import sys,json;print(json.load(s
 KEY=$(printf '%s' "$CWD" | sed 's|/|-|g; s|\.|-|g')
 TASKS_BASE="/private/tmp/claude-501/$KEY"
 [ -d "$TASKS_BASE" ] || exit 0
-tmux list-panes >/dev/null 2>&1 || exit 0
+# tmux 判定：$TMUX 直判，否则沿 PPID 祖先链找 tmux（server 存在 ≠ 身在 tmux，2026-08-28）
+_in_ancestor_tmux() {
+  local p=$$
+  while [ -n "$p" ] && [ "$p" != "1" ]; do
+    p=$(ps -o ppid= -p "$p" 2>/dev/null | tr -d ' ')
+    [ -z "$p" ] && return 1
+    case "$(ps -o comm= -p "$p" 2>/dev/null)" in *tmux*) return 0;; esac
+  done
+  return 1
+}
+_in_ancestor_tmux || exit 0
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
 MARK=$(date +%s)

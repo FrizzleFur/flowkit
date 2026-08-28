@@ -13,11 +13,23 @@ REG="${TMPDIR:-/tmp}/claude-watch-panes.reg"
 DIR="$(cd "$(dirname "$0")" && pwd)"
 WATCHER="$DIR/watch-agent.sh"
 
-# ---- 两级 tmux 检测（$TMUX 空 ≠ 不在 tmux：background job 上下文实测失真 2026-08-24）----
+# ---- 两级 tmux 检测 ----
+# ① $TMUX 直判；② $TMUX 空 ≠ 不在 tmux（background job 上下文失真，2026-08-24）。
+#    但 server 存在 ≠ 身在 tmux——list-panes 探测在"非 tmux 会话 + 本机有 server"时误判（2026-08-28），
+#    精确判定：沿 PPID 祖先链找 tmux 进程
+_in_ancestor_tmux() {
+  local p=$$
+  while [ -n "$p" ] && [ "$p" != "1" ]; do
+    p=$(ps -o ppid= -p "$p" 2>/dev/null | tr -d ' ')
+    [ -z "$p" ] && return 1
+    case "$(ps -o comm= -p "$p" 2>/dev/null)" in *tmux*) return 0;; esac
+  done
+  return 1
+}
 IN_TMUX=0
 if [ -n "$TMUX" ] && tmux list-panes >/dev/null 2>&1; then
   IN_TMUX=1
-elif tmux list-panes >/dev/null 2>&1 && [ -n "$(tmux display-message -p '#{session_name}' 2>/dev/null)" ]; then
+elif _in_ancestor_tmux; then
   IN_TMUX=1
 fi
 [ "$IN_TMUX" = "1" ] || exit 0
