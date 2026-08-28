@@ -163,13 +163,14 @@ Stage -1: 跨会话经验召回 → Stage 0: Superpowers 检查 (强制) → Sta
 
 | 检查点 | 阈值 | 动作 |
 |--------|------|---------|
-| Stage / Phase 边界（脚本实测） | > 70% | AskUserQuestion: 保存并继续 / 保存并交接（生成 HANDOFF.md 给下一个 agent）/ 跳过 |
+| Stage / Phase 边界（脚本实测） | > 70% | AskUserQuestion: 保存并继续 / 保存并交接（生成 HANDOFF.md 给下一个 agent）/ 跳过 / 交接并记住自动 |
+| Stage / Phase 边界（已开启自动交接） | > 75% | 免弹窗自动交接：更新五件套 + HANDOFF.md → tmux 新窗口 spawn 续接会话（接力上限 `--handoff-max`，默认 3） |
 | Stage 2 后 | > 65% | 压缩 ST 输出为摘要 |
 | Stage 3.7 后 | > 70% | 压缩代码级计划为 agent_hint 摘要 |
 | Stage 4 每个 Agent 后 | > 75% | 压缩中间结果 |
 | 任意时刻 | > 85% | 警告用户，建议 `/compact` |
 
-弹窗决策先于压缩：用户选「保存并继续」时先做 checkpoint（更新 STATE.md/progress.md/task_plan.md）再按压缩矩阵处理。同一 Stage 边界最多弹一次，选「跳过」则下个边界重新检测。保存与 HANDOFF.md 协议见 `references/context-management.md` 的「主动 Checkpoint 与 Handoff」。检测脚本失败（exit 2）时静默降级为原压缩矩阵，不阻塞管道。`--no-context-guard` 禁用。
+弹窗决策先于压缩：用户选「保存并继续」时先做 checkpoint（更新 STATE.md/progress.md/task_plan.md）再按压缩矩阵处理。同一 Stage 边界最多弹一次，选「跳过」则下个边界重新检测。选「交接并记住自动」后本会话进入自动交接状态（偏好写入 STATE.md，续接会话继承），详见 `references/context-management.md` 的「自动交接协议」。保存与 HANDOFF.md 协议见同文件「主动 Checkpoint 与 Handoff」。检测脚本失败（exit 2）时静默降级为原压缩矩阵，不阻塞管道。`--no-context-guard` 禁用。
 
 STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协议见 `references/context-management.md`。
 
@@ -681,6 +682,7 @@ Stage 5 验证通过后的收尾工作:
 /flow-deep [options] <任务表述>
 
 阶段: --no-prompt | --no-plan | --no-multi(串行) | --no-recall | --no-context-guard(禁用上下文容量检测弹窗)
+上下文: --no-auto-handoff(本次运行禁用已记忆的自动交接) | --handoff-max N(接力代数上限，默认 3)
 思考: --think-hard(10K) | --no-think | --no-mermaid | --no-discuss | --no-skill-match
 执行: --no-tdd | --tdd-dual | --no-review | --no-panel | --panel-roles "R01,R02" | --panel-depth quick|basic|advanced | --no-prime
 迭代: --iterate N | --guard <cmd> | --ralph-max N | --no-ralph | --no-distill

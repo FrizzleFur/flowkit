@@ -1,6 +1,6 @@
 # Flow / Flow-Deep 依赖与架构说明
 
-> 本文档供人类阅读，不被 AI 自动加载。更新: 2026-05-02
+> 本文档供人类阅读，不被 AI 自动加载。更新: 2026-08-28
 
 ## 定位
 
@@ -76,7 +76,7 @@ Stage 5.7         Ralph Loop (--ralph)         Ralph Loop (Stage 5.5 用完自�
 | skill-routing.md | Agent 技能路由矩阵 |
 | fallback-protocol.md | 退回 Plan 协议 |
 | ralph-integration.md | Ralph Loop 集成规范 |
-| context-management.md | 上下文压缩 + STATE.md 模板 |
+| context-management.md | 上下文压缩 + STATE.md 模板 + Auto Handoff 自动交接协议 |
 | code-planning.md | 代码级细化格式 |
 | capability-registry.md | 能力发现注册表 |
 
@@ -153,6 +153,7 @@ Plan:  --strict-plan | --plan-review | --code-plan | --precise-plan
 /flow-deep [options] <任务表述>
 
 阶段: --no-prompt | --no-plan | --no-multi
+上下文: --no-auto-handoff | --handoff-max N
 思考: --think-hard(10K) | --no-think | --no-mermaid | --no-discuss
 执行: --no-tdd | --tdd-dual | --no-review | --no-panel | --panel-roles | --panel-depth
 迭代: --iterate N | --guard <cmd> | --ralph-max N | --no-ralph
@@ -172,5 +173,6 @@ Plan:  --strict-plan | --plan-review | --code-plan | --precise-plan
 
 flow-deep 的独有优势:
 - STATE.md 跨会话恢复（GStack 和 GSD 都没有）
+- Auto Handoff 75% 上下文自动交接（脚本真值检测 + tmux 接力 spawn，实测闭环）
 - Auto-Decide Layer（原创设计，非照搬 GStack）
 - Ralph Loop 集成（Stop Hook + auto-iterate 双层迭代）

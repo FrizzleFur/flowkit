@@ -2,7 +2,7 @@
 
 > **📝 Blog Deep Dive**: [FlowKit: AI-Native Workflow Orchestration Toolkit](https://michaelmaomao.github.io/2026/05/05/FlowKit-AI%E5%8E%9F%E7%94%9F%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%BC%96%E6%8E%92%E5%B7%A5%E5%85%B7%E9%9B%86/) — Design motivation, core architecture, decision trade-offs and lessons learned
 
-> AI-native workflow orchestration toolkit — structured pipelines from task analysis to verified delivery.
+> AI-native workflow orchestration toolkit — structured pipelines from task analysis to verified delivery, with 75% automatic context relay keeping long tasks alive across sessions.
 
 English | **[中文](README.md)**
 
@@ -148,7 +148,33 @@ Crash recovery built into the pipeline:
 
 No other community framework (GSD, GStack) has this capability.
 
-### 4. Quantitative Prompt Scoring
+### 4. Auto Handoff — Automatic Context Relay at 75%
+
+The enemy of long tasks is context rot: quality degrades as the window fills, until auto-compact crudely compresses or the session overflows. Auto Handoff proactively relays to a fresh window at **75%** — triggered by `scripts/check_context.py` reading real API usage from the session transcript (precise measurement, not model self-estimation):
+
+```
+  Old session (context ≥ 75%)                  New session (context ≈ 14%)
+  ┌───────────────────────────┐                ┌───────────────────────────┐
+  │ check_context.py measures │                │ HANDOFF.md is the prompt  │
+  │          │                │                │          │                │
+  │ Five plan files +         │   tmux window  │ Reads STATE.md etc.       │
+  │ HANDOFF.md written        │ ───spawn────▶  │ in order                  │
+  │          │                │                │          │                │
+  │ tmux new-window relay     │                │ Resumes from Next Action  │
+  │ Old window wraps up       │                │ Continues as if nothing   │
+  └───────────────────────────┘                └───────────────────────────┘
+```
+
+Four design points:
+
+- **User control**: automation is opt-in — pick "hand off and remember" in the dialog; the preference is written to STATE.md and inherited by the successor; `--no-auto-handoff` exits anytime
+- **Runaway guard**: `--handoff-max` (default 3) caps relay generations, preventing infinite relay loops
+- **Traceable**: the nested session starts with `CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1` so it stays resumable via `--resume`
+- **Verified end-to-end**: real tmux spawn → new session reads HANDOFF.md → resumes from Next Action
+
+It is the proactive sibling of STATE.md recovery: STATE.md answers "how to resume after a crash", Auto Handoff answers "when to proactively switch windows".
+
+### 5. Quantitative Prompt Scoring
 
 Based on Johari Window theory + 3S Principles:
 
@@ -168,7 +194,7 @@ Based on Johari Window theory + 3S Principles:
   Q4 with feeding    → Score 7.0-8.5/10
 ```
 
-### 5. Fallback Protocol — Plan-First Error Handling
+### 6. Fallback Protocol — Plan-First Error Handling
 
 When execution hits unexpected issues, the first question is not "how do I fix this" but "what did the plan assume wrong":
 
@@ -254,11 +280,20 @@ Invoke in Claude Code:
 
 **Original contributions not found in any community framework:**
 - STATE.md crash recovery mechanism
+- Auto Handoff — 75% automatic context relay (tmux spawn, verified end-to-end)
 - Auto-Decide Layer with 6 principles
 - Ralph Loop integration (stop-hook + auto-iterate dual-layer iteration)
 - Johari Window-based prompt scoring
 
 ## Changelog
+
+### v1.3.0 (2026-08-28)
+
+**flow-deep**
+- Added **Auto Handoff (75% automatic context relay)** — the Context Guard dialog gains a "hand off and remember" option (armed state written to STATE.md, inherited by successor sessions); when armed, boundary measurements ≥ 75% relay automatically without prompting: five plan files + HANDOFF.md → tmux new-window spawn of the successor session (`CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1` keeps nested sessions resumable)
+- Added `--no-auto-handoff` / `--handoff-max N` flags (relay cap defaults to 3 generations to prevent infinite loops)
+- Constitution principle #4 amended: from "ask, never auto-handoff" to "prompt with a rememberable choice"
+- Chain verified end-to-end: real tmux spawn → new session reads HANDOFF.md → resumes from Next Action
 
 ### v1.2.1 (2026-08-21)
 

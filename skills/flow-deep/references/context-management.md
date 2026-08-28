@@ -55,6 +55,8 @@ Progress: [N/M phases done, ~X%]
 Last Session: [YYYY-MM-DD HH:MM]
 Stopped At: [what was happening]
 Next Action: [specific action to resume — must be actionable without reading other files]
+Auto Handoff: [disabled / enabled(YYYY-MM-DD HH:MM 用户选择)]
+Handoff Count: [N / max（默认 3，--handoff-max 调整）]
 ```
 
 ### 更新规则
@@ -68,7 +70,7 @@ Next Action: [specific action to resume — must be actionable without reading o
 | Stage 3.7 完成 | Phase Progress (agent_hints 摘要) | 仅代码任务触发 |
 | Stage 4 每个 Phase 完成 | Current Position, Phase Progress, Decisions Log | 记录该 Phase 的关键决策 |
 | Stage 5 完成 | Current Position (status), Blockers | 记录未通过项 |
-| Context Guard 保存（选项 a/b） | Session Continuity, Phase Progress | 必须写 Next Action；选项 b 额外生成 HANDOFF.md |
+| Context Guard 保存（选项 a/b/d） | Session Continuity, Phase Progress | 必须写 Next Action；选项 b/d 额外生成 HANDOFF.md；选项 d 额外写 Auto Handoff / Handoff Count |
 | 执行后处理 | Current Position (completed), 清空 Next Action | 最终状态 |
 | 暂停/中断 | Session Continuity | 必须写 Next Action |
 
@@ -126,17 +128,18 @@ python3 ~/.claude/skills/flow-deep/scripts/check_context.py --threshold 70
 - 1M 窗口模型加 `--window 1000000`。
 - 限制：采样式检测，Stage 中间的 context 暴涨由 P1 系统警告兜底。
 
-### 三选项语义（超阈值时 AskUserQuestion）
+### 四选项语义（超阈值时 AskUserQuestion）
 
 | 选项 | 动作 | 语义 |
 |------|------|------|
 | a) 保存并继续 | 更新 STATE.md / progress.md → 按压缩矩阵处理中间结果 → 继续本会话 | 还想在本会话跑完，只要存档保险 |
 | b) 保存并交接 | 更新五件套（STATE/task_plan/findings/progress/spec，spec.md 存在时）→ 生成 HANDOFF.md → 提示用户开新会话 | 主动换窗口，避免 context rot |
 | c) 跳过 | 仅记录本次跳过，不改文件 | 用户判断当前阶段收尾很快，不值得存档 |
+| d) 交接并记住自动 | 执行选项 b 全部动作 → STATE.md 写入 `Auto Handoff: enabled` | 本次会话后续边界达到自动交接阈值时免弹窗直接交接；续接会话继承此偏好（见「自动交接协议」） |
 
 **节流**：同一 Stage 边界最多弹一次；选 c) 后下个边界重新检测再问（阈值未降则再弹，但同一 Stage 不重复）。
 
-**无交互降级**（子代理 / headless 场景 AskUserQuestion 不可用）：默认执行选项 a（保存并继续——可自主完成的最小破坏项），三选项文案与决策理由落盘到 progress.md 或执行日志，**不静默跳过、不杜撰用户选择**。HANDOFF.md 的交付同样以此为准：非交互场景以文件落盘为交付（终端展示仅交互场景执行）。
+**无交互降级**（子代理 / headless 场景 AskUserQuestion 不可用）：默认执行选项 a（保存并继续——可自主完成的最小破坏项），四选项文案与决策理由落盘到 progress.md 或执行日志，**不静默跳过、不杜撰用户选择**。HANDOFF.md 的交付同样以此为准：非交互场景以文件落盘为交付（终端展示仅交互场景执行）。例外：若 Auto Handoff 已 armed，动作链本就无弹窗环节，非交互场景直接执行完整自动交接（tmux 不在时按降级路径落盘打印命令）。
 
 ### 保存动作清单（选项 a/b 共同部分）
 
@@ -146,6 +149,49 @@ python3 ~/.claude/skills/flow-deep/scripts/check_context.py --threshold 70
 4. （仅选项 b）同步刷新 findings.md 关键决策区，保证新会话单读文件即可还原决策脉络
 5. （仅选项 b）若 `spec.md` 存在（Goal Contract 所在，交接时最有价值），核对其中 Success Criteria 与实际进度是否同步
 
+### 自动交接协议（Auto Handoff，2026-08-28 新增）
+
+> **决议变更记录**: 宪法自检 #4 原为"只询问不自动交接"（2026-08-20）。2026-08-28 用户决议修订为"弹窗但可记忆"——自动交接必须经用户显式选择（选项 d）进入，不做全局默认。控制权语义保留：自动化的入口 = 用户做选择的时刻。
+
+**进入自动状态的三种方式**:
+1. 弹窗选 d)「交接并记住自动」（显式 opt-in，主入口）
+2. 续接会话继承：新会话读 STATE.md 时 `Auto Handoff: enabled` 随恢复协议带入
+3. 会话中用户口头开启（如"之后自动交接吧"）→ 等同选项 d，写入 STATE.md
+
+**退出**: 用户口头关闭 / `--no-auto-handoff` 参数 → STATE.md 写回 `disabled`。
+
+**触发与动作链**（armed 状态下，Stage/Phase 边界实测 ≥ 75%）:
+1. 跳过弹窗，直接执行选项 b 全部保存动作（五件套 + HANDOFF.md）
+2. `Handoff Count` +1；若达到上限（默认 3，`--handoff-max N` 调整）→ 不再 spawn，改为提示"接力已达上限，请人工接管"，防无限接力环
+3. spawn 续接会话（见下）
+4. 本会话输出移交报告（HANDOFF.md 路径 + 新窗口名 + 接力代数）后停止接收新任务。**会话不自杀**：Claude Code 无安全自终止机制，旧窗口由用户手动关闭
+
+**spawn 续接会话**（tmux 优先；无 tmux 静默降级为打印命令，文件落盘即交付）:
+
+IN_TMUX（`[ -n "$TMUX" ]` 显式判定）时:
+
+```bash
+tmux new-window -n "handoff-<run-id>-g<N>" -c "$PWD" \
+  "CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1 claude \"\$(cat <plan-dir>/HANDOFF.md)\""
+```
+
+三个关键点（官方文档核实，2026-08-28）:
+- `CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1`（v2.1.172+）: 从会话内 Bash 启动的嵌套交互式 TUI 默认被排除在 `--resume`/历史/`claude agents` 之外，此变量保证续接会话可追溯
+- `-c "$PWD"`: tmux 新窗口默认目录可能不是当前 pane 的 cwd，显式锚定项目目录
+- HANDOFF.md 即新会话的初始 prompt，其"必读文件"清单触发恢复协议；交互式窗口权限提示可正常确认（这是选 tmux 而非 headless 的原因）
+
+无 tmux 降级: 打印单条命令 `claude "$(cat <plan-dir>/HANDOFF.md)"` 由用户执行，其余动作（五件套 + 计数 + 报告）不变。
+
+**阈值分工**: ≥70% 且未 armed → 弹窗（四选项）；≥75% 且 armed → 自动交接。75% 留出写文件与 spawn 的余量；auto-compact 在窗口边界才触发，本协议始终跑在它前面。
+
+**多会话串扰**: spawn 后旧会话不再做 Guard 检测；check_context.py 的 mtime 竞争由 first_msg 核对 + `--session` 纠偏兜底（见「检测方法」节）。
+
+**宪法自检（2026-08-28 增补）**:
+1. 必要性 ✓ — spawn 续接与偏好记忆均为现有能力空白
+2. 可拆性 ✓ — 全部挂在现有边界检查点，未新增 Stage；脚本层零新增（check_context.py 参数复用）
+3. 可跳过性 ✓ — 不选 d 即永不自动；`--no-auto-handoff` 随时退出；`--handoff-max` 防失控
+4. 控制权 ✓ — 自动化进入点 = 用户显式选择时刻；宪法 #4 为修订而非推翻（见顶部决议记录）
+
 ### HANDOFF.md 模板（选项 b 生成，写入 `<plan-dir>/HANDOFF.md` 并在终端展示全文）
 
 > 遵循 claude-handoff 经验：**不复制五件套内容，只引导新 agent 按序去读**——重复内容会随进度过期，路径引用不会。
@@ -153,7 +199,7 @@ python3 ~/.claude/skills/flow-deep/scripts/check_context.py --threshold 70
 ```markdown
 # HANDOFF — flow-deep 衔接 prompt（Run ID: <run_id>）
 
-你是接续上一个会话的 agent。上一个会话在 context <N>% 处主动 checkpoint。
+你是接续上一个会话的 agent。上一个会话在 context <N>% 处主动 checkpoint（接力第 <G>/<max> 代，Auto Handoff: <enabled|disabled>）。
 
 ## 任务
 <任务一句话>（详见 .plan/spec.md Goal Contract）
@@ -180,7 +226,7 @@ python3 ~/.claude/skills/flow-deep/scripts/check_context.py --threshold 70
 
 ### 与恢复协议的衔接
 
-新会话从 HANDOFF.md 进入 → 被引导读 STATE.md → 走现有「恢复协议」（Stage 4 中断从 Phase Progress 继续）。HANDOFF.md 在恢复完成后可删除（一次性文件，STATE.md 才是持久锚点）。
+新会话从 HANDOFF.md 进入 → 被引导读 STATE.md → 走现有「恢复协议」（Stage 4 中断从 Phase Progress 继续）。HANDOFF.md 在恢复完成后可删除（一次性文件，STATE.md 才是持久锚点）。恢复时 STATE.md 的 `Auto Handoff: enabled` 随之带入续接会话（偏好跨代继承，防每代重复弹窗）；用户可随时口头关闭。
 
 ### 设计宪法自检记录（2026-08-20 新增本协议时）
 
@@ -302,6 +348,8 @@ checkpoint:
 1. **暂停当前阶段**: 记录 checkpoint
 2. **等待压缩完成**: 不要在压缩过程中执行新任务
 3. **恢复执行**: 从 checkpoint 继续
+
+**PreCompact hook 兜底（可选，默认不配置）**: 极端场景（Stage 中间 context 暴涨直接触发 auto-compact，跳过边界检测）下，可给 PreCompact hook（matcher `auto`）配一段同步脚本，在压缩前落盘一个指向 STATE.md 的标记文件。注意官方语义（2026-08-28 核实）：PreCompact 的 stdout **不进入上下文**、模型**没有** turn 响应——脚本只能做文件操作，不能指挥模型写 handoff。本协议的 75% 前置检测已保证跑在 auto-compact 之前，故默认不配。
 
 ## 避免压缩的内容
 

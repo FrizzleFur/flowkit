@@ -2,7 +2,7 @@
 
 > **📝 博客深度解读**: [FlowKit: AI 原生工作流编排工具集](https://michaelmaomao.github.io/2026/05/05/FlowKit-AI%E5%8E%9F%E7%94%9F%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%BC%96%E6%8E%92%E5%B7%A5%E5%85%B7%E9%9B%86/) —— 设计动机、核心架构、设计决策与踩坑经验详解
 
-> AI 原生工作流编排工具集 —— 从任务分析到验证交付的结构化管道。
+> AI 原生工作流编排工具集 —— 从任务分析到验证交付的结构化管道，75% 上下文自动交接让长任务跨会话不断线。
 
 **[English](README_EN.md)** | 中文
 
@@ -141,7 +141,32 @@
 
 GSD、GStack 等社区框架均无此能力。
 
-### 4. Prompt 量化评分
+### 4. Auto Handoff —— 75% 上下文自动交接，长任务不断线
+
+长任务最大的敌人是 context rot：上下文越满质量越差，直到 auto-compact 粗暴压缩或直接溢出。Auto Handoff 让管道在 **75%** 处主动换窗续命——触发依据是 `scripts/check_context.py` 从 transcript 读到的 API usage 真值（精确检测，非模型自估）：
+
+```
+  旧会话（context ≥ 75%）                        新会话（context ≈ 14%）
+  ┌───────────────────────────┐                 ┌───────────────────────────┐
+  │ check_context.py 边界实测 │                 │ HANDOFF.md 即初始 prompt  │
+  │          │                │                 │          │                │
+  │ 五件套 + HANDOFF.md 落盘  │    tmux 窗口    │ 按序读 STATE.md 等三件套  │
+  │          │                │ ───spawn────▶   │          │                │
+  │ tmux new-window 接力      │                 │ 从 Next Action 精确恢复   │
+  │ 移交报告后旧窗口收尾       │                 │ 继续执行，像什么都没发生   │
+  └───────────────────────────┘                 └───────────────────────────┘
+```
+
+四个设计点：
+
+- **用户控制权**：弹窗选「交接并记住自动」才进入自动状态（opt-in），偏好写入 STATE.md 由续接会话继承；`--no-auto-handoff` 随时退出
+- **防失控护栏**：`--handoff-max`（默认 3 代）接力上限，杜绝无限接力环
+- **可追溯**：嵌套会话以 `CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1` 启动，续接会话可被 `--resume` 追溯
+- **实测闭环**：真实 tmux spawn → 新会话读 HANDOFF.md → 从 Next Action 恢复，全链路验证通过
+
+它是 STATE.md 恢复机制的主动版：STATE.md 解决"断了怎么接"，Auto Handoff 解决"在最佳时机主动断"。
+
+### 5. Prompt 量化评分
 
 基于乔哈里视窗理论 + 3S 原则：
 
@@ -159,7 +184,7 @@ GSD、GStack 等社区框架均无此能力。
   Q4 使用喂模式   → 评分 7.0-8.5/10
 ```
 
-### 5. Fallback 协议 —— 遇错先问 Plan
+### 6. Fallback 协议 —— 遇错先问 Plan
 
 执行中遇到意外时，第一反应不是"怎么修"，而是"Plan 哪里假设错了"：
 
@@ -245,11 +270,20 @@ cp -r skills/prompt ~/.claude/skills/
 
 **原创贡献（社区框架中均未出现）：**
 - STATE.md 崩溃恢复机制
+- Auto Handoff 75% 上下文自动交接（tmux 接力 spawn，实测闭环）
 - Auto-Decide Layer 六原则自动决策系统
 - Ralph Loop 集成（Stop Hook + auto-iterate 双层迭代）
 - 乔哈里视窗 Prompt 量化评分
 
 ## 更新日志 (Changelog)
+
+### v1.3.0 (2026-08-28)
+
+**flow-deep**
+- 新增 **Auto Handoff（75% 自动交接）** —— Context Guard 弹窗新增「交接并记住自动」（armed 状态写入 STATE.md，续接会话继承偏好）；armed 后边界实测 ≥75% 免弹窗自动交接：五件套 + HANDOFF.md → tmux 新窗口 spawn 续接会话（`CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1` 保证嵌套会话可追溯）
+- 新增 `--no-auto-handoff` / `--handoff-max N` 参数（接力上限默认 3 代，防无限接力环）
+- 宪法 #4 决议修订：由"只询问不自动交接"改为"弹窗但可记忆"
+- 链路实测闭环：真实 tmux spawn → 新会话读 HANDOFF.md → 从 Next Action 恢复
 
 ### v1.2.1 (2026-08-21)
 
