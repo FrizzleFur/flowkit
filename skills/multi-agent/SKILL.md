@@ -225,7 +225,7 @@ project_context:
 
 ### tmux 分屏可视化模式（IN_TMUX 且 pane 正常时）
 
-> **不可依赖 harness 自动分屏**（旧文档声称"Agent 工具会自动为 subagent 分配 pane"，2026-08-28 实测异步 subagent 不再自动出 pane）。pane 可视化由本 skill 的脚本机制保证，生命周期全自动：
+> **两种 agent，两种 pane 行为（2026-08-28 双向实测）**: Agent(name) 命名 agent 由 harness **自动分配 pane**，但 agent 本体存活期间 pane 常驻——关闭只需 `TaskStop(name)`，pane 随之自动消失（实测），勿再手动 kill-pane；unnamed 异步 agent **无自动 pane** 但返回 output_file，观察窗由本 skill 脚本保证，生命周期全自动：
 
 **开启**（每个 Agent 调用返回后的下一动作立即执行；output_file 取自 Agent 返回值）:
 
@@ -236,6 +236,7 @@ bash ~/.claude/skills/multi-agent/scripts/spawn-pane.sh "<agent名>" "<output_fi
 - 两级 tmux 检测内置（$TMUX 空 ≠ 不在 tmux）；NO_TMUX / split 失败 → 静默 no-op，不阻塞分发
 - pane 自动命名（pane-border 显示 agent 名），登记入 `$TMPDIR/claude-watch-panes.reg`
 - 宽窗横分 / 窄窗竖分，新 pane ≤45%，主 pane 不被挤扁
+- **适用范围（2026-08-28 实测）**: 本脚本只服务 **unnamed 异步 agent**（有 output_file、无自动 pane）。Agent(name) 命名 agent 无落盘文件（临时桩秒删）、由 harness 自动分配 pane——不要对它调 spawn-pane（会白等 90s 后自动放弃）；其 pane 关闭 = `TaskStop(name)` 即可
 
 **关闭（零动作，自动）**: watcher 三重自杀——输出文件静默 >120s / 文件消失 / 进程被杀 → `remain-on-exit off` 下 pane 自动回收。遗留由 `reap-panes.sh` 兜底（登记表制，只清观察窗，绝不触碰主 pane）：
 

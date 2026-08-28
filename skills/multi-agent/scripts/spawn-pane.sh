@@ -41,12 +41,15 @@ if [ -f "$REG" ]; then
 fi
 
 # ---- 开窗：宽窗横分 / 窄窗竖分，新 pane ≤45%，主 pane 不被挤扁 ----
+# 锚定调用者所在 pane（$TMUX_PANE 由 tmux 注入）；缺失时 server 自选窗口，可能落到相邻窗口（已知怪癖 2026-08-28）
+TARGET=""
+[ -n "$TMUX_PANE" ] && TARGET="-t $TMUX_PANE"
 W=$(tmux display-message -p '#{session_name}:#{window_index}')
 WIDTH=$(tmux display-message -p '#{window_width}')
 if [ "$WIDTH" -ge 100 ]; then
-  PANE=$(tmux split-window -h -d -P -F '#{pane_id}' -l 45% -c "$PWD" "bash '$WATCHER' '$LABEL' '$FILE'")
+  PANE=$(tmux split-window -h -d -P -F '#{pane_id}' -l 45% $TARGET -c "$PWD" "bash '$WATCHER' '$LABEL' '$FILE'")
 else
-  PANE=$(tmux split-window -v -d -P -F '#{pane_id}' -l 45% -c "$PWD" "bash '$WATCHER' '$LABEL' '$FILE'")
+  PANE=$(tmux split-window -v -d -P -F '#{pane_id}' -l 45% $TARGET -c "$PWD" "bash '$WATCHER' '$LABEL' '$FILE'")
 fi
 [ -n "$PANE" ] || exit 0   # split 失败静默降级
 
