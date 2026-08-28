@@ -3,8 +3,10 @@ name: multi-agent
 description: >
   Agent Teams 方案生成与执行引擎。通过 Agent(name) + SendMessage(to: name) 工具链并行分发多 agent 团队（subagent 后台运行）；
   在 tmux 中且 pane 可用时自动获得分屏可视化，pane 故障或无 tmux 时静默降级为无分屏并发（无需任何前置依赖）。
-  当用户说 /MultiAgent、"多agent"、"团队协作"、"并行处理"、"teammate"、"创建agent团队" 时使用。
-  支持项目上下文感知、协作式方案生成，环境自适应。
+  当用户说 /MultiAgent、"fan out subagents"、"fan out"、"sends a team"、"多agent"、"团队协作"、"并行处理"、
+  "teammate"、"创建agent团队"、"派团队"、"扇出"、"并行深挖"、"派几个agent分头调研" 时使用——
+  即使只说一句 "fan out subagents" 也应触发本 skill（只读任务走 Fast Path 直接分发，写入任务走完整方案确认）。
+  支持项目上下文感知、协作式方案生成、分片覆盖验收（nothing missed）、环境自适应。
 ---
 
 # MultiAgent Skill
@@ -15,19 +17,55 @@ Trigger when user:
 - 显式调用 `/MultiAgent <任务描述>`
 - 请求创建 Agent Teams / spawn teammates
 - 使用关键词: "多 agent", "团队协作", "并行处理", "teammate"
+- 说官方 Tip 同款短语: "fan out subagents", "fan out", "sends a team", "digs deep", "每个都深挖", "别漏掉任何东西"
+- 中文口语委托: "派团队", "扇出", "并行深挖", "分头调研"
 - 任务需要多 Agent 并发执行
 
 ## Core Architecture
 
 ```mermaid
 graph TB
-    A[用户输入] --> S0[Step 0: 项目上下文感知]
+    A[用户输入] --> R{"风险路由: 只读 or 写入"}
+    R -->|"只读/低风险"| F["Fast Path: 分片分解 + 直接分发"]
+    R -->|"写入/高风险"| S0[Step 0: 项目上下文感知]
     S0 --> S1[资源检测]
     S1 --> S2[任务分析 + 角色匹配]
     S2 --> S3[协作式方案生成]
     S3 --> S4[用户微调确认]
-    S4 --> S5[执行]
+    F --> S5[执行]
+    S4 --> S5
 ```
+
+## 路由：Fast Path vs Full Path
+
+分发前先做一次风险判定，决定走哪条通道。判断标准是**任务性质**（只读 vs 写入），不是触发词本身——同一句 "fan out subagents" 对调研任务是 Fast Path，对改代码任务是 Full Path。
+
+判定必须有显式锚点（防跳过，同 tmux 检测判定行机制）：分发前在回复中写出
+`路由判定: 只读 → Fast Path`（或 `写入 → Full Path`）——未判定就分发属于流程违规。
+
+| 通道 | 适用 | 流程 |
+|------|------|------|
+| Fast Path | 只读/低风险：调研、信息收集、代码审查、文档阅读、多源比对 | 轻量上下文 → 分片分解 → 一行方案预告（告知式）→ 直接分批分发 → 分片清单核对 |
+| Full Path | 写入/高风险：写代码、改配置、批量文件操作、跨系统重构 | Step 0-5 完整流程（项目上下文 → 角色匹配 → 协作式方案 + 用户确认 → 执行） |
+
+### Fast Path（一句话 fan-out 场景）
+
+用户说 "fan out subagents" / "派团队深挖" 这类一句话委托时，期待的是**立刻派出**，不是方案评审：
+
+1. **轻量上下文**（不跑 Step 0 全扫描）：任务描述 + 目标目录/模块即可，项目规范以「必读路径」写进 Agent prompt（让 agent 自己读 CLAUDE.md），主 Agent 不预读全文
+2. **分片分解（nothing missed 的前提）**：把任务分解为**互斥且完备**的分片（按模块/数据源/风险维度/文件区间），显式列出分片清单——分片有遗漏，汇总必有遗漏
+3. **一行方案预告（告知式，不阻塞）**:
+   ```
+   分片分发: [A 模块调研] [B 数据源核对] [C 历史提交考古] → 3 agent 分 2 批（并发 ≤2）
+   ```
+4. **分批分发**：遵守并发硬约束（同消息 ≤2，超出分批；429/1302 退避规则同样生效）——Fast Path 省的是流程摩擦，**不是安全预算**
+5. **汇总核对（nothing gets missed 的验收落点）**：每个 agent 返回后逐项勾销分片清单；分片未覆盖或证据不足 → SendMessage 补查该分片，全部勾销才算完成
+
+### Agent 深度要求（digs deep，写进每个 fan-out Agent 的 prompt）
+
+- **穷尽分片**：扫描分片内全部对象，不抽样；发现分片外相关线索要报告而非展开（避免越界重复劳动）
+- **证据锚点**：结论必须带 file:line / URL / 数据出处，无锚点的结论显式标注「推测」
+- **深挖优先于罗列**：宁可单个问题挖到根因/原始出处，不要广而浅的清单
 
 ## Step 0: 项目上下文感知
 
@@ -67,22 +105,28 @@ project_context:
 
 统一的角色映射表（任务类型 → 角色 → subagent_type）:
 
+> **动态发现优先（2026-08-26 校准）**: agent 列表随环境/插件变化，**首选从当前会话可用的 agent types 清单中匹配**，下表仅为常见通用 agent 的映射参考。若表中 subagent_type 不在当前会话可用列表中，一律降级 `general-purpose`——引用不存在的 type 会让 Agent 调用直接失败。
+
 | 任务类型 | 推荐角色 | subagent_type |
 |----------|---------|---------------|
-| 代码审查 | security-auditor, code-reviewer | `voltagent-qa-sec:security-auditor` |
-| 功能开发(前端) | frontend-developer | `voltagent-core-dev:frontend-developer` |
-| 功能开发(后端) | backend-developer | `voltagent-core-dev:backend-developer` |
-| 全栈开发 | fullstack-developer | `voltagent-core-dev:backend-developer` |
-| 数据库 | database-optimizer | `voltagent-data-ai:postgres-pro` |
-| 测试 | test-automator | `voltagent-qa-sec:test-automator` |
-| 安全 | security-auditor | `voltagent-qa-sec:security-auditor` |
-| DevOps | devops-architect | `voltagent-dev-exp:build-engineer` |
-| 文档 | technical-writer | `voltagent-dev-exp:documentation-engineer` |
-| 研究 | research-analyst | `voltagent-research:research-analyst` |
-| 数据 | data-analyst | `voltagent-data-ai:data-analyst` |
-| 通用 | general-purpose | `general-purpose` |
+| 只读大范围搜索/定位 | Explore | `Explore` |
+| 代码审查/质量 | code-reviewer | `feature-dev:code-reviewer` |
+| 代码理解/功能分析 | code-explorer | `feature-dev:code-explorer` |
+| 架构设计 | code-architect | `feature-dev:code-architect` |
+| 实现计划 | Plan | `Plan` |
+| 后端设计 | backend-architect | `backend-architect` |
+| 前端 | frontend-architect | `frontend-architect` |
+| DevOps | devops-architect | `devops-architect` |
+| 根因分析 | root-cause-analyst | `root-cause-analyst` |
+| 安全 | security-engineer | `security-engineer` |
+| 性能 | performance-engineer | `performance-engineer` |
+| 测试/质量 | quality-engineer | `quality-engineer` |
+| 需求分析 | requirements-analyst | `requirements-analyst` |
+| 文档 | technical-writer | `technical-writer` |
+| 重构 | refactoring-expert | `refactoring-expert` |
+| 通用兜底 | general-purpose | `general-purpose` |
 
-> 注意: subagent_type 依赖已安装的 voltagent 插件。运行前用 `ls ~/.claude/plugins/*/agents/` 验证映射是否有效。
+> 历史参考: 旧版映射到 voltagent 插件系列（voltagent-qa-sec:security-auditor 等），该系列已不在当前环境，勿再引用。
 
 **复杂度判断**:
 
@@ -299,6 +343,11 @@ Phase 间不应销毁 team，应复用空闲 Agent:
 ## 接口约定
 [与其他 Agent 的数据交换格式/接口定义]
 
+## 深度要求（digs deep）
+- 穷尽分片内全部对象，不抽样；分片外相关线索报告即可，不展开
+- 结论带证据锚点（file:line / URL / 数据出处）；无锚点结论显式标注「推测」
+- 深挖优先于罗列：宁可单个问题挖到根因/原始出处
+
 ## 完成标准
 [明确的验收条件]
 ```
@@ -322,10 +371,10 @@ Step 2: 任务分析 → 功能开发, 中等复杂度
 
 用户微调 → 确认 → 执行:
   Agent({ name: "api",
-    subagent_type: "voltagent-core-dev:backend-developer",
+    subagent_type: "general-purpose",
     prompt: "实现用户认证: JWT token, 登录/注册/刷新接口...\n项目上下文: Node.js/Express..." })
   Agent({ name: "test",
-    subagent_type: "voltagent-qa-sec:test-automator",
+    subagent_type: "quality-engineer",
     prompt: "为 auth 模块编写测试..." })
 ```
 
@@ -339,6 +388,7 @@ Bug 修复 → 1 个 fixer(frontend-developer) + 1 个 reviewer(code-reviewer)�
 
 ```
 /MultiAgent [任务描述]    Agent(name) 并行分发；有 tmux 且 pane 正常 → 自动分屏可视化；否则无分屏并发（自动降级）
+"fan out subagents" 等一句话委托（只读任务）→ Fast Path: 分片分解 + 告知式预告 + 直接分批分发 + 分片清单核对
 ```
 
 > 环境自适应: 在 tmux 中则分屏执行；不在则静默降级为无分屏并发。无需安装 tmux，但必须先完成环境检测——跳过检测 ≠ NO_TMUX。

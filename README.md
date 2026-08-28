@@ -285,6 +285,11 @@ cp -r skills/prompt ~/.claude/skills/
 - 宪法 #4 决议修订：由"只询问不自动交接"改为"弹窗但可记忆"
 - 链路实测闭环：真实 tmux spawn → 新会话读 HANDOFF.md → 从 Next Action 恢复
 
+**multi-agent**
+- 新增 **Fast Path 风险路由** —— 分发前按任务性质（只读 vs 写入）路由：一句话 fan-out（调研/审查/比对）走分片分解 + 告知式预告 + 直接分批分发 + 分片清单勾销核对，写入任务仍走 Step 0-5 完整流程；判定需显式锚点（`路由判定: 只读 → Fast Path`），并发 ≤2 硬约束不变
+- 触发词对齐官方 Tip 与中文口语（"fan out subagents"、"派团队"、"扇出"等）
+- agent 映射表重写为**动态发现优先**（旧 voltagent 插件映射已失效，不在可用列表一律降级 general-purpose），修复照抄旧表导致 Agent 调用直接失败的问题
+
 ### v1.2.1 (2026-08-21)
 
 **multi-agent / flow / flow-deep**
