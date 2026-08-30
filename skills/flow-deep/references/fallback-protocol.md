@@ -54,6 +54,8 @@
 
 ## Plan Fallback 操作步骤
 
+> **能力缺口视角（2026-08-30 补，AIBC 增量解锁原则）**: 触发 Fallback 时除了问「Plan 哪里假设错了」，还要问「**当前缺什么能力、怎么让它 legible 且 enforceable**」——agent 卡住的修复几乎从不是"更努力"，而是补上缺失的能力（工具/上下文/机械检查），并用它解锁下一步（build one missing capability, use it to unlock the next）。与下方分类树正交使用：偏差归偏差修复，缺口归能力补齐。
+
 ### 步骤 1: 暂停执行
 
 - 立即停止当前 Phase 的执行
