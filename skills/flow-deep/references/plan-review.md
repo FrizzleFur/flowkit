@@ -138,3 +138,4 @@ Stage 3 完成
 - 审查结果记录到 findings.md，便于追溯
 - 半自动模式: Agent 完成审查后，必须等用户确认才继续
 - 每次只启动一个审查 Agent（不需要多个）
+- **Agent 生命周期（2026-08-28 补）**: 审查 Agent 返回报告后即 `TaskStop plan-reviewer` 关闭，不留 idle teammate——报告已落 findings/上下文，等待用户确认期间它无事可做
