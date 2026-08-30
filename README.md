@@ -227,6 +227,8 @@ GSD、GStack 等社区框架均无此能力。
 
 ## 快速上手
 
+> **新设备部署**（FlowKit + codegraph × serena 双图工具链 → 多仓项目）：见 [docs/deploy-new-device.md](docs/deploy-new-device.md)——三阶段十步实操手册，含实测背书与三大坑。
+
 本工具集为 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI 设计。
 
 ### 一行安装（推荐）
