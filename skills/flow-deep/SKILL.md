@@ -529,7 +529,7 @@ Phase 间不应销毁 team，应复用空闲 Agent。检测 TaskList + tmux list
 
 - 即时清理: Agent completed 且不被复用 → `TaskStop <name>`（NO_TMUX 唯一动作）/ shutdown → kill pane（IN_TMUX 附加）
 - Phase 间孤儿清理: 检测残留 pane 并 kill
-- 全局清理: 全部 Phase 完成 → shutdown 全部 → 倒序 kill → TeamDelete
+- 全局清理: 全部 Phase 完成 → TaskStop 全部（本体）→ 倒序 kill pane（TeamDelete 已废弃，无需调用）
 
 #### Delegate 模式（主 Agent 协调协议）
 

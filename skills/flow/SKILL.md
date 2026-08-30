@@ -17,8 +17,6 @@ allowed-tools:
   - WebSearch
   - AskUserQuestion
   - Agent
-  - TeamCreate
-  - TeamDelete
   - SendMessage
   - TaskList
   - TaskCreate
@@ -152,7 +150,7 @@ allowed-tools:
           ▼
 ┌─────────────────────┐
 │ Stage 4.5: Agent 清理│  IN_TMUX 时执行
-│   tmux + TeamDelete  │
+│   tmux + TaskStop    │
 └─────────┬───────────┘
           │
           ▼
@@ -411,7 +409,7 @@ Plan 质量:                          superpowers 技能:
 
 > 完整清理脚本（即时清理 + 孤儿清理 + 全局清理）见 `references/cleanup-procedure.md`
 
-Stage 4 完成后执行三层清理: 即时清理（Agent completed → shutdown → kill pane）→ 孤儿清理（残留 pane）→ 全局清理（倒序 kill + TeamDelete）
+Stage 4 完成后执行三层清理: 即时清理（Agent completed → shutdown → kill pane）→ 孤儿清理（残留 pane）→ 全局清理（倒序 kill；TeamDelete 已废弃无需调用）
 
 ### Stage 5: 完成验证
 
