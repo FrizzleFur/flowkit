@@ -34,6 +34,8 @@
 | `code-verification` | Claude Code Agent | **prime-agent** ← 自动路由 | prime-agent CLI (--no-session --mode json) |
 | `autonomous-task` | Claude Code Agent | **prime-agent** ← 自动路由 | prime-agent --autonomous + gate |
 
+> **C36 多仓增强（叠加注入，不替代上面任何 type）**: 当任务为多仓/跨文件（Goal Contract 标注了目标仓库清单）时，`code-implementation` / `code-review` / `testing` 类 Agent **额外**注入下方「多仓代码修改 Agent（C36 路由）」的导航与编辑协议块——TDD 纪律不变，代码定位与编辑方式改走双图。协议详情见 `references/multi-repo-toolchain.md`。
+
 ## Agent Prompt 模板
 
 ### 代码实现 — 双 Agent TDD 模式
@@ -166,6 +168,30 @@
 完成标准: [agent_hint.completion_criteria]
 ```
 
+### 多仓代码修改 Agent（C36 路由——叠加注入块）
+
+> 用于 Goal Contract 标注了目标仓库清单的多仓任务。此块叠加在 code-implementation/testing 的 TDD 模板之后（纪律与导航正交）。
+
+```
+【多仓双图导航协议（C36）】你的任务跨以下仓库: [agent_hint.repositories]
+
+编辑期铁律——serena 符号级操作序列:
+1. 激活: activate_project("<目标仓绝对路径>")——注意项目名可能=分支名，报错时从
+   get_current_config 列表选对应仓；切仓后先确认所需工具在 active 集内
+2. 实读: find_symbol(name_path_pattern="<qualified_name>", relative_path="<file>")
+   ——不用行号！上游 codegraph 定位给的行号是索引时点投影，以你此刻的实读为准
+3. 精改: 整方法替换用 replace_symbol_body（按 name_path 定位，不依赖内容匹配）；
+   局部改动先 read_file 实读真实字节再构造 needle（find_symbol 返回的 body 是
+   规范化展示，不能直接当 needle）
+4. 复查: get_diagnostics_for_file（注意排除系统库 import 的环境误报）
+
+已知坑: find_referencing_symbols 对跨文件/extension 调用漏报——跨仓影响面以
+task_plan 里的 codegraph impact 结果为准，不要因返回空就下"无调用者"结论。
+并行说明: codegraph WAL 模式下查询不阻塞写入，多 Agent 并发查询安全；
+但 serena 激活/切仓是会话级状态——跨仓任务给每仓分配独立 Agent，或在
+prompt 中明确串行切仓顺序。
+```
+
 ## 并行分发策略
 
 1. 读取所有 Phase 的 `agent_hint.depends_on` 字段
@@ -176,25 +202,9 @@
 
 ## 完成后清理流程
 
-**前置**: 在 TeamCreate 之前已记录 `MAIN_PANE=$(tmux display-message -p '#{pane_index}')`
+> 2026-08-30 对齐现实：TeamCreate/TeamDelete 已废弃（会话单一隐式团队）；SendMessage 发 shutdown_request 会被 harness 拦截（schema 只允许被动 shutdown_response）。与 SKILL.md 的 Agent 清理节（2026-08-28 补丁）同步。
 
 1. TaskList 确认所有任务 completed/failed
-2. 向每个 Agent 发送 shutdown（优先使用结构化协议）:
-   ```
-   SendMessage({ to: "agent-name", message: { type: "shutdown_request", request_id: "final-cleanup" } })
-   ```
-3. 等待 3-5 秒后执行增强清理脚本:
-```bash
-W=$(tmux display-message -p '#{session_name}:#{window_index}')
-# 倒序 kill 非 MAIN_PANE，避免索引偏移
-LAST=$(tmux list-panes -t "$W" -F '#{pane_index}' | tail -1)
-for i in $(seq "$LAST" -1 0); do
-  [ "$i" = "$MAIN_PANE" ] && continue
-  tmux kill-pane -t "$W.$i" 2>/dev/null
-done
-# 验证
-REMAINING=$(tmux list-panes -t "$W" | wc -l | tr -d ' ')
-[ "$REMAINING" = "1" ] && echo "清理完成，仅保留主面板: $MAIN_PANE" || echo "警告: 仍有 $REMAINING 个面板"
-```
-4. TeamDelete 清理团队文件
-5. 汇总结果，更新 progress.md
+2. 对每个已完成且不复用的 Agent 执行 `TaskStop(task_id=<agent名>)`——mailbox 型 agent 完成后静默 idle 不自动退出，TaskStop 是唯一正解（NO_TMUX 降级模式下的唯一动作）
+3. （IN_TMUX 时附加）TaskStop 后按需 kill 残留 pane；完整脚本见 `references/cleanup-procedure.md`
+4. 汇总结果，更新 progress.md

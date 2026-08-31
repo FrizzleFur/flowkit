@@ -104,7 +104,7 @@ flow-deep 用以下自检守住"用户控制"。每次新增 Stage / 检查点 /
 
 > references 文件**按需读取**，不要在触发时一次性加载。详细加载时序表见 `references/context-management.md` 的 "References 加载时序" 章节。
 
-关键路径: Stage 0 → capability-registry + STATE.md | Stage 3 → plan-quality + context-management | Stage 4 → skill-routing + fallback-protocol
+关键路径: Stage 0 → capability-registry + STATE.md | Stage 3 → plan-quality + context-management（多仓任务加 multi-repo-toolchain） | Stage 4 → skill-routing + fallback-protocol
 
 ## 触发条件
 
@@ -163,14 +163,13 @@ Stage -1: 跨会话经验召回 → Stage 0: Superpowers 检查 (强制) → Sta
 
 | 检查点 | 阈值 | 动作 |
 |--------|------|---------|
-| Stage / Phase 边界（脚本实测） | > 70% | AskUserQuestion: 保存并继续 / 保存并交接（生成 HANDOFF.md 给下一个 agent）/ 跳过 / 交接并记住自动 |
-| Stage / Phase 边界（已开启自动交接） | > 75% | 免弹窗自动交接：更新五件套 + HANDOFF.md → tmux 新窗口 spawn 续接会话（接力上限 `--handoff-max`，默认 3） |
+| Stage / Phase 边界（脚本实测） | > 70% | AskUserQuestion: 保存并继续 / 保存并交接（生成 HANDOFF.md 给下一个 agent）/ 跳过 |
 | Stage 2 后 | > 65% | 压缩 ST 输出为摘要 |
 | Stage 3.7 后 | > 70% | 压缩代码级计划为 agent_hint 摘要 |
 | Stage 4 每个 Agent 后 | > 75% | 压缩中间结果 |
 | 任意时刻 | > 85% | 警告用户，建议 `/compact` |
 
-弹窗决策先于压缩：用户选「保存并继续」时先做 checkpoint（更新 STATE.md/progress.md/task_plan.md）再按压缩矩阵处理。同一 Stage 边界最多弹一次，选「跳过」则下个边界重新检测。选「交接并记住自动」后本会话进入自动交接状态（偏好写入 STATE.md，续接会话继承），详见 `references/context-management.md` 的「自动交接协议」。保存与 HANDOFF.md 协议见同文件「主动 Checkpoint 与 Handoff」。检测脚本失败（exit 2）时静默降级为原压缩矩阵，不阻塞管道。`--no-context-guard` 禁用。
+弹窗决策先于压缩：用户选「保存并继续」时先做 checkpoint（更新 STATE.md/progress.md/task_plan.md）再按压缩矩阵处理。同一 Stage 边界最多弹一次，选「跳过」则下个边界重新检测。保存与 HANDOFF.md 协议见 `references/context-management.md` 的「主动 Checkpoint 与 Handoff」。检测脚本失败（exit 2）时静默降级为原压缩矩阵，不阻塞管道。`--no-context-guard` 禁用。
 
 STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协议见 `references/context-management.md`。
 
@@ -254,7 +253,7 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
 - Constraints：约束、风险、不可触碰范围、需要保留的行为
 - Non-goals：明确不做的相邻任务，避免范围蔓延
 - Verification Plan：完成后如何证明达标（命令、检查点、人工确认项）
-- Execution Strategy：串行 / multi-agent / Workflow 的初步判断
+- Execution Strategy：串行 / multi-agent / Workflow 的初步判断（**多仓任务在此标注目标仓库清单**——触发 C36 双图路由）
 
 **行为**:
 1. 从用户原始任务中提取上述字段
@@ -356,7 +355,7 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
 **行为**:
 
 **[Plan Mode 内部]** — 调用 `EnterPlanMode` 进入只读沙箱:
-1. 用 Glob/Grep/Read 探索代码库，理解现有结构
+1. 用 Glob/Grep/Read 探索代码库，理解现有结构（**多仓/跨文件任务**：先按 `references/multi-repo-toolchain.md` 做环境与准备分档，探索优先 codegraph 定位、修改规划按 C36 四段式）
 2. 基于优化后的表述和深度思考结论，设计实现方案
 3. 将方案写入系统指定的 plan 文件（遵循 planning-with-files 模板 + plan-quality.md Checklist）
 
@@ -524,11 +523,13 @@ Phase 间不应销毁 team，应复用空闲 Agent。检测 TaskList + tmux list
 
 #### Agent 与 Pane 自动清理
 
+> **适用范围（2026-08-28 补）**: 本节适用 **Stage 0-5 全部 agent 分发点**——含 Stage 3.5 plan-reviewer、Stage 3.6 面板等评审型 agent，非仅 Stage 4 执行 agent。任何「Agent completed 且不被复用」时点即应关闭。NO_TMUX 降级模式下清理对象是 **TaskStop 该命名 agent**（mailbox 型 agent 完成后静默 idle 不自动退出，「kill pane」仅为 tmux 附加动作，不能替代 agent 本体关闭）。实测教训：panel 五席评审返回后 idle 未清——规则挂在 Stage 4 语境 + pane 措辞掩盖 agent 本体清理，两因叠加未触发。
+
 > 完整清理脚本（即时清理 + 孤儿清理 + 全局清理）见 `~/.claude/skills/flow/references/cleanup-procedure.md`
 
-- 即时清理: Agent completed 且不被复用 → shutdown → kill pane
+- 即时清理: Agent completed 且不被复用 → `TaskStop <name>`（NO_TMUX 唯一动作）/ shutdown → kill pane（IN_TMUX 附加）
 - Phase 间孤儿清理: 检测残留 pane 并 kill
-- 全局清理: 全部 Phase 完成 → shutdown 全部 → 倒序 kill → TeamDelete
+- 全局清理: 全部 Phase 完成 → TaskStop 全部（本体）→ 倒序 kill pane（TeamDelete 已废弃，无需调用）
 
 #### Delegate 模式（主 Agent 协调协议）
 
@@ -682,7 +683,6 @@ Stage 5 验证通过后的收尾工作:
 /flow-deep [options] <任务表述>
 
 阶段: --no-prompt | --no-plan | --no-multi(串行) | --no-recall | --no-context-guard(禁用上下文容量检测弹窗)
-上下文: --no-auto-handoff(本次运行禁用已记忆的自动交接) | --handoff-max N(接力代数上限，默认 3)
 思考: --think-hard(10K) | --no-think | --no-mermaid | --no-discuss | --no-skill-match
 执行: --no-tdd | --tdd-dual | --no-review | --no-panel | --panel-roles "R01,R02" | --panel-depth quick|basic|advanced | --no-prime
 迭代: --iterate N | --guard <cmd> | --ralph-max N | --no-ralph | --no-distill

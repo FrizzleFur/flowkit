@@ -45,6 +45,7 @@
 | **[flow-deep](skills/flow-deep/SKILL.md)** | 全量深度引擎 | 强制全开 —— 所有关卡不可跳过 |
 | **[multi-agent](skills/multi-agent/SKILL.md)** | 多 Agent 协作 | tmux 分屏并行 + 阶段间复用 |
 | **[prompt](skills/prompt/SKILL.md)** | Prompt 评分 | 乔哈里视窗 + 3S 原则量化评估 |
+| **[auto-skill](skills/auto-skill/SKILL.md)** | 跨会话记忆 | Stage -1 召回 + Stage 5.8 沉淀 —— 经验库闭环（个人数据本地维护，仓库只含协议与骨架） |
 
 ## 设计亮点
 
@@ -225,6 +226,8 @@ GSD、GStack 等社区框架均无此能力。
 | Ralph Loop | 手动触发 | 迭代用完自动触发 |
 
 ## 快速上手
+
+> **新设备部署**（FlowKit + codegraph × serena 双图工具链 → 多仓项目）：见 [docs/deploy-new-device.md](docs/deploy-new-device.md)——三阶段十步实操手册，含实测背书与三大坑。
 
 本工具集为 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI 设计。
 

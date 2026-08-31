@@ -53,9 +53,50 @@
 | C14 | verification-before-completion | discipline |
 | C15 | systematic-debugging | discipline |
 | C30-C34 | 领域能力 | discipline |
+| C35-C36 | 领域能力（zread 远端研究 / C36 双图本地开发） | discipline |
 | C40-C42 | 安全防护 | discipline |
 
 > 新增能力时在此表登记层级；未登记默认 discipline。
+
+### 能力关系图（REC-4 — registry 的显式图化，2026-08-30）
+
+```mermaid
+flowchart LR
+    subgraph orchestrate["编排层 orchestrate（子控制流）"]
+        C05[planning-with-files]:::orch
+        C06[multi-agent]:::orch
+        C13[auto-iterate]:::orch
+    end
+    subgraph discipline["纪律层 discipline（被注入/被调用）"]
+        C01[using-superpowers]:::disc
+        C02["/prompt"]:::disc
+        C03[Sequential Thinking]:::disc
+        C04["/mermaid"]:::disc
+        C10[TDD]:::disc
+        C11[writing-plans]:::disc
+        C12[code-review]:::disc
+        C14[verification]:::disc
+        C15[systematic-debugging]:::disc
+        C30[web-access]:::disc
+        C34[prime-agent]:::disc
+        C35[zread MCP]:::disc
+        C36[dual-graph<br/>多仓导航]:::disc
+    end
+    C05 -->|"plan 后执行"| C06
+    C06 -->|"注入"| C10
+    C06 -->|"注入"| C12
+    C05 -->|"细化代码计划"| C11
+    C13 -->|"失败迭代时调试"| C15
+    C06 -->|"研究型任务联网"| C30
+    C30 -.->|"结构化仓库阅读优先"| C35
+    C06 -->|"多仓任务注入四段式"| C36
+    C03 -->|"第6维能力匹配读 registry"| C05
+    C14 -->|"验证依据"| C05
+    classDef orch fill:#0f62be,color:#fff
+    classDef disc fill:#198038,color:#fff
+```
+
+图例：实线 = 调用方向（orchestrate → discipline 允许）；虚线 = 协作关系；蓝 = 编排层，绿 = 纪律层。约束（orchestrate 间禁止互调、discipline 禁止反向劫持）见上方「层级二分」。
 
 ---
 
@@ -232,6 +273,27 @@
 - 关键词: prime-agent, RLM, IPython 代码验证, 实际运行验证, Prime Agent, 代码执行验证, security-audit
 - 说明: RLM harness，通过持久 IPython kernel 实际运行代码验证分析。C34 可用时 security-audit / code-verification 自动路由到此后端
 
+### C35: zread MCP
+- 类型: 领域
+- 层级: discipline（外部工具调用）
+- 触发: 任务涉及 GitHub 仓库深度阅读、结构探索、源码/文档检索
+- Stage: 2（研究）/ 4（研究型执行）
+- 检查: MCP server `zread` 可用（get_repo_structure / read_file / search_doc）
+- 路由: 仓库研究的主通道（结构化读取优于网页解析）；web-access 用于补充搜索与降级
+- 关键词: GitHub 仓库, repo structure, 源码阅读, 仓库调研, zread, 深度研究
+- 说明: 2026-08-30 graph engineering 研究全程验证（三仓库深读 + 报告引用回溯核对）；与 C30 web-access 构成「结构化优先、网页补充」的联网研究组合
+
+### C36: dual-graph code navigation（多仓双图工具链）
+- 类型: 领域（组合型能力——tool-graph 复合边范式首例）
+- 层级: discipline
+- 触发: 任务涉及 2+ 仓库或跨文件影响面的代码理解/修改
+- Stage: 3（探索：codegraph 定位）/ 4（执行：serena 精改）
+- 检查: `which codegraph` + serena 可用（完整环境检验见 references/multi-repo-toolchain.md 第 0 层）
+- 路由: 四段式流水线——codegraph 跨仓定位 → serena name_path 实读 → replace_symbol_body 精改 → 诊断 + impact 复查。**交接契约：传 qualified_name + file_path 不传行号；freshness 裁决权归 serena**
+- 依赖: codegraph CLI/MCP + serena MCP
+- 关键词: 多仓, 跨仓库, dual-graph, codegraph, serena, 工作区索引, 影响面, 符号编辑
+- 说明: 2026-08-30 FDNote 实践验证（v1.1.6 DB 半年存活 + 增量 sync 19s + 跨仓切换冒烟全通）；详细协议见 references/multi-repo-toolchain.md，论证与实证见研究仓库 graph-engineering-research（research/06 + 07）
+
 ---
 
 ## L5: 安全防护能力（自动触发）
@@ -270,7 +332,7 @@ Stage 2 完成后，执行以下审计清单：
 L1 必需: [C01: ✓] [C02: ✓] [C03: ✓] [C04: ✓] [C05: ✓] [C06: ✓]
 L2 代码质量: [C10: ✓/✗] [C11: ✓/✗] [C12: ✓/✗] [C13: ✓/✗] [C14: ✓] [C15: ✓/✗]
 L3 思考增强: [C20: ✓] [C22: ✓] 或 [C23: ✓/✗]
-L4 领域: [C30: ✓/✗] [C31: ✓/✗] [C32: ✓/✗] [C33: ✓/✗] [C34: ✓/✗]
+L4 领域: [C30: ✓/✗] [C31: ✓/✗] [C32: ✓/✗] [C33: ✓/✗] [C34: ✓/✗] [C35: ✓/✗] [C36: ✓/✗]
 L5 安全: [C40: ✓/✗] [C41: ✓/✗] [C42: ✓/✗]
 
 ### 任务匹配结果

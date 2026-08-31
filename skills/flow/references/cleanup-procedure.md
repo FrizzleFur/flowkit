@@ -51,8 +51,8 @@ for i in $(seq "$LAST" -1 0); do [ "$i" = "$MAIN_PANE" ] || tmux kill-pane -t "$
 [ "$(tmux list-panes -t "$W" | wc -l | tr -d ' ')" = "1" ] && echo "清理完成" || echo "警告: 仍有残留面板"
 ```
 
-最后执行 `TeamDelete` 清理团队文件。
+~~最后执行 `TeamDelete` 清理团队文件。~~ → 已废弃（会话单一隐式团队，无需调用）。
 
 ## 执行后全局清理（Stage 5 验证通过后）
 
-shutdown 全部剩余 Agent → 倒序 kill 非 MAIN_PANE → 验证只剩主面板 → TeamDelete
+TaskStop 全部剩余 Agent（本体）→ 倒序 kill 非 MAIN_PANE → 验证只剩主面板（TeamDelete 已废弃）

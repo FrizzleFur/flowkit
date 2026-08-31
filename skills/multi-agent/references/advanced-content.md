@@ -130,7 +130,7 @@ Agent 自主决定角色和工作流。适用: 不确定性强、任务多变。
 
 ## Python 代码参考
 
-> 以下代码来自 multi-agent-orchestration，作为概念参考。Claude Code 实际使用 TeamCreate/Agent/TaskCreate 工具链。
+> 以下代码来自 multi-agent-orchestration，作为概念参考。Claude Code 实际使用 Agent(name)/SendMessage/TaskStop 工具链（TeamCreate/TeamDelete 已废弃）。
 
 ```python
 # 顺序编排
