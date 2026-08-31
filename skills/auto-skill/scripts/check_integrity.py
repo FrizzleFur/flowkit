@@ -9,6 +9,11 @@
      （含目录迁移残留识别：/Users/<旧用户名>/... → 当前用户名映射建议）
   2. [[wikilink]] 引用：目标在库内（experience/ + knowledge-base/）是否可解析
   3. 索引对称性：_index.json 登记的文件 vs 磁盘实存文件，双向核对
+     （README.md 为结构说明文件，不算条目，不参与核对）
+
+  已核实豁免约定（2026-08-31）：条目正文含「路径核实（日期）」标记行的，视为人工已分检
+  ——历史取证快照、或引用即条目主题本身（如旧机器路径事故记录）——跳过其路径与 wikilink
+  检查，仅在报告中列出豁免清单。只豁免不删除，保留证据原文。
 
 用法：
   python3 ~/.claude/skills/auto-skill/scripts/check_integrity.py [--root <auto-skill目录>]
@@ -25,6 +30,9 @@ from pathlib import Path
 # 绝对路径模式：macOS 用户路径，遇空白/中文标点/全角开闭括号/引号终止
 # （全角开括号必须排除：路径后紧跟「（注释」时贪婪匹配会吞掉左括号——2026-08-30 首跑实测）
 PATH_RE = re.compile(r"`?(/Users/[A-Za-z0-9_.\-]+(?:/[^\s`'\"\(\)\[\]（）【】「」『』《》<>，。；：，。；）】、]+)*)`?")
+# 已核实豁免标记：条目含此标记 = 人工已分检，跳过路径与 wikilink 检查（见模块 docstring）
+TRIAGED_MARK = "路径核实（"
+
 WIKILINK_RE = re.compile(r"\[\[([^\]|:][^\]|]*)(?:\|[^\]]+)?\]\]")  # 首字符排除 : —— [[:<:]] 等 BSD 字符类不是 wikilink
 
 
@@ -64,9 +72,13 @@ def main() -> None:
     known_names = [f.stem for f in md_files]
     current_user = Path.home().name
     broken_paths, broken_links, migration_hits = [], [], []
+    exempted = []
 
     for f in md_files:
         text = f.read_text(encoding="utf-8")
+        if TRIAGED_MARK in text:
+            exempted.append(f.name)
+            continue
         # --- 1. 绝对路径 ---
         for p in extract_paths(text):
             if Path(p).exists():
@@ -101,7 +113,7 @@ def main() -> None:
             fp = e.get("file")
             if fp and not (idx_path.parent / fp).exists():
                 index_mismatches.append((idx_path.name, f"登记文件不存在: {fp}"))
-        local_stems = {f.stem for f in idx_path.parent.glob("*.md") if f.stem != "_index"}
+        local_stems = {f.stem for f in idx_path.parent.glob("*.md") if f.stem not in ("_index", "README")}
         for orphan in sorted(local_stems - listed_stems):
             index_mismatches.append((idx_path.name, f"磁盘有文件但未登记: {orphan}.md"))
 
@@ -133,11 +145,13 @@ def main() -> None:
     section("断链 wikilink（库内无同名条目）", broken_links,
             lambda t: [f"{c}" for c in close_matches(t, known_names)])
     section("索引不对称", index_mismatches)
+    section("已核实豁免（人工分检标记，跳过路径/wikilink 检查）", [(n, "—") for n in exempted])
 
     total = len(broken_paths) + len(migration_hits) + len(broken_links) + len(index_mismatches)
     print("\n" + "=" * 64)
     print(f"总计发现: {total} 处（断路径 {len(broken_paths)} / 迁移残留 {len(migration_hits)} / "
           f"断 wikilink {len(broken_links)} / 索引不对称 {len(index_mismatches)}）")
+    print(f"已核实豁免: {len(exempted)} 个条目")
     print("策略: 只报告不修复 — 修复请人工确认后进行（serena memories check 同款保守策略）")
 
 
