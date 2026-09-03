@@ -6,6 +6,10 @@
 
 English | **[中文](README.md)**
 
+![FlowKit multi-agent tmux in action](docs/images/multi-agent-tmux.jpg)
+
+> Live session — the main session fans out a shard checklist while multiple agents build in parallel across tmux panes; the status bar underneath is [glm-quota-hud](https://github.com/FrizzleFur/glm-quota-hud) watching GLM quota and context headroom in real time.
+
 ## Pipeline Overview
 
 ```
@@ -47,6 +51,18 @@ Working with AI coding agents (Claude Code, Cursor, etc.) revealed a gap: **agen
 | **[flow-deep](skills/flow-deep/SKILL.md)** | Full-depth orchestration | All quality gates forced ON — for high-stakes tasks |
 | **[multi-agent](skills/multi-agent/SKILL.md)** | Agent team coordination | tmux-split parallel execution with phase-aware scheduling |
 | **[prompt](skills/prompt/SKILL.md)** | Prompt scoring & optimization | Johari Window + 3S Principles quantitative evaluation |
+
+## Showcase
+
+### Multi-Agent Parallel Execution
+
+The hero image is a real work session: the main session breaks out a fan-out shard checklist (`Wave2 P0 fan-out (7/11)`), and each agent digs deep in its own context — a single agent ran 11 minutes straight to deliver one complete batch, while the main session only orchestrates, integrates, and verifies. tmux split panes are a visualization enhancement: without tmux, execution silently degrades to pane-free concurrency with zero capability loss.
+
+### Companion Tool: glm-quota-hud — a Quota Dashboard in Your Status Bar
+
+Parallel agents burn quota fast. The status bar in the hero image — `V1 🔥 95% | mcp23% | 📈21.4%/h ⚠3:19` — is [glm-quota-hud](https://github.com/FrizzleFur/glm-quota-hud) in action: GLM Coding Plan dual-account quota (5h windows / weekly credit pools / rate forecasting / depletion countdowns) pinned to the Claude Code status bar, so you see the 429 before it hits:
+
+![glm-quota-hud status bar](docs/images/glm-hud.jpg)
 
 ## Design Highlights
 

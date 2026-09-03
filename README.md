@@ -6,6 +6,10 @@
 
 **[English](README_EN.md)** | 中文
 
+![FlowKit multi-agent tmux 实录](docs/images/multi-agent-tmux.jpg)
+
+> 真机实录 —— 主会话派发 fan-out 分片清单，多个 agent 在 tmux 分屏中并行施工；底部状态栏由伴生工具 [glm-quota-hud](https://github.com/FrizzleFur/glm-quota-hud) 实时盯守 GLM 额度与 Context 余量。
+
 ## Pipeline 架构总览
 
 ```
@@ -46,6 +50,18 @@
 | **[multi-agent](skills/multi-agent/SKILL.md)** | 多 Agent 协作 | tmux 分屏并行 + 阶段间复用 |
 | **[prompt](skills/prompt/SKILL.md)** | Prompt 评分 | 乔哈里视窗 + 3S 原则量化评估 |
 | **[auto-skill](skills/auto-skill/SKILL.md)** | 跨会话记忆 | Stage -1 召回 + Stage 5.8 沉淀 —— 经验库闭环（个人数据本地维护，仓库只含协议与骨架） |
+
+## 效果展示
+
+### Multi-Agent 并行施工
+
+顶图就是真实任务现场：主会话拆出 fan-out 分片清单（`Wave2 P0 图解+组件 fan-out (7/11)`），每个 agent 独立上下文并行深挖——单个 agent 连续施工 11 分钟交付一个完整批次，主会话只做统筹、集成与验收。tmux 分屏只是可视化增强：无 tmux 环境自动降级为无分屏并发，能力不打折。
+
+### 伴生工具：glm-quota-hud —— 状态栏里的额度仪表盘
+
+多 agent 并行意味着额度烧得飞快。顶图状态栏里 `V1 🔥谷5h 95% | mcp23% | 📈21.4%/h 余5%≈0.2h ⚠3:19` 的实时监控来自 [glm-quota-hud](https://github.com/FrizzleFur/glm-quota-hud) —— 把 GLM Coding Plan 双账号额度（5h 窗口 / 周积分池 / 速率预测 / 耗尽倒计时）钉在 Claude Code 状态栏，429 之前先看到：
+
+![glm-quota-hud 状态栏效果](docs/images/glm-hud.jpg)
 
 ## 设计亮点
 
