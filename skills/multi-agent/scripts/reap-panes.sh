@@ -17,22 +17,16 @@ while IFS='|' read -r pid label file ts; do
     continue   # pane 已自行关闭 → 仅移除登记
   fi
   if [ "$file" = "⏳pending" ] && [ $(( $(date +%s) - ts )) -gt 180 ]; then
-    tmux kill-pane -t "$pid" 2>/dev/null
-    echo "reaped $pid ($label 超时未绑定)"
-    REAPED=$((REAPED+1))
+    tmux kill-pane -t "$pid" && { echo "reaped $pid ($label 超时未绑定)"; REAPED=$((REAPED+1)); }
     continue
   fi
   if [ ! -f "$file" ]; then
-    tmux kill-pane -t "$pid" 2>/dev/null
-    echo "reaped $pid ($label 文件已消失)"
-    REAPED=$((REAPED+1))
+    tmux kill-pane -t "$pid" && { echo "reaped $pid ($label 文件已消失)"; REAPED=$((REAPED+1)); }
     continue
   fi
   M=$(stat -f %m "$file" 2>/dev/null || echo 0)
   if [ $(( $(date +%s) - M )) -gt 180 ]; then
-    tmux kill-pane -t "$pid" 2>/dev/null
-    echo "reaped $pid ($label 静默>180s)"
-    REAPED=$((REAPED+1))
+    tmux kill-pane -t "$pid" && { echo "reaped $pid ($label 静默>180s)"; REAPED=$((REAPED+1)); }
     continue
   fi
   echo "$pid|$label|$file|$ts" >> "$REG.tmp"

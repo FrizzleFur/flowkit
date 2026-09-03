@@ -241,6 +241,13 @@ bash ~/.claude/skills/multi-agent/scripts/spawn-pane.sh "<agent名>" "<output_fi
 - 宽窗横分 / 窄窗竖分，新 pane ≤45%，主 pane 不被挤扁
 - **适用范围（2026-08-28 实测）**: 本脚本只服务 **unnamed 异步 agent**（有 output_file、无自动 pane）。Agent(name) 命名 agent 无落盘文件（临时桩秒删）、由 harness 自动分配 pane——不要对它调 spawn-pane（会白等 90s 后自动放弃）；其 pane 关闭 = `TaskStop(name)` 即可
 
+**命名 agent 完成后的强制收尾三步（2026-08-31 泄漏教训）**:
+teammate 型命名 agent **完成任务后进程不退出**（常驻 mailbox 等下一条消息），pane 会一直 alive——"任务完成"≠"pane 会自己关"。reap-panes.sh 对命名 pane 零感知（无 output file），唯一回收途径是主会话显式操作。因此每个命名 agent 完成后必须依次执行：
+1. **主会话打印完成进度汇总**——先向用户展示每个 agent 的成果验收（改了哪些文件/关键 diff/是否越界），用户可见进度后再清理
+2. **`TaskStop(name)` 收 agent 本体**——pane 随之自动回收；跳过这步 pane 泄漏（实测 dev:1.2/1.3 挂 7 分钟无人收）
+3. **`tmux list-panes -a` 验证 pane 消失**
+选型推论：不需要多轮 SendMessage 协作的小任务，优先 unnamed + spawn-pane 观察窗（watcher/reap 三重兜底全自动）；命名 agent 留给需要按名协作的长任务
+
 **关闭（零动作，自动）**: watcher 三重自杀——输出文件静默 >120s / 文件消失 / 进程被杀 → `remain-on-exit off` 下 pane 自动回收。遗留由 `reap-panes.sh` 兜底（登记表制，只清观察窗，绝不触碰主 pane）：
 
 ```bash
