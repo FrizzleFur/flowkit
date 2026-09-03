@@ -350,6 +350,10 @@ cp -r skills/prompt ~/.claude/skills/
 **multi-agent**
 - `SKILL.md` 更新（315 → 328 行）
 
+## 社区
+
+本项目在 [LINUX DO](https://linux.do) 社区发布与交流，欢迎前来讨论反馈。
+
 ## License
 
 MIT

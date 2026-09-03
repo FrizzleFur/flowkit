@@ -357,6 +357,10 @@ Invoke in Claude Code:
 **multi-agent**
 - `SKILL.md` update (315 → 328 lines)
 
+## Community
+
+This project is shared and discussed on the [LINUX DO](https://linux.do) community. Feedback and discussion welcome.
+
 ## License
 
 MIT
