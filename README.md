@@ -50,6 +50,7 @@
 | **[multi-agent](skills/multi-agent/SKILL.md)** | 多 Agent 协作 | tmux 分屏并行 + 阶段间复用 |
 | **[prompt](skills/prompt/SKILL.md)** | Prompt 评分 | 乔哈里视窗 + 3S 原则量化评估 |
 | **[auto-skill](skills/auto-skill/SKILL.md)** | 跨会话记忆 | Stage -1 召回 + Stage 5.8 沉淀 —— 经验库闭环（个人数据本地维护，仓库只含协议与骨架） |
+| **[ppt-agent](skills/ppt-agent/SKILL.md)** | PPT 生成工作流 | 需求调研 → 金字塔大纲 → Bento Grid → 逐页 SVG（可导入 Office 编辑） |
 
 ## 效果展示
 
@@ -295,6 +296,14 @@ cp -r skills/prompt ~/.claude/skills/
 - 乔哈里视窗 Prompt 量化评分
 
 ## 更新日志 (Changelog)
+
+### v1.4.0 (2026-09-04)
+
+**ppt-agent（新模块）**
+- 新增 **ppt-agent** —— 借鉴 linux.do 精华帖《应该是目前最强的PPT Agent》（sandun）的策划师工作流：需求调研 → 金字塔原理大纲（强制确认点）→ Bento Grid 卡片布局 → 逐页 SVG 设计稿（可直接拖入 Office 2016+ 编辑）
+- 内置 **4 套风格色板预设**（商务深色/简约浅色/科技/活泼），开工定义一次全篇复用，解决 AI 生成 PPT 常见的"每页配色漂移"
+- 内置 **文字防溢出约束**（估宽公式 + 字号层级表）与无外部依赖纪律，保证 SVG 拖入 PowerPoint 不丢资源
+- 交付自带 **preview.html 翻页查看器**（键盘导航）与布局选型速查表（页面内容类型 → 推荐布局直接映射）
 
 ### v1.3.0 (2026-08-28)
 

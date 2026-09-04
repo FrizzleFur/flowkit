@@ -51,6 +51,8 @@ Working with AI coding agents (Claude Code, Cursor, etc.) revealed a gap: **agen
 | **[flow-deep](skills/flow-deep/SKILL.md)** | Full-depth orchestration | All quality gates forced ON — for high-stakes tasks |
 | **[multi-agent](skills/multi-agent/SKILL.md)** | Agent team coordination | tmux-split parallel execution with phase-aware scheduling |
 | **[prompt](skills/prompt/SKILL.md)** | Prompt scoring & optimization | Johari Window + 3S Principles quantitative evaluation |
+| **[auto-skill](skills/auto-skill/SKILL.md)** | Cross-session memory | Stage -1 recall + Stage 5.8 distillation — experience loop (personal data stays local; repo ships protocol & skeleton only) |
+| **[ppt-agent](skills/ppt-agent/SKILL.md)** | PPT generation workflow | Requirement research → pyramid outline → Bento Grid → page-by-page SVG (editable in Office) |
 
 ## Showcase
 
@@ -302,6 +304,14 @@ Invoke in Claude Code:
 - Johari Window-based prompt scoring
 
 ## Changelog
+
+### v1.4.0 (2026-09-04)
+
+**ppt-agent (new module)**
+- Added **ppt-agent** — a planner-style PPT workflow adapted from the linux.do featured post "应该是目前最强的PPT Agent" (sandun): requirement research → pyramid-principle outline (mandatory confirmation gate) → Bento Grid card layouts → page-by-page SVG deliverables (drag straight into Office 2016+ and edit)
+- Ships **4 preset style palettes** (business dark / minimal light / tech / playful) defined once and reused across all pages, fixing the classic AI-generated-deck problem of per-slide color drift
+- Enforces **text-overflow guards** (width estimation + font-size hierarchy) and a no-external-dependency rule so SVGs never lose resources when imported into PowerPoint
+- Deliverables include a **preview.html pager** (keyboard navigation) and a layout cheat sheet mapping content types to recommended Bento layouts
 
 ### v1.3.0 (2026-08-28)
 
