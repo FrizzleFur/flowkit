@@ -336,6 +336,8 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
 
 **可选增强**: 若需 SVG 持久化，通过 `node ~/.claude/skills/mermaid/render.mjs <file>` 保存。
 
+**可选增强（show-me，2026-09-07 用户裁定接入）**: 当方案依赖用户可能不熟悉的概念/机制（如引入新模式、新框架语义），或任务结构更适合 call tree/diff/pseudocode 形态表达时，调用 show-me skill 做形态速览与概念讲解——分工：mermaid+ASCII 管流程图，show-me 管结构速览与陌生概念可视化，不互斥。
+
 **注意**: excalidraw 终端不可渲染，仅用于用户明确要求的高质量导出场景。
 
 **禁用**: `--no-mermaid`
@@ -366,6 +368,7 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
    - `task_plan.md` — 分阶段任务计划（写入 `--plan-dir` 指定目录）
    - `findings.md` — 研究发现（含思考/讨论结论）
    - `progress.md` — 执行进度追踪
+   - 可选（show-me）: 方案依赖不熟悉概念、或用户需要人类向方案总览时，用 show-me 生成 HTML 方案页——task_plan.md 是给 agent 执行的（机器向），方案页是给人看懂方案的（人类向），两者不合并（2026-09-07 用户裁定接入）
 5. 对生成的 plan 执行 plan-quality.md 中的 Quality Checklist 自检
 6. 向用户展示质量评分，确认后进入 Stage 3.5
 

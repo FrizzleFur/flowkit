@@ -301,9 +301,29 @@ Invoke in Claude Code:
 - Auto Handoff — 75% automatic context relay (tmux spawn, verified end-to-end)
 - Auto-Decide Layer with 6 principles
 - Ralph Loop integration (stop-hook + auto-iterate dual-layer iteration)
+- Loop Memory three-tier records (TSV logs history / memory stores future rules / experience bank for global distillation) + on-the-loop mid-run async steering
 - Johari Window-based prompt scoring
 
 ## Changelog
+
+### v1.6.0 (2026-09-07)
+
+**flow-deep / flow / auto-iterate (humanlayer mechanism absorption)**
+- Deep-researched 4 humanlayer/skills (show-me / build-iterated-agentic-loop / design-control-loop / improve-claude-md); verdict "1 install, 3 borrow" — mechanisms absorbed into existing files for full benefit at zero trigger-surface cost
+- **Loop Memory file** (auto-iterate) — TSV logs history, memory stores future rules; durable-vs-oneoff discrimination + standing-feedback admission test
+- **on-the-loop async steering** (flow Stage 5.5) — mid-iteration corrections go to loop-memory without breaking the loop; effective from next Pick
+- **Guard vs Dampener duality** (auto-iterate) — Guard guards your own changes, Dampener guards external degradation; advisory→blocking graduation
+- **Controller spectrum + fused criterion** (auto-iterate) — countable goals get deterministic controllers, fuzzy goals use agentic Pick; strategy evolves across campaigns
+- **One-sentence job gate** (flow plan-quality) — a goal that can't be stated as one verifiable sentence goes back to rethink, no plan written
+- **Unattended output gate** (flow-deep ralph-integration) — "output rate ≤ review rate" before headless Ralph runs, complementing the anti-giving-up lower bound
+- show-me capability hints at flow-deep Stage 2b/3 (optional, non-mandatory)
+
+**show-me (new skill)**
+- Installed humanlayer show-me v1.0.1 — visual explanation vocabulary (pseudocode / call tree / diff / HTML solution pages)
+- Description enhanced: proactively appears when a plan involves unfamiliar concepts (verified live during an AST migration task)
+
+**multi-agent**
+- Synced runtime evolution: named-only ruling, pretrust-cwd.sh pre-trust (prevents trust-dialog pane stalls), Fast Path additions (118-line backfill)
 
 ### v1.5.0 (2026-09-07)
 

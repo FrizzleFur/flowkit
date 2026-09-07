@@ -17,6 +17,15 @@ Plan Quality Checklist:
   □ 依赖声明: 该步骤依赖哪些前置步骤的输出
 ```
 
+**Plan 级检查（先于上述 Task 级检查）**:
+
+```
+□ 单句任务定义门: 整个 plan 的目标能压缩为一句可验证的话
+  （"you can state the job in one sentence"，源自 humanlayer
+   build-iterated-agentic-loop，2026-09 吸收）。
+  压不成一句可验证的话 → 目标/边界未想清，退回 Stage 2，不强行写 plan。
+```
+
 ## 禁止出现的 Placeholder 模式
 
 以下模式视为 Plan 质量问题，必须在生成时修正:

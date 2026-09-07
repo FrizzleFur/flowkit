@@ -293,9 +293,29 @@ cp -r skills/auto-skill ~/.claude/skills/
 - Auto Handoff 75% 上下文自动交接（tmux 接力 spawn，实测闭环）
 - Auto-Decide Layer 六原则自动决策系统
 - Ralph Loop 集成（Stop Hook + auto-iterate 双层迭代）
+- Loop Memory 三层记录体系（TSV 记历史 / memory 存未来规则 / 经验库全局沉淀）+ on-the-loop 运行中异步纠偏
 - 乔哈里视窗 Prompt 量化评分
 
 ## 更新日志 (Changelog)
+
+### v1.6.0 (2026-09-07)
+
+**flow-deep / flow / auto-iterate（humanlayer 机制吸收）**
+- 深研 humanlayer/skills 四 skill（show-me / build-iterated-agentic-loop / design-control-loop / improve-claude-md），结论「1 装 3 借鉴」——机制吸收进现有文件获得全部收益、零触发面成本
+- 新增 **Loop Memory 文件**（auto-iterate）—— TSV 记历史、memory 存未来规则；durable-vs-oneoff 判别 + standing-feedback 准入删除测试
+- 新增 **on-the-loop 异步纠偏通道**（flow Stage 5.5）—— 迭代运行中插话纠正写 loop-memory，不打断循环、下轮 Pick 生效
+- 新增 **Guard vs Dampener 对偶**（auto-iterate）—— Guard 防自己改坏，Dampener 防外部恶化，advisory→blocking 渐进
+- 新增 **Controller 谱系 + fused 判据**（auto-iterate）—— 可数目标外置确定性 controller，模糊目标才用 agentic Pick；策略跨 campaign 可演化
+- 新增 **单句任务定义门**（flow plan-quality）—— 目标压不成一句可验证的话，退回不写 plan
+- 新增 **无人值守产出闸门**（flow-deep ralph-integration）—— 挂机跑 Ralph 前「产出速率 ≤ 评审速率」，与防"过早放弃"互补
+- flow-deep Stage 2b/3 接入 **show-me capability 提示**（可选，非强制）
+
+**show-me（新 skill）**
+- 安装 humanlayer show-me v1.0.1 —— 视觉讲解形态词汇表（pseudocode / call tree / diff / HTML 方案页）
+- description 增强：方案依赖不熟悉概念时主动出现做视觉讲解（实测：AST 迁移任务 Stage 2b 自动命中）
+
+**multi-agent**
+- 同步运行时仓演进：named-only 裁定、派发前 pretrust-cwd.sh 预信任（防 trust 弹窗卡 pane）、Fast Path 补充（118 行差异回补）
 
 ### v1.5.0 (2026-09-07)
 

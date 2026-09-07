@@ -2,7 +2,9 @@
 # spawn-pane.sh — 为并行 subagent 开观察窗（multi-agent pane 生命周期 · 开启端）
 # 用法: bash spawn-pane.sh <label> <output-file>
 # 行为: 两级 tmux 检测 → split-window 启动自杀式 watcher → 写登记表 → pane 命名
-# 降级: NO_TMUX 或 split 失败 → 静默 exit 0（可视化增强，不是能力前提）
+# 降级: NO_TMUX → 全静默 exit 0（真不在 tmux，无需打扰，可视化增强不是能力前提）;
+#       IN_TMUX 下 split 失败 / $TMUX_PANE 缺失 → 输出一行 WARN 到 stderr（失败留证据，2026-08-31：
+#       "静默"的对象是不打断任务流，不是不可见——失败无证据则「好像不开分屏」查无实据）
 # 关闭: watcher 三重自杀（静默120s/文件消失/被杀）→ remain-on-exit off 自动回收；
 #       遗留由 reap-panes.sh 兜底（只清登记在册 pane，主 pane 天然安全）
 # 创建: mike, 2026-08-28
@@ -55,7 +57,11 @@ fi
 # ---- 开窗：宽窗横分 / 窄窗竖分，新 pane ≤45%，主 pane 不被挤扁 ----
 # 锚定调用者所在 pane（$TMUX_PANE 由 tmux 注入）；缺失时 server 自选窗口，可能落到相邻窗口（已知怪癖 2026-08-28）
 TARGET=""
-[ -n "$TMUX_PANE" ] && TARGET="-t $TMUX_PANE"
+if [ -n "$TMUX_PANE" ]; then
+  TARGET="-t $TMUX_PANE"
+else
+  echo "[spawn-pane] WARN: \$TMUX_PANE 缺失, 观察窗可能落到相邻窗口而非当前窗 (label=$LABEL)" >&2
+fi
 W=$(tmux display-message -p '#{session_name}:#{window_index}')
 WIDTH=$(tmux display-message -p '#{window_width}')
 if [ "$WIDTH" -ge 100 ]; then
@@ -63,7 +69,10 @@ if [ "$WIDTH" -ge 100 ]; then
 else
   PANE=$(tmux split-window -v -d -P -F '#{pane_id}' -l 45% $TARGET -c "$PWD" "bash '$WATCHER' '$LABEL' '$FILE'")
 fi
-[ -n "$PANE" ] || exit 0   # split 失败静默降级
+if [ -z "$PANE" ]; then
+  echo "[spawn-pane] WARN: split-window 失败, 观察窗未开 (label=$LABEL, target=${TARGET:-server 自选})" >&2
+  exit 0   # 失败留证据但不打断分发主链路（2026-08-31）
+fi
 
 tmux select-pane -t "$PANE" -T "$LABEL" 2>/dev/null
 tmux set-window-option -t "$W" pane-border-status top >/dev/null 2>&1

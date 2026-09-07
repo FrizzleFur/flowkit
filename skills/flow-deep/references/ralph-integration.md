@@ -263,6 +263,7 @@ flow-deep SKILL.md 中 Stage 5.7 的描述：
 
 ## 注意事项
 
+- **无人值守产出闸门（PR bounding 理念，源自 humanlayer build-iterated-agentic-loop，2026-09 吸收）**: ralph-loop 防"过早放弃"（下界保障），但无人值守运行时还有反向风险——"产出失控"（上界缺失）。挂机跑 Ralph 前，需确认"产出速率 ≤ 评审速率"：自动产生的变更堆积极快于人工 review 速度时（如每轮 keep 都在累积未 review 的 commit），应主动降速或分段暂停等确认，而非持续自动 keep。参考实现：自动化运行有界（每段 N 轮），人工 dispatch 无界（用户显式续期）。
 - Ralph Loop 是会话级机制，不是 Agent 级机制。它在主对话中运行，不在 tmux 分屏中。
 - **固定 prompt 约束**: Ralph Hook 每轮注入启动时的固定 prompt，不支持动态更新。初始 prompt 必须内嵌"自行从 progress.md 读取最新状态"的指令。
 - Completion Promise 只能在"Stage 5 全部通过"或"策略穷尽"时输出。不得为了退出循环而输出虚假 promise。

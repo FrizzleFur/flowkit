@@ -61,6 +61,18 @@ direction: higher 或 lower（根据指标语义推断）
 
 注：`--ralph`（Stage 5.7）是用户显式启用的「明知故犯」强制循环，专门对抗「中间态合法就停」；它不属于本节的误锁范畴，无需此处处理。
 
+## on-the-loop 异步纠偏通道（源自 humanlayer design-control-loop，2026-09 吸收）
+
+现有确认点全部是阻断式（in-the-loop：AskUserQuestion、Plan 审批、Approval Gate——停下等用户）。迭代运行中还缺一条非阻断通道（on-the-loop）：用户观察迭代过程时可以**随手注入纠正而不打断循环**。
+
+**运作方式**：
+- 迭代运行中，用户随时说一句纠正（"vendor 目录别动"、"上次这类改动会导致 flaky"）
+- 主 Agent 把它写入 `.plan/loop-memory.md`（durable 判别通过后，见 auto-iterate/references/tsv-tracking.md 的 Loop Memory 节），**不中断当前迭代**
+- 后续每轮 Pick 开始时读取 loop-memory，纠正自然生效——改变的是未来轮次的行为，不是当前轮
+- 区别于 in-the-loop：in-the-loop 改变当前轮（阻断等待），on-the-loop 改变未来轮（异步生效）
+
+**durable-vs-oneoff 判别同样适用**：只对本次任务有效的纠正不写 loop-memory，留在当次迭代描述里。
+
 ## 跳过条件
 
 不使用 `--iterate` 参数且 Stage 5 全部达标

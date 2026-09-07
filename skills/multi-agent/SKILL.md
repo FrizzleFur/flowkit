@@ -46,7 +46,7 @@ graph TB
 
 | 通道 | 适用 | 流程 |
 |------|------|------|
-| Fast Path | 只读/低风险：调研、信息收集、代码审查、文档阅读、多源比对 | 轻量上下文 → 分片分解 → 一行方案预告（告知式）→ 直接分批分发 → 分片清单核对 |
+| Fast Path | 只读/低风险：调研、信息收集、代码审查、文档阅读、多源比对 | 轻量上下文 → 分片分解 → 一行方案预告（告知式）→ 直接分批分发 → 分片清单核对（named agent 收尾同样执行「完成即总结即收」纪律） |
 | Full Path | 写入/高风险：写代码、改配置、批量文件操作、跨系统重构 | Step 0-5 完整流程（项目上下文 → 角色匹配 → 协作式方案 + 用户确认 → 执行） |
 
 ### Fast Path（一句话 fan-out 场景）
@@ -59,7 +59,9 @@ graph TB
    ```
    分片分发: [A 模块调研] [B 数据源核对] [C 历史提交考古] → 3 agent 分 2 批（并发 ≤2）
    ```
-4. **分批分发**：遵守并发硬约束（同消息 ≤2，超出分批；429/1302 退避规则同样生效）——Fast Path 省的是流程摩擦，**不是安全预算**
+4. **预信任（分发前双锚点之二，见「派发前置」出口判定表）**：跑 `pretrust-cwd.sh "$PWD"` 并让出口输出出现在回复中——防 trust 弹窗卡 pane 属安全预算，Fast Path 同样不豁免
+5. **分批分发**：遵守并发硬约束（同消息 ≤2，超出分批；429/1302 退避规则同样生效）——Fast Path 省的是流程摩擦，**不是安全预算**
+6. **汇总核对（nothing gets missed 的验收落点）**：每个 agent 返回后逐项勾销分片清单；分片未覆盖或证据不足 → SendMessage 补查该分片，全部勾销才算完成
 5. **汇总核对（nothing gets missed 的验收落点）**：每个 agent 返回后逐项勾销分片清单；分片未覆盖或证据不足 → SendMessage 补查该分片，全部勾销才算完成
 
 ### Agent 深度要求（digs deep，写进每个 fan-out Agent 的 prompt）
@@ -101,7 +103,7 @@ project_context:
   Plugins: settings.json → enabledPlugins
   Subagents: Agent tool 的 subagent_type 列表
   MCP: settings.json → mcpServers
-  tmux: 两级检测——①[ -n "$TMUX" ] && echo IN_TMUX；②为空时沿 PPID 祖先链找 tmux 进程（background job 会丢 $TMUX，"变量为空"≠"不在 tmux"，2026-08-24；server 存在≠身在 tmux——list-panes 探测在本机有 server 的非 tmux 会话会误判，2026-08-28 改 PPID 链判定，spawn-pane.sh/agent-pane-hook.sh 已内置）
+  tmux: 两级检测——①[ -n "$TMUX" ] && echo IN_TMUX；②为空时沿 PPID 祖先链找 tmux 进程（background job 会丢 $TMUX，"变量为空"≠"不在 tmux"，2026-08-24；server 存在≠身在 tmux——list-panes 探测在本机有 server 的非 tmux 会话会误判，2026-08-28 改 PPID 链判定）
 ```
 
 ## Step 2: 任务分析 + 角色匹配
@@ -128,8 +130,6 @@ project_context:
 | 文档 | technical-writer | `technical-writer` |
 | 重构 | refactoring-expert | `refactoring-expert` |
 | 通用兜底 | general-purpose | `general-purpose` |
-
-> 历史参考: 旧版映射到 voltagent 插件系列（voltagent-qa-sec:security-auditor 等），该系列已不在当前环境，勿再引用。
 
 **复杂度判断**:
 
@@ -226,38 +226,54 @@ project_context:
   `执行模式判定: IN_TMUX → tmux-split`（或 `NO_TMUX → no-split`）
 - **跳过检测 ≠ NO_TMUX**：未判定就按降级启动属于流程违规（实测踩坑 2026-08-21：跳过检测直接降级启动两个审计 agent，分屏可观察性丢失且启动后不可逆）
 
-### tmux 分屏可视化模式（IN_TMUX 且 pane 正常时）
+### 派发前置：预信任 cwd（防 trust 弹窗卡 pane，2026-09-01）
 
-> **两种 agent，两种 pane 行为（2026-08-28 双向实测）**: Agent(name) 命名 agent 由 harness **自动分配 pane**，但 agent 本体存活期间 pane 常驻——关闭只需 `TaskStop(name)`，pane 随之自动消失（实测），勿再手动 kill-pane；unnamed 异步 agent **无自动 pane** 但返回 output_file，观察窗由本 skill 脚本保证，生命周期全自动：
+named agent 的 pane 是独立 claude 进程，启动时对 cwd 做 workspace trust 检查，未信任路径会弹
+「Yes, I trust this folder」阻塞等待——N 个 agent 卡 N 个 pane（2026-09-01 FDNote worktree 实测）。
+信任记账在 `~/.claude.json` 的 `projects.<路径>.hasTrustDialogAccepted`：git 仓库按**主仓根**键控
+（worktree 复用主仓根信任），非仓目录按启动目录。官方手段即手改该字段（docs: "trust it by hand"）；
+`--dangerously-skip-permissions` 只免 permission prompt **不免** trust 弹窗，`claude -p` 从不弹。
 
-**开启**（每个 Agent 调用返回后的下一动作立即执行；output_file 取自 Agent 返回值）:
-
-```bash
-bash ~/.claude/skills/multi-agent/scripts/spawn-pane.sh "<agent名>" "<output_file>"
-```
-
-- 两级 tmux 检测内置（$TMUX 空 ≠ 不在 tmux）；NO_TMUX / split 失败 → 静默 no-op，不阻塞分发
-- pane 自动命名（pane-border 显示 agent 名），登记入 `$TMPDIR/claude-watch-panes.reg`
-- 宽窗横分 / 窄窗竖分，新 pane ≤45%，主 pane 不被挤扁
-- **适用范围（2026-08-28 实测）**: 本脚本只服务 **unnamed 异步 agent**（有 output_file、无自动 pane）。Agent(name) 命名 agent 无落盘文件（临时桩秒删）、由 harness 自动分配 pane——不要对它调 spawn-pane（会白等 90s 后自动放弃）；其 pane 关闭 = `TaskStop(name)` 即可
-
-**命名 agent 完成后的强制收尾三步（2026-08-31 泄漏教训）**:
-teammate 型命名 agent **完成任务后进程不退出**（常驻 mailbox 等下一条消息），pane 会一直 alive——"任务完成"≠"pane 会自己关"。reap-panes.sh 对命名 pane 零感知（无 output file），唯一回收途径是主会话显式操作。因此每个命名 agent 完成后必须依次执行：
-1. **主会话打印完成进度汇总**——先向用户展示每个 agent 的成果验收（改了哪些文件/关键 diff/是否越界），用户可见进度后再清理
-2. **`TaskStop(name)` 收 agent 本体**——pane 随之自动回收；跳过这步 pane 泄漏（实测 dev:1.2/1.3 挂 7 分钟无人收）
-3. **`tmux list-panes -a` 验证 pane 消失**
-选型推论：不需要多轮 SendMessage 协作的小任务，优先 unnamed + spawn-pane 观察窗（watcher/reap 三重兜底全自动）；命名 agent 留给需要按名协作的长任务
-
-**关闭（零动作，自动）**: watcher 三重自杀——输出文件静默 >120s / 文件消失 / 进程被杀 → `remain-on-exit off` 下 pane 自动回收。遗留由 `reap-panes.sh` 兜底（登记表制，只清观察窗，绝不触碰主 pane）：
+**派发前必跑**（Fast Path 与 Full Path 一致；`NO_TRUST_PRESEED=1` 显式跳过）：
 
 ```bash
-bash ~/.claude/skills/multi-agent/scripts/reap-panes.sh   # 已挂 Stop hook 每轮自动跑（2026-08-28）
+bash ~/.claude/skills/multi-agent/scripts/pretrust-cwd.sh "$PWD"
 ```
+
+- **出口判定表**（2026-09-01 三角色评审收敛）：脚本有三个合法出口，回复中出现其一即为已执行；
+  **违规 = 回复里找不到任何出口输出**（步骤被整个跳过，同 2026-08-21「判定必须有显式锚点」教训）：
+
+  | 出口 | 脚本末行形态 | 判定 | 下一步 |
+  |---|---|---|---|
+  | 成功 | `预信任完成: 注入 N 跳过 M` | 合规 | 正常派发 |
+  | 显式跳过 | `预信任跳过: NO_TRUST_PRESEED=1` | 合规（用户环境决策，**模型不得自行设置该开关**） | 正常派发 |
+  | 失败降级 | `警告: ...`（如 .claude.json 损坏/路径无效） | 合规但已降级 | **不重试脚本**，继续派发并明示用户「pane 弹 trust 弹窗时手动选 Yes」 |
+- **双键位**：脚本自动同时种「cwd + git 主仓根」（`--show-toplevel` 在 worktree 里返回 worktree
+  自身，脚本用 `--git-common-dir` 反推主仓根），两种记账模型通吃
+- **失败降级**：脚本报错（如 .claude.json 损坏）不阻塞派发，改为提示用户「pane 弹 trust 弹窗时
+  手动选 Yes」；已弹出的存量弹窗注入无效（进程已加载配置），只能手动确认
+- **残余竞争**：注入与 CC 进程回写 .claude.json 存在 last-writer-wins 窗口，脚本已做备份
+  （bak-pretrust-*，保留 3 份）+ 原子写；2026-09-01 实测并发无害
+
+### tmux 分屏模式（IN_TMUX 且 pane 正常时，named-only）
+
+> **named-only 原则（2026-08-31 用户裁定，观察窗体系退役）**: tmux 内一律用 `Agent(name=...)` 命名 agent——harness 自动分配 pane，且 pane 是**独立 Claude Code 进程、真交互 UI**（capture 实测 cmd=版本号，工具调用/回传实时滚动，零解析零脚本成本）。unnamed 异步 agent 无自动 pane，旧版为其定制的观察窗体系（spawn-pane.sh / watch-agent.sh / reap-panes.sh / 登记表 / 观察窗判定行）**已全部退役**——那只是 tail transcript 的二手摘要，且生命周期管理复杂度高；unnamed 仅保留给 NO_TMUX 场景与不看过程的纯后台批量（不开窗、不观察）。
+
+**分发**: 写法同下节无分屏模式（`Agent(name)` 同消息 ≤2 分批防 429/1302）。
+
+**pane 几何约束**: 单窗 pane ≥4 时每个都很窄（实测 6 pane 每行仅 ~14 字符）——pane 只是过程可视化，**主会话总结才是主要信息通道**（这正是「完成即总结即收」纪律的物理依据）。
+
+**完成即总结即收（强制纪律，2026-08-31 用户写死）**:
+每个命名 agent 的完成通知到达时，立即依次执行——不得攒批拖延、不得为看 pane 效果挂机不收：
+1. **主会话总结该 agent 进度**——子 agent 的完成必须即时映射为主会话可见的总结（成果验收：结论/改动文件/是否越界），不允许「完成了但主会话无声无息」
+2. **`TaskStop(name)` 收 agent 本体**——pane 随之自动回收。teammate 完成后进程常驻 mailbox 不退出，"任务完成"≠"pane 会自己关"；跳过这步 pane 泄漏（实测 dev:1.2/1.3 挂 7 分钟无人收）
+3. **`tmux list-panes` 验证 pane 消失**
 
 ```
 CRITICAL 规则（2026-08 实测更新，TeamCreate/team_name 已废弃）:
   必须 → Agent(name=...) 会话内唯一命名 + SendMessage(to: name) 按名寻址
   废弃 → TeamCreate/TeamDelete（工具已不存在）；Agent(team_name)（参数已废弃，传了也被忽略——session 有单一隐式 team）
+  废弃 → 观察窗体系 spawn-pane.sh/watch-agent.sh/reap-panes.sh（2026-08-31 named-only 裁定退役，脚本文件留存备查，主流程不再引用）
   pane 故障 → 首个 Agent 报 respawn pane 失败（如 Warp 环境 Device not configured）→ 立即按无分屏降级继续，不阻塞任务
 ```
 
@@ -275,32 +291,27 @@ CRITICAL 规则（2026-08 实测更新，TeamCreate/team_name 已废弃）:
 
 **执行步骤**:
 
-1. **主 pane 保护（内置于脚本）**: spawn-pane.sh / reap-panes.sh 采用登记表制，只操作登记在册的观察窗，主 pane 无需手动记录排除（2026-08-28 起）
-
-2. **并行启动 Teammates**（无依赖的在同一条消息中）:
+1. **并行启动 Teammates**（无依赖的在同一条消息中）:
    ```
    Agent({ name: "agent-1", subagent_type: "...", prompt: "[含项目上下文的完整任务描述]" })
    Agent({ name: "agent-2", subagent_type: "...", prompt: "[...]" })
    ```
    name 会话内唯一，用于 SendMessage({ to: "agent-1" }) 寻址与多阶段复用；无需创建 team（TeamCreate 已废弃）。
 
-3. **创建和分配任务**:
+2. **创建和分配任务**:
    ```
    TaskCreate({ title: "[任务]", description: "[描述]" })
    TaskUpdate({ id: "[task-id]", owner: "[teammate-name]" })
    ```
 
-4. **监控协调**: TaskList 跟踪进度，SendMessage 协调，完成后 shutdown
+3. **监控协调**: TaskList 跟踪进度，SendMessage 协调
 
-5. **清理**（Agent 完成/全部完成后）:
-   - **观察窗: 自动为主** — watcher 静默自杀 + `remain-on-exit off` 自动回收 pane，模型无需手动 kill；遗留由 `reap-panes.sh` 兜底（登记表制，绝不触碰主 pane），已挂 Stop hook 每轮自动跑（2026-08-28）
-   - **agent 本体终止**: TaskList 检测 Agent completed 且不被后续复用 → **`TaskStop(task_id=name)` 终止 agent 本体**。⚠️ 只 kill pane 会残留 agent 本体（HUD 条目不消失）；SendMessage 主动 shutdown_request 已被 harness 拦截——**必须用 TaskStop**（2026-08-24 实测）
-   - **兜底孤儿清理**: Phase 切换前跑一次 `bash ~/.claude/skills/multi-agent/scripts/reap-panes.sh`（登记表制替代旧手写扫描循环，避免误杀非观察窗 pane）
-   - **全局清理**: 所有 Phase 完成后跑 reap 并验证仅剩主面板:
+4. **清理**（每个 Agent 完成即执行，见「完成即总结即收」纪律；全部完成后终验）:
+   - **agent 本体终止**: **`TaskStop(task_id=name)` 终止 agent 本体**。⚠️ 只 kill pane 会残留 agent 本体（HUD 条目不消失）；SendMessage 主动 shutdown_request 已被 harness 拦截——**必须用 TaskStop**（2026-08-24 实测）
+   - **全局清理**: 所有 Phase 完成后验证仅剩主面板:
      ```bash
-     bash ~/.claude/skills/multi-agent/scripts/reap-panes.sh
      W=$(tmux display-message -p '#{session_name}:#{window_index}')
-     [ "$(tmux list-panes -t "$W" | wc -l | tr -d ' ')" = "1" ] && echo "清理完成" || echo "警告: 仍有残留面板（检查是否未登记的手动 pane）"
+     [ "$(tmux list-panes -t "$W" | wc -l | tr -d ' ')" = "1" ] && echo "清理完成" || echo "警告: 仍有残留面板"
      ```
 
 ## Delegate 模式
@@ -316,19 +327,20 @@ CRITICAL 规则（2026-08 实测更新，TeamCreate/team_name 已废弃）:
 - TaskList 交接: A TaskUpdate(completed) → 主 Agent 检测 → 启动 B
 - SendMessage 交接: 即时通知/协调指令
 
-### 多阶段续接（优先复用分屏）
+### 多阶段续接（与「完成即总结即收」的裁决边界）
 
-Phase 间不应销毁 team，应复用空闲 Agent:
+Phase 间复用空闲 Agent 可省重建开销，但必须先过裁决门，避免与完成即收纪律打架：
+- **已确认还有下阶段任务要派给该 agent → 完成通知到达时不收本体**（第 1 步照常：主会话总结进度），SendMessage 续派新任务，复用原 pane
+- **确认不再复用 → 立即 `TaskStop` 收本体**（纪律第 2、3 步照常）
 
 1. **TaskList** → 找 status=completed 的 Agent
 2. **SendMessage** → 发送新任务给空闲 Agent（复用原分屏）
-3. **补充/裁剪** → 空闲不够则新建，多余则 shutdown
+3. **补充/裁剪** → 空闲不够则新建，多余则 `TaskStop`
 
 ```
 绝对禁止:
   不管已有 pane 直接创建新 Agent（面板越开越多）
-  全部 shutdown 再重建（浪费资源）
-  （原「禁止 run_in_background 替代分屏 Agent」条已过时：当前版本 subagent 默认后台运行，以 name 寻址复用即可）
+  全部 TaskStop 再重建（浪费资源）
 ```
 
 ### 冲突解决
@@ -339,7 +351,7 @@ Phase 间不应销毁 team，应复用空闲 Agent:
 | 设计冲突 | Stage 2 明确接口 | 主 Agent 裁决，SendMessage 通知适配 |
 | 依赖冲突 | task_plan 标注依赖 | 主 Agent 重新排序 |
 | 进度阻塞 | 设置超时 | 重试或降级 |
-| 崩溃循环 | 单 agent 失败上限 2 次 | 连续 2 次崩溃 → 主 Agent 串行接管，不再重生（见 cleanup-procedure.md「崩溃循环检测与降级」） |
+| 崩溃循环 | 单 agent 失败上限 2 次 | 连续 2 次崩溃 → 主 Agent 串行接管该任务，不再重生 |
 
 ## Agent Prompt 模板
 
@@ -379,18 +391,18 @@ Phase 间不应销毁 team，应复用空闲 Agent:
 输入: /MultiAgent 实现用户认证功能
 
 Step 0: 读取 CLAUDE.md → 技术栈 Node.js/Express
-Step 1: 检测资源 → fullstack-developer, test-automator 可用
+Step 1: 检测资源 → backend-architect, quality-engineer 在当前会话可用清单中
 Step 2: 任务分析 → 功能开发, 中等复杂度
 
 方案草案:
-| 队友 | 角色 | 文件范围 | 依赖 |
-|------|------|---------|------|
-| api | backend-developer | src/api/auth/*, src/middleware/auth.* | - |
-| test | test-automator | tests/auth/* | api |
+| 队友 | 角色 | subagent_type | 文件范围 | 依赖 |
+|------|------|---------------|---------|------|
+| api | backend-architect | backend-architect | src/api/auth/*, src/middleware/auth.* | - |
+| test | quality-engineer | quality-engineer | tests/auth/* | api |
 
 用户微调 → 确认 → 执行:
   Agent({ name: "api",
-    subagent_type: "general-purpose",
+    subagent_type: "backend-architect",
     prompt: "实现用户认证: JWT token, 登录/注册/刷新接口...\n项目上下文: Node.js/Express..." })
   Agent({ name: "test",
     subagent_type: "quality-engineer",
@@ -398,7 +410,7 @@ Step 2: 任务分析 → 功能开发, 中等复杂度
 ```
 
 ### 简写: 简单任务
-Bug 修复 → 1 个 fixer(frontend-developer) + 1 个 reviewer(code-reviewer)，无依赖，直接并行。
+Bug 修复 → 1 个 fixer(frontend-architect) + 1 个 reviewer(feature-dev:code-reviewer)，无依赖，直接并行。
 
 ### 简写: 复杂任务
 支付系统重构 → 5 个 Agent（core/gateway/security/database/test），3 个 Phase，需 worktree 隔离，Phase 间复用分屏。
@@ -410,12 +422,6 @@ Bug 修复 → 1 个 fixer(frontend-developer) + 1 个 reviewer(code-reviewer)�
 "fan out subagents" 等一句话委托（只读任务）→ Fast Path: 分片分解 + 告知式预告 + 直接分批分发 + 分片清单核对
 ```
 
-> 环境自适应: 在 tmux 中则分屏执行；不在则静默降级为无分屏并发。无需安装 tmux，但必须先完成环境检测——跳过检测 ≠ NO_TMUX。
-
-| 复杂度 | 队友数 | 确认项 |
-|--------|--------|--------|
-| 简单 | 2-3 | 队友分配 |
-| 中等 | 3-5 | 队友 + 文件 + 依赖 |
-| 复杂 | 5+ | 队友 + 文件 + 依赖 + 隔离 + 验收 |
+> 环境自适应: 在 tmux 中则分屏执行（named-only）；不在则静默降级为无分屏并发。无需安装 tmux，但必须先完成环境检测——跳过检测 ≠ NO_TMUX。复杂度分档与确认项见 Step 2「复杂度判断」。
 
 > 编排理论、通信模式、高级技术和 Python 参考代码见 `references/advanced-content.md`
