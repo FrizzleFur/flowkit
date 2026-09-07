@@ -52,7 +52,6 @@ Working with AI coding agents (Claude Code, Cursor, etc.) revealed a gap: **agen
 | **[multi-agent](skills/multi-agent/SKILL.md)** | Agent team coordination | tmux-split parallel execution with phase-aware scheduling |
 | **[prompt](skills/prompt/SKILL.md)** | Prompt scoring & optimization | Johari Window + 3S Principles quantitative evaluation |
 | **[auto-skill](skills/auto-skill/SKILL.md)** | Cross-session memory | Stage -1 recall + Stage 5.8 distillation — experience loop (personal data stays local; repo ships protocol & skeleton only) |
-| **[ppt-agent](skills/ppt-agent/SKILL.md)** | PPT generation workflow | Requirement research → pyramid outline → Bento Grid → page-by-page SVG (editable in Office) |
 
 ## Showcase
 
@@ -278,6 +277,7 @@ cp -r skills/flow ~/.claude/skills/
 cp -r skills/flow-deep ~/.claude/skills/
 cp -r skills/multi-agent ~/.claude/skills/
 cp -r skills/prompt ~/.claude/skills/
+cp -r skills/auto-skill ~/.claude/skills/
 ```
 
 Invoke in Claude Code:
@@ -304,6 +304,16 @@ Invoke in Claude Code:
 - Johari Window-based prompt scoring
 
 ## Changelog
+
+### v1.5.0 (2026-09-07)
+
+**ppt-agent (removed)**
+- **ppt-agent removed from FlowKit** — a deliberate layering call: the five core modules are orchestration infrastructure (pipeline / discipline / memory serving any task), while ppt-agent is a self-contained domain content-production workflow with zero pipeline coupling (not routed by skill-routing, never reads planning files). The repo returns to a pure "workflow orchestration toolkit" scope; the module lives on in the author's personal skills environment
+- Users who installed ppt-agent via v1.4.0 are unaffected — deleting the skill directory uninstalls it
+
+**multi-agent**
+- Backfilled **named-agent three-step closing protocol** (missed in the 08-31 sync) — teammate-type named agents stay resident after finishing, so each completion must run "summarize progress → `TaskStop(name)` to reap the agent (pane auto-recycles) → verify with `tmux list-panes`" to prevent pane leaks
+- Evolution note: pane management has shifted from the spawn-pane watcher system (described in v1.3.0, applies to unnamed async agents only) to "named agent: reap on completion" — named agents get panes from the harness automatically; don't spawn watcher panes for them
 
 ### v1.4.0 (2026-09-04)
 

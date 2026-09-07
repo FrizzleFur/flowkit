@@ -50,7 +50,6 @@
 | **[multi-agent](skills/multi-agent/SKILL.md)** | 多 Agent 协作 | tmux 分屏并行 + 阶段间复用 |
 | **[prompt](skills/prompt/SKILL.md)** | Prompt 评分 | 乔哈里视窗 + 3S 原则量化评估 |
 | **[auto-skill](skills/auto-skill/SKILL.md)** | 跨会话记忆 | Stage -1 召回 + Stage 5.8 沉淀 —— 经验库闭环（个人数据本地维护，仓库只含协议与骨架） |
-| **[ppt-agent](skills/ppt-agent/SKILL.md)** | PPT 生成工作流 | 需求调研 → 金字塔大纲 → Bento Grid → 逐页 SVG（可导入 Office 编辑） |
 
 ## 效果展示
 
@@ -270,6 +269,7 @@ cp -r skills/flow ~/.claude/skills/
 cp -r skills/flow-deep ~/.claude/skills/
 cp -r skills/multi-agent ~/.claude/skills/
 cp -r skills/prompt ~/.claude/skills/
+cp -r skills/auto-skill ~/.claude/skills/
 ```
 
 在 Claude Code 中调用：
@@ -296,6 +296,16 @@ cp -r skills/prompt ~/.claude/skills/
 - 乔哈里视窗 Prompt 量化评分
 
 ## 更新日志 (Changelog)
+
+### v1.5.0 (2026-09-07)
+
+**ppt-agent（移出）**
+- **ppt-agent 移出 FlowKit** —— 定位分层：五个核心模块均为编排基础设施（服务于任意任务的管道/纪律/记忆），ppt-agent 则是自包含的领域内容生产工作流，与管道零耦合（不被 skill-routing 路由、不读规划文件）。移出后仓库回归纯「工作流编排工具集」定位，模块在作者个人 skills 环境继续维护
+- 已通过 v1.4.0 安装 ppt-agent 的用户不受影响，删除对应 skill 目录即卸载
+
+**multi-agent**
+- 补录 **命名 agent 收尾三步协议**（08-31 漏记）—— teammate 型命名 agent 完成后进程常驻不退出，必须依次执行「进度汇总 → `TaskStop(name)` 收本体（pane 随之自动回收）→ `tmux list-panes` 验证」，防 pane 泄漏
+- 演进说明：pane 管理重心已从 spawn-pane 观察窗体系（v1.3.0 所述，仅适用 unnamed 异步 agent）转向「named agent 完成即收」——named 场景由 harness 自动分配 pane，勿再手动开观察窗
 
 ### v1.4.0 (2026-09-04)
 
