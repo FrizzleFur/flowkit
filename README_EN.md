@@ -288,6 +288,20 @@ Invoke in Claude Code:
 /prompt evaluate this prompt: "write a sorting algorithm"
 ```
 
+## Multi-Platform Support (new in v1.6.1)
+
+The full flowkit family now runs on **OpenAI Codex CLI**, with zero impact on the Claude Code experience:
+
+| Platform | Invocation | Adaptation |
+|----------|-----------|------------|
+| Claude Code | `/flow` | Native mechanisms, unchanged |
+| Codex CLI | `$flow` | Built-in `codex-compat.md` layer per skill (mechanism mapping: AskUserQuestion→numbered options, Plan Mode→plan presentation + manual toggle, Task system→.plan file protocol, Agent→spawn_agent tool family) |
+| DeepSeek dsh | `/flow` | Natively isomorphic (ask_user_question / exit_plan_mode / hooks.json reuse); theoretically works, not yet field-tested |
+
+To install on Codex: symlink or copy each skill folder under `skills/` into `~/.agents/skills/` (the Codex USER-level skill directory). The SKILL.md format follows the open [agentskills.io](https://agentskills.io) standard.
+
+Design principles: frontmatter and descriptions are untouched (CC triggering behavior is unaffected); adaptation content lives in reference files loaded via progressive disclosure only on non-CC platforms; missing Codex interaction primitives are degraded-and-simulated rather than dropped.
+
 ## Design Philosophy
 
 | Source | What it manages | What we took |
@@ -305,6 +319,14 @@ Invoke in Claude Code:
 - Johari Window-based prompt scoring
 
 ## Changelog
+
+### v1.6.1 (2026-09-08)
+
+**Family-wide multi-platform adaptation (Codex CLI)**
+- flow / multi-agent / prompt / auto-skill gain a "Platform Compatibility" section + a `codex-compat.md` adaptation layer — usable in OpenAI Codex CLI via the `$flow` prefix
+- Four-piece mechanism mapping: AskUserQuestion→numbered plain-language options, Plan Mode approval→plan presentation + manual toggle, Task system→planning-with-files file protocol, Agent orchestration→spawn_agent tool family
+- Zero impact on Claude Code: frontmatter/description untouched; adaptation content loaded via progressive disclosure only on non-CC platforms
+- SKILL.md format shares the agentskills.io open standard — one entity, multi-platform symlinks
 
 ### v1.6.0 (2026-09-07)
 

@@ -259,6 +259,20 @@ cp -r skills/auto-skill ~/.claude/skills/
 /prompt 评估这个提示词："写一个排序算法"
 ```
 
+## 多平台支持（v1.6.1 新增）
+
+flowkit 全家已适配 **OpenAI Codex CLI** 运行，Claude Code 体验零变化：
+
+| 平台 | 调用 | 适配方式 |
+|------|------|---------|
+| Claude Code | `/flow` | 原生机制，零变化 |
+| Codex CLI | `$flow` | 各技能内置 `codex-compat.md` 适配层（机制映射：AskUserQuestion→编号选项、Plan Mode→plan 呈现+人工切换、Task 系统→.plan 文件协议、Agent→spawn_agent 族） |
+| DeepSeek dsh | `/flow` | 机制原生同构（ask_user_question / exit_plan_mode / hooks.json 复用），理论可用，待实测 |
+
+安装到 Codex：把 `skills/` 下各技能目录 symlink 或复制到 `~/.agents/skills/`（Codex USER 层 skill 目录）即可，SKILL.md 格式同源于 [agentskills.io](https://agentskills.io) 开放标准。
+
+设计原则：frontmatter 与 description 零变更（CC 触发行为不受影响）；适配内容全部下沉 reference 文件按渐进披露加载；Codex 缺失的交互原语全部降级模拟而非砍功能。
+
 ## 设计哲学
 
 | 来源 | 管什么 | 我们吸收了什么 |
@@ -276,6 +290,14 @@ cp -r skills/auto-skill ~/.claude/skills/
 - 乔哈里视窗 Prompt 量化评分
 
 ## 更新日志 (Changelog)
+
+### v1.6.1 (2026-09-08)
+
+**全家族多平台适配（Codex CLI）**
+- flow / multi-agent / prompt / auto-skill 四技能新增「平台兼容」节 + `codex-compat.md` 适配层——OpenAI Codex CLI 以 `$flow` 前缀可用
+- 机制映射四件套：AskUserQuestion→编号选项自然语言、Plan Mode 审批→plan 呈现+人工切换、Task 系统→planning-with-files 文件协议、Agent 编排→spawn_agent 工具族
+- Claude Code 侧零影响：frontmatter/description 零变更，适配内容按渐进披露仅在非 CC 环境加载
+- SKILL.md 格式同源 agentskills.io 开放标准，一份实体多平台 symlink 共用
 
 ### v1.6.0 (2026-09-07)
 

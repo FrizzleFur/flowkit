@@ -425,3 +425,7 @@ Bug 修复 → 1 个 fixer(frontend-architect) + 1 个 reviewer(feature-dev:code
 > 环境自适应: 在 tmux 中则分屏执行（named-only）；不在则静默降级为无分屏并发。无需安装 tmux，但必须先完成环境检测——跳过检测 ≠ NO_TMUX。复杂度分档与确认项见 Step 2「复杂度判断」。
 
 > 编排理论、通信模式、高级技术和 Python 参考代码见 `references/advanced-content.md`
+
+## 平台兼容
+
+非 Claude Code 环境（如 Codex / dsh）运行时，先读 `references/codex-compat.md` 获取 spawn_agent 映射与主从模式改写。Claude Code 环境忽略本节。

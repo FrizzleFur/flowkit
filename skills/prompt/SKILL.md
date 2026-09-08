@@ -1,6 +1,7 @@
 ---
 name: prompt
-description: Evaluate, score, or optimize prompts based on Johari Window and 3S principles
+description: >-
+  Prompt 评分与优化工具：基于乔哈里视窗四象限定位信息盲区（第四象限独有知识必须用"喂模式"喂给 AI，否则 2 分封顶）、3S 原则（Single/Specific/Short）约束表达，输出 1-10 评分、四级问题诊断（Critical/High/Medium/Low）与优化重写版本；多轮对话型 Prompt 额外检查节奏四律。当用户说"这个提示词怎么样""帮我优化这个 prompt""评一下/改进这段 prompt"、输入 /prompt 或 /prompt-scoring、或粘贴一段长文本疑似 prompt 想评估质量时使用。Do NOT use for: 代码评审、文档/报告生成、翻译润色等本身是任务执行的请求；用户想直接执行某个 prompt 而非评估优化它的场景（英文 prompt 评分可能有偏差，本 skill 以中文优化为主）。
 ---
 
 # Prompt Scoring Skill
@@ -331,3 +332,7 @@ public class UserService { }
 - 中文优化为主，英文 Prompt 评分可能有偏差
 - 主观性评分，仅供参考
 - 需要结合具体场景判断
+
+## 平台兼容
+
+本技能为纯方法论，各 harness 通用；非 Claude Code 环境的调用前缀差异见 `codex-compat.md`。Claude Code 环境忽略本节。

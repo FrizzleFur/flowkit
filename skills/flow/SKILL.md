@@ -489,3 +489,7 @@ Stage 4 完成后执行三层清理: 即时清理（Agent completed → shutdown
 - **Plan 质量**: Stage 3 生成的 plan 应满足 `references/plan-quality.md` 的 Checklist，特别是 `--precise-plan` 或 `--deep` 时
 - **退回 Plan 纪律**: Stage 4 中遇到 Plan 假设有误时，不要"硬推"就地修复，而应触发 Fallback 协议（详见 `references/fallback-protocol.md`）
 - **Plan Review 半自动**: 审查 Agent 只输出报告，不自动修改 plan。用户确认后才继续
+
+## 平台兼容
+
+非 Claude Code 环境（如 Codex / dsh）运行时，先读 `references/codex-compat.md` 获取机制映射与降级指令。Claude Code 环境忽略本节。

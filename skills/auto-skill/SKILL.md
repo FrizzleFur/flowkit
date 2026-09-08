@@ -202,3 +202,7 @@ metadata:
 npm install -g qmd && qmd collection add knowledge-base --name auto-skill && qmd embed
 ```
 安装后，改用 `qmd_query` 工具进行语义检索。
+
+## 平台兼容
+
+非 Claude Code 环境（如 Codex / dsh）运行时，召回触发机制的映射见 `references/codex-compat.md`。Claude Code 环境忽略本节。
