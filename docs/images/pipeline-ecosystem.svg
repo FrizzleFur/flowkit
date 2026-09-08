@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 500" width="1060" height="500" role="img" aria-label="FlowKit 生态关系图">
+  <!-- FlowKit 生态关系图 · 生成于 2026-09-08 · 源自 skills repo docs/skills-overview.html v2 -->
+  <style>
+    .bg { fill: #0d1117; }
+    .enode { fill: #1c2129; stroke: #30363d; stroke-width: 1; }
+    .enode-user { fill: #10261a; stroke: #198038; }
+    .enode-hot { stroke: #58a6ff; }
+    .etext { fill: #f0f6fc; font-size: 13px; font-weight: 600; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .etsub { fill: #8b949e; font-size: 11px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .elabel { fill: #58a6ff; font-size: 11.5px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .elabel-g { fill: #3fb950; font-size: 11.5px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .eline { stroke: #8b949e; stroke-width: 1.3; fill: none; }
+    .eline-g { stroke: #3fb950; stroke-width: 1.3; fill: none; }
+    .eline-b { stroke: #58a6ff; stroke-width: 1.3; fill: none; stroke-dasharray: 5 4; }
+  </style>
+  <defs>
+    <marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path fill="#8b949e" d="M0,0 L7,3 L0,6 Z"/></marker>
+    <marker id="arg" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path fill="#3fb950" d="M0,0 L7,3 L0,6 Z"/></marker>
+    <marker id="arb" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path fill="#58a6ff" d="M0,0 L7,3 L0,6 Z"/></marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1060" height="500"/>
+
+  <!-- 用户 -->
+  <rect class="enode enode-user" x="400" y="14" width="260" height="48" rx="7"/>
+  <text class="etext" x="530" y="34" text-anchor="middle">用户 · 一句话任务</text>
+  <text class="etsub" x="530" y="50" text-anchor="middle">"/flow-deep 重构支付系统"</text>
+
+  <!-- 双引擎 -->
+  <rect class="enode" x="130" y="112" width="240" height="60" rx="7"/>
+  <text class="etext" x="250" y="136" text-anchor="middle">flow</text>
+  <text class="etsub" x="250" y="154" text-anchor="middle">轻量编排 · 按需启用</text>
+
+  <rect class="enode enode-hot" x="640" y="112" width="240" height="60" rx="7"/>
+  <text class="etext" x="760" y="136" text-anchor="middle">flow-deep</text>
+  <text class="etsub" x="760" y="154" text-anchor="middle">全量深度 · 默认全开</text>
+
+  <!-- 用户 → 双引擎 -->
+  <line class="eline" x1="460" y1="62" x2="300" y2="112" marker-end="url(#ar)"/>
+  <text class="elabel" x="318" y="82">中等任务 / 可回滚</text>
+  <line class="eline" x1="600" y1="62" x2="730" y2="112" marker-end="url(#ar)"/>
+  <text class="elabel" x="648" y="82">重要 / 高风险任务</text>
+
+  <!-- 双引擎互链 -->
+  <line class="eline-g" x1="374" y1="134" x2="636" y2="134" marker-end="url(#arg)"/>
+  <line class="eline-g" x1="636" y1="152" x2="374" y2="152" marker-end="url(#arg)"/>
+  <text class="elabel-g" x="505" y="128" text-anchor="middle">升级</text>
+  <text class="elabel-g" x="505" y="168" text-anchor="middle">降级</text>
+
+  <!-- 汇聚总线 -->
+  <line class="eline" x1="250" y1="172" x2="250" y2="200"/>
+  <line class="eline" x1="760" y1="172" x2="760" y2="200"/>
+  <line class="eline" x1="150" y1="200" x2="930" y2="200"/>
+
+  <!-- 四能力位 -->
+  <rect class="enode" x="30" y="238" width="210" height="62" rx="7"/>
+  <text class="etext" x="135" y="262" text-anchor="middle">prompt</text>
+  <text class="etsub" x="135" y="280" text-anchor="middle">输入质量 · 乔哈里+3S</text>
+
+  <rect class="enode" x="272" y="238" width="232" height="62" rx="7"/>
+  <text class="etext" x="388" y="262" text-anchor="middle">planning-with-files</text>
+  <text class="etsub" x="388" y="280" text-anchor="middle">规划落盘 · 三件套恢复</text>
+
+  <rect class="enode" x="536" y="238" width="210" height="62" rx="7"/>
+  <text class="etext" x="641" y="262" text-anchor="middle">multi-agent</text>
+  <text class="etsub" x="641" y="280" text-anchor="middle">并发执行 · 分片验收</text>
+
+  <rect class="enode" x="780" y="238" width="210" height="62" rx="7"/>
+  <text class="etext" x="885" y="262" text-anchor="middle">ex-web</text>
+  <text class="etsub" x="885" y="280" text-anchor="middle">可视化交付 · 讲解页</text>
+
+  <!-- 总线 → 四能力位 -->
+  <line class="eline" x1="135" y1="200" x2="135" y2="238" marker-end="url(#ar)"/>
+  <text class="elabel" x="142" y="226">Stage 1 输入优化</text>
+  <line class="eline" x1="388" y1="200" x2="388" y2="238" marker-end="url(#ar)"/>
+  <text class="elabel" x="395" y="226">Stage 3 规划落盘</text>
+  <line class="eline" x1="641" y1="200" x2="641" y2="238" marker-end="url(#ar)"/>
+  <text class="elabel" x="648" y="226">Stage 4 并发执行</text>
+  <line class="eline" x1="885" y1="200" x2="885" y2="238" marker-end="url(#ar)"/>
+  <text class="elabel" x="892" y="226">分析产物讲解页</text>
+
+  <!-- multi-agent → agents -->
+  <rect class="enode" x="536" y="368" width="230" height="56" rx="7"/>
+  <text class="etext" x="651" y="390" text-anchor="middle">named agents × N</text>
+  <text class="etsub" x="651" y="408" text-anchor="middle">tmux 分屏 / 静默降级</text>
+  <line class="eline-g" x1="641" y1="300" x2="641" y2="368" marker-end="url(#arg)"/>
+  <text class="elabel-g" x="650" y="340">同消息 ≤2/批 · 防限流</text>
+
+  <!-- auto-skill 闭环 -->
+  <rect class="enode enode-hot" x="790" y="368" width="240" height="56" rx="7"/>
+  <text class="etext" x="910" y="390" text-anchor="middle">auto-skill</text>
+  <text class="etsub" x="910" y="408" text-anchor="middle">跨会话记忆 · 双库</text>
+  <polyline class="eline-b" points="998,364 998,176 888,176" marker-end="url(#arb)"/>
+  <text class="elabel" x="948" y="168" text-anchor="middle">Stage -1 经验召回</text>
+  <polyline class="eline-b" points="888,160 1016,160 1016,364" marker-end="url(#arb)"/>
+  <text class="elabel" x="948" y="152" text-anchor="middle">Stage 5.8 经验沉淀</text>
+
+  <!-- 注记 -->
+  <text class="etsub" x="30" y="452">实线 = 管道内调用 · 绿色 = 可逆切换/分发 · 蓝色虚线 = 跨会话记忆流（auto-skill 同时服务全部 skill 的经验读写）</text>
+  <text class="etsub" x="30" y="470">planning-with-files 与 ex-web 为同源生态 skill（上游私有 skills 仓库，本仓库未收录源码）</text>
+</svg>
