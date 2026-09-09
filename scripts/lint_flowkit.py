@@ -108,7 +108,10 @@ def lint_verify_cmds(root: Path) -> list[tuple[str, str, str]]:
 
 def lint_ref_integrity(root: Path) -> list[tuple[str, str, str]]:
     """L5: 引用完整性——分两种形态：技能内相对引用按 skill 根解析（断链=error）；
-    跨技能引用（~/.claude/skills/<name>/...）在仓内或安装副本可解析即通过（运行时以已装副本为准）。"""
+    跨技能引用分两级：目标技能在本仓 skills/ 下（家族内）→ 文件必须仓内可解析（error，
+    CI 无安装副本环境也要挡）；目标技能不在本仓（外部家族成员，如 auto-iterate 由私有仓管）
+    → 合法外部依赖，不报 error（本地有装副本时确认存在与否仅作提示）。
+    教训（2026-09-09 CI 首跑）：外部依赖用「安装副本 OR」判定会把 CI 必挂的合法引用判成断链。"""
     errors, seen = [], set()
     home_skills = Path.home() / ".claude" / "skills"
     for f in [*root.glob("skills/*/SKILL.md"), *root.glob("skills/*/references/*.md")]:
@@ -122,9 +125,13 @@ def lint_ref_integrity(root: Path) -> list[tuple[str, str, str]]:
                 if key in seen:
                     continue
                 seen.add(key)
-                if not ((root / "skills" / target_skill / rest).exists()
-                        or (home_skills / target_skill / rest).exists()):
-                    errors.append((key[0], key[1], "跨技能引用目标在仓与安装副本均不存在（L5 断链）"))
+                in_repo = (root / "skills" / target_skill).is_dir()
+                repo_hit = (root / "skills" / target_skill / rest).exists()
+                home_hit = (home_skills / target_skill / rest).exists()
+                if in_repo and not repo_hit:
+                    errors.append((key[0], key[1], "家族内技能跨引用断链——目标文件不在本仓（L5 断链）"))
+                # else: 外部家族依赖（目标技能不在本仓，如 auto-iterate 由私有仓管）——合法，静默；
+                # 本地安装副本是否存在不影响判定（CI 无安装副本属常态，教训 2026-09-09 CI 首跑）
             else:
                 rel = m.group("rel")
                 key = (str(f.relative_to(root)), rel)
