@@ -6,6 +6,8 @@ FlowKit 全量版本历史。格式遵循 [Keep a Changelog](https://keepachange
 
 ### flow-deep
 - Stage 3 新增 **Plan Mode 审批弹窗说明** —— ExitPlanMode 审批后的「执行模式选择」弹窗（auto-accept edits / manually approve / bypass permissions）为 harness 原生行为，skill 无法消除；指引通过 `permissions.defaultMode` 预设（如 `acceptEdits`）或会话启动时 Shift+Tab 预切规避；计划审批弹窗本身为用户控制权红线，不可绕过
+- Stage 4 新增 **分发前置自检**（执行型 agent 必做）—— 派发前扫描写入路径清单识别作用域外路径（新建项目同级文件夹、/tmp 等）并征询用户（`/add-dir` / 绝对路径 allow 规则 / 修改规划），未处理不派发；防 subagent 启动后卡在权限确认上无人察觉（后台 agent 授权等待无面板提示，比主会话弹窗更难发现）
+- agent-dispatch.md 新增 **权限与作用域章节**（flow/flow-deep 共用）—— subagent 权限继承机制速览（继承模式与 allow/deny 规则、acceptEdits 覆盖新建文件、保护路径任何模式都弹、文件编辑类批准不落盘）+ 作用域外写入前置处理协议 + 分发 prompt 约定（写盘用 Write/Edit 工具）+ 弹窗诊断对照表；依据 2026-09-09 官方 permissions/sub-agents/permission-modes 文档核实
 
 ### 仓库基础设施
 - 新增 **CLAUDE.md / AGENTS.md** —— Agent 协作规范落库：版本演进纪律（CHANGELOG 全量收敛 + README 滚动保留最近 3 版）、条目写法、提交规范（含并发提交 409 重取 sha 规则）；README / README_EN 日志区同步收敛为最近三版
