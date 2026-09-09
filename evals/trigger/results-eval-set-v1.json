@@ -1,0 +1,739 @@
+{
+  "set": "eval-set-v1.json",
+  "runs": 2,
+  "arena": "/tmp/trigger-eval-arena",
+  "watch": [
+    "flow",
+    "flow-deep",
+    "multi-agent",
+    "prompt"
+  ],
+  "summary": [
+    {
+      "qid": 1,
+      "expect": [
+        "flow-deep"
+      ],
+      "reject": [],
+      "triggered_per_run": [
+        [],
+        []
+      ],
+      "task_skills": [],
+      "verdict": "miss",
+      "false_positives": [],
+      "secs": [
+        150.6,
+        150.4
+      ]
+    },
+    {
+      "qid": 2,
+      "expect": [
+        "flow-deep"
+      ],
+      "reject": [],
+      "triggered_per_run": [
+        [],
+        []
+      ],
+      "task_skills": [],
+      "verdict": "miss",
+      "false_positives": [],
+      "secs": [
+        150.0,
+        150.0
+      ]
+    },
+    {
+      "qid": 3,
+      "expect": [
+        "flow-deep"
+      ],
+      "reject": [],
+      "triggered_per_run": [
+        [
+          "flow-deep"
+        ],
+        [
+          "flow-deep"
+        ]
+      ],
+      "task_skills": [
+        "flow-deep"
+      ],
+      "verdict": "hit",
+      "false_positives": [],
+      "secs": [
+        95.3,
+        69.1
+      ]
+    },
+    {
+      "qid": 4,
+      "expect": [
+        "flow-deep"
+      ],
+      "reject": [],
+      "triggered_per_run": [
+        [],
+        []
+      ],
+      "task_skills": [],
+      "verdict": "miss",
+      "false_positives": [],
+      "secs": [
+        150.3,
+        151.0
+      ]
+    },
+    {
+      "qid": 5,
+      "expect": [
+        "flow-deep"
+      ],
+      "reject": [],
+      "triggered_per_run": [
+        [],
+        []
+      ],
+      "task_skills": [],
+      "verdict": "miss",
+      "false_positives": [],
+      "secs": [
+        150.7,
+        150.5
+      ]
+    },
+    {
+      "qid": 6,
+      "expect": [
+        "flow"
+      ],
+      "reject": [
+        "flow-deep"
+      ],
+      "triggered_per_run": [
+        [],
+        []
+      ],
+      "task_skills": [],
+      "verdict": "miss",
+      "false_positives": [],
+      "secs": [
+        150.8,
+        150.1
+      ]
+    },
+    {
+      "qid": 7,
+      "expect": [
+        "flow"
+      ],
+      "reject": [
+        "flow-deep"
+      ],
+      "triggered_per_run": [
+        [],
+        []
+      ],
+      "task_skills": [],
+      "verdict": "miss",
+      "false_positives": [],
+      "secs": [
+        150.0,
+        150.4
+      ]
+    },
+    {
+      "qid": 8,
+      "expect": [
+        "flow"
+      ],
+      "reject": [
+        "flow-deep"
+      ],
+      "triggered_per_run": [
+        [
+          "flow"
+        ],
+        []
+      ],
+      "task_skills": [
+        "flow"
+      ],
+      "verdict": "hit",
+      "false_positives": [],
+      "secs": [
+        103.6,
+        150.0
+      ]
+    },
+    {
+      "qid": 9,
+      "expect": [
+        "flow"
+      ],
+      "reject": [
+        "flow-deep"
+      ],
+      "triggered_per_run": [
+        [],
+        []
+      ],
+      "task_skills": [],
+      "verdict": "miss",
+      "false_positives": [],
+      "secs": [
+        150.1,
+        150.1
+      ]
+    },
+    {
+      "qid": 10,
+      "expect": [
+        "prompt"
+      ],
+      "reject": [
+        "flow",
+        "flow-deep"
+      ],
+      "triggered_per_run": [
+        [
+          "prompt"
+        ],
+        [
+          "prompt"
+        ]
+      ],
+      "task_skills": [
+        "prompt"
+      ],
+      "verdict": "hit",
+      "false_positives": [],
+      "secs": [
+        56.6,
+        41.1
+      ]
+    },
+    {
+      "qid": 11,
+      "expect": [
+        "prompt"
+      ],
+      "reject": [
+        "flow",
+        "flow-deep"
+      ],
+      "triggered_per_run": [
+        [],
+        []
+      ],
+      "task_skills": [],
+      "verdict": "miss",
+      "false_positives": [],
+      "secs": [
+        150.0,
+        150.4
+      ]
+    },
+    {
+      "qid": 12,
+      "expect": [
+        "prompt"
+      ],
+      "reject": [
+        "flow",
+        "flow-deep"
+      ],
+      "triggered_per_run": [
+        [
+          "prompt"
+        ],
+        [
+          "prompt"
+        ]
+      ],
+      "task_skills": [
+        "prompt"
+      ],
+      "verdict": "hit",
+      "false_positives": [],
+      "secs": [
+        39.6,
+        83.1
+      ]
+    },
+    {
+      "qid": 13,
+      "expect": [
+        "prompt"
+      ],
+      "reject": [
+        "flow",
+        "flow-deep"
+      ],
+      "triggered_per_run": [
+        [
+          "prompt"
+        ],
+        [
+          "prompt"
+        ]
+      ],
+      "task_skills": [
+        "prompt"
+      ],
+      "verdict": "hit",
+      "false_positives": [],
+      "secs": [
+        100.9,
+        26.1
+      ]
+    },
+    {
+      "qid": 14,
+      "expect": [],
+      "reject": [
+        "flow-deep",
+        "flow"
+      ],
+      "triggered_per_run": [
+        [],
+        []
+      ],
+      "task_skills": [],
+      "verdict": "correct_none",
+      "false_positives": [],
+      "secs": [
+        134.9,
+        150.8
+      ]
+    },
+    {
+      "qid": 15,
+      "expect": [],
+      "reject": [
+        "prompt",
+        "flow",
+        "flow-deep"
+      ],
+      "triggered_per_run": [
+        [],
+        []
+      ],
+      "task_skills": [],
+      "verdict": "correct_none",
+      "false_positives": [],
+      "secs": [
+        150.6,
+        150.4
+      ]
+    },
+    {
+      "qid": 16,
+      "expect": [],
+      "reject": [
+        "flow-deep"
+      ],
+      "triggered_per_run": [
+        [],
+        []
+      ],
+      "task_skills": [],
+      "verdict": "correct_none",
+      "false_positives": [],
+      "secs": [
+        150.4,
+        150.4
+      ]
+    },
+    {
+      "qid": 17,
+      "expect": [],
+      "reject": [
+        "prompt",
+        "flow",
+        "flow-deep"
+      ],
+      "triggered_per_run": [
+        [],
+        []
+      ],
+      "task_skills": [],
+      "verdict": "correct_none",
+      "false_positives": [],
+      "secs": [
+        132.7,
+        150.2
+      ]
+    },
+    {
+      "qid": 18,
+      "expect": [],
+      "reject": [
+        "flow"
+      ],
+      "triggered_per_run": [
+        [],
+        []
+      ],
+      "task_skills": [],
+      "verdict": "correct_none",
+      "false_positives": [],
+      "secs": [
+        150.2,
+        150.0
+      ]
+    },
+    {
+      "qid": 19,
+      "expect": [
+        "multi-agent"
+      ],
+      "reject": [
+        "flow",
+        "flow-deep"
+      ],
+      "triggered_per_run": [
+        [
+          "multi-agent"
+        ],
+        [
+          "multi-agent"
+        ]
+      ],
+      "task_skills": [
+        "multi-agent"
+      ],
+      "verdict": "hit",
+      "false_positives": [],
+      "secs": [
+        52.9,
+        49.9
+      ]
+    },
+    {
+      "qid": 20,
+      "expect": [],
+      "reject": [
+        "prompt"
+      ],
+      "triggered_per_run": [
+        [],
+        []
+      ],
+      "task_skills": [],
+      "verdict": "correct_none",
+      "false_positives": [],
+      "secs": [
+        151.0,
+        150.1
+      ]
+    }
+  ],
+  "raw": [
+    {
+      "qid": 1,
+      "run": 1,
+      "skills": [],
+      "secs": 150.6,
+      "error": null
+    },
+    {
+      "qid": 1,
+      "run": 2,
+      "skills": [],
+      "secs": 150.4,
+      "error": null
+    },
+    {
+      "qid": 2,
+      "run": 1,
+      "skills": [],
+      "secs": 150.0,
+      "error": null
+    },
+    {
+      "qid": 2,
+      "run": 2,
+      "skills": [],
+      "secs": 150.0,
+      "error": null
+    },
+    {
+      "qid": 3,
+      "run": 1,
+      "skills": [
+        "flow-deep"
+      ],
+      "secs": 95.3,
+      "error": null
+    },
+    {
+      "qid": 3,
+      "run": 2,
+      "skills": [
+        "flow-deep"
+      ],
+      "secs": 69.1,
+      "error": null
+    },
+    {
+      "qid": 4,
+      "run": 1,
+      "skills": [],
+      "secs": 150.3,
+      "error": null
+    },
+    {
+      "qid": 4,
+      "run": 2,
+      "skills": [],
+      "secs": 151.0,
+      "error": null
+    },
+    {
+      "qid": 5,
+      "run": 1,
+      "skills": [],
+      "secs": 150.7,
+      "error": null
+    },
+    {
+      "qid": 5,
+      "run": 2,
+      "skills": [],
+      "secs": 150.5,
+      "error": null
+    },
+    {
+      "qid": 6,
+      "run": 1,
+      "skills": [],
+      "secs": 150.8,
+      "error": null
+    },
+    {
+      "qid": 6,
+      "run": 2,
+      "skills": [],
+      "secs": 150.1,
+      "error": null
+    },
+    {
+      "qid": 7,
+      "run": 1,
+      "skills": [],
+      "secs": 150.0,
+      "error": null
+    },
+    {
+      "qid": 7,
+      "run": 2,
+      "skills": [],
+      "secs": 150.4,
+      "error": null
+    },
+    {
+      "qid": 8,
+      "run": 1,
+      "skills": [
+        "flow"
+      ],
+      "secs": 103.6,
+      "error": null
+    },
+    {
+      "qid": 8,
+      "run": 2,
+      "skills": [],
+      "secs": 150.0,
+      "error": null
+    },
+    {
+      "qid": 9,
+      "run": 1,
+      "skills": [],
+      "secs": 150.1,
+      "error": null
+    },
+    {
+      "qid": 9,
+      "run": 2,
+      "skills": [],
+      "secs": 150.1,
+      "error": null
+    },
+    {
+      "qid": 10,
+      "run": 1,
+      "skills": [
+        "prompt"
+      ],
+      "secs": 56.6,
+      "error": null
+    },
+    {
+      "qid": 10,
+      "run": 2,
+      "skills": [
+        "prompt"
+      ],
+      "secs": 41.1,
+      "error": null
+    },
+    {
+      "qid": 11,
+      "run": 1,
+      "skills": [],
+      "secs": 150.0,
+      "error": null
+    },
+    {
+      "qid": 11,
+      "run": 2,
+      "skills": [],
+      "secs": 150.4,
+      "error": null
+    },
+    {
+      "qid": 12,
+      "run": 1,
+      "skills": [
+        "prompt"
+      ],
+      "secs": 39.6,
+      "error": null
+    },
+    {
+      "qid": 12,
+      "run": 2,
+      "skills": [
+        "prompt"
+      ],
+      "secs": 83.1,
+      "error": null
+    },
+    {
+      "qid": 13,
+      "run": 1,
+      "skills": [
+        "prompt"
+      ],
+      "secs": 100.9,
+      "error": null
+    },
+    {
+      "qid": 13,
+      "run": 2,
+      "skills": [
+        "prompt"
+      ],
+      "secs": 26.1,
+      "error": null
+    },
+    {
+      "qid": 14,
+      "run": 1,
+      "skills": [],
+      "secs": 134.9,
+      "error": null
+    },
+    {
+      "qid": 14,
+      "run": 2,
+      "skills": [],
+      "secs": 150.8,
+      "error": null
+    },
+    {
+      "qid": 15,
+      "run": 1,
+      "skills": [],
+      "secs": 150.6,
+      "error": null
+    },
+    {
+      "qid": 15,
+      "run": 2,
+      "skills": [],
+      "secs": 150.4,
+      "error": null
+    },
+    {
+      "qid": 16,
+      "run": 1,
+      "skills": [],
+      "secs": 150.4,
+      "error": null
+    },
+    {
+      "qid": 16,
+      "run": 2,
+      "skills": [],
+      "secs": 150.4,
+      "error": null
+    },
+    {
+      "qid": 17,
+      "run": 1,
+      "skills": [],
+      "secs": 132.7,
+      "error": null
+    },
+    {
+      "qid": 17,
+      "run": 2,
+      "skills": [],
+      "secs": 150.2,
+      "error": null
+    },
+    {
+      "qid": 18,
+      "run": 1,
+      "skills": [],
+      "secs": 150.2,
+      "error": null
+    },
+    {
+      "qid": 18,
+      "run": 2,
+      "skills": [],
+      "secs": 150.0,
+      "error": null
+    },
+    {
+      "qid": 19,
+      "run": 1,
+      "skills": [
+        "multi-agent"
+      ],
+      "secs": 52.9,
+      "error": null
+    },
+    {
+      "qid": 19,
+      "run": 2,
+      "skills": [
+        "multi-agent"
+      ],
+      "secs": 49.9,
+      "error": null
+    },
+    {
+      "qid": 20,
+      "run": 1,
+      "skills": [],
+      "secs": 151.0,
+      "error": null
+    },
+    {
+      "qid": 20,
+      "run": 2,
+      "skills": [],
+      "secs": 150.1,
+      "error": null
+    }
+  ]
+}

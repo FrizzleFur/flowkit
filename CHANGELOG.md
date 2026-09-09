@@ -4,6 +4,13 @@ FlowKit 全量版本历史。格式遵循 [Keep a Changelog](https://keepachange
 
 ## [Unreleased]
 
+（暂空——v1.7.0 刚发版）
+
+## [v1.7.0] - 2026-09-09
+
+（暂空——v1.7.0 刚发版）
+
+
 ### flow-deep
 - Stage 3 **反转默认：默认不再进入 Plan Mode** —— 默认路径改为「plan 落盘 `.plan/` 三件套 + plan-quality 质量自检 + AskUserQuestion 用户确认点（批准/修改/重新规划）」，规划纪律与 Stage 3.5/3.6 审查关卡不变，仅审批载体从 harness 弹窗换为对话内确认；新增 `--plan-mode` 参数显式进入 Plan Mode（对应 flow 的 `--strict-plan`）。依据 2026-09-09 官方文档核实：ExitPlanMode 审批弹窗属 permission prompt，无任何配置/环境变量/flags 可抑制，且 bypass 会话中 Plan Mode 只读封锁本就不强制——保留 Plan Mode 只剩弹窗打断，无沙箱收益（取代本段原「Plan Mode 审批弹窗说明」条目）；附带修正 Stage 3 STATE.md `next_action` 漏 Stage 3.5 的顺序缺陷
 - Stage 4 新增 **分发前置自检**（执行型 agent 必做）—— 派发前扫描写入路径清单识别作用域外路径（新建项目同级文件夹、/tmp 等）并征询用户（`/add-dir` / 绝对路径 allow 规则 / 修改规划），未处理不派发；防 subagent 启动后卡在权限确认上无人察觉（后台 agent 授权等待无面板提示，比主会话弹窗更难发现）
@@ -11,6 +18,7 @@ FlowKit 全量版本历史。格式遵循 [Keep a Changelog](https://keepachange
 
 ### 仓库基础设施
 - 新增 **CLAUDE.md / AGENTS.md** —— Agent 协作规范落库：版本演进纪律（CHANGELOG 全量收敛 + README 滚动保留最近 3 版）、条目写法、提交规范（含并发提交 409 重取 sha 规则）；README / README_EN 日志区同步收敛为最近三版
+- 新增 **T-302 trigger eval 竞技场**（`evals/trigger/`）——20 条竞争口径 eval set（should/near-miss）+ runner（stream-json 早停检测 + command 注入竞技场 + effort 钉住）；首轮结果 12/20：**near-miss 6/6 零误触发（precision 满分），漏触发为主**（flow-deep 1/5、flow 1/4、prompt 3/4）——方向明确：description 无需收紧、可考虑增强触发表达；口径注记：150s 超时下部分 miss 含「决策未发生」与「决定不触发」的混淆，优化迭代另排期
 - 新增 **evals 三层体系** —— skill 本体的回归测试（管道验证一切，唯独不验证自己的补位）：L0 静态断言 / L1 触发（T-302 待建）/ L2 行为；五条防漂移规则 + 失效报警信号 + 环境三元组纪律（evals/README.md）
 - **lint_flowkit.py 升级七项断言 + GitHub Actions CI 门禁** —— 新增 L5 引用完整性（技能内/跨技能两种形态）、L6 codex-compat 双向一致、L7 frontmatter 一致；L3 增 budget 线（flow-deep 800 行 = REC-11 下沉触发线，error 级）；CI 零 LLM 成本，push/PR 即跑；首跑抓出并修复 2 条跨技能裸相对引用真断链
 - CLAUDE.md 增 **「谁改契约谁带测试」协作纪律** 与 **引用写法规范**（跨技能引用必须 `~/.claude/skills/<name>/` 全路径）
@@ -119,3 +127,6 @@ FlowKit 全量版本历史。格式遵循 [Keep a Changelog](https://keepachange
 **multi-agent**
 - `SKILL.md` 更新（315 → 328 行）
 
+
+
+## [

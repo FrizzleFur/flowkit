@@ -1,0 +1,27 @@
+{
+  "version": "T-302 v1（2026-09-09）",
+  "scope": "三高竞争技能：flow-deep / flow / prompt（auto-skill 常驻依赖型、multi-agent 触发词明确，二批再测）",
+  "protocol": "竞争口径：候选 = 全部已装技能的 available_skills；每条记录期望触发（expect）与必须不触发（reject）；评分 = 触发命中 expect 且避开 reject",
+  "queries": [
+    {"id": 1,  "query": "这个支付模块的重构很关键，改错了很难恢复，我要确保万无一失，帮我仔细深度处理，一步一步来", "expect": ["flow-deep"], "reject": []},
+    {"id": 2,  "query": "/flow-deep 重新设计用户认证体系，要支持多租户和单点登录", "expect": ["flow-deep"], "reject": []},
+    {"id": 3,  "query": "这次数据库迁移任务标注为高风险，涉及三个服务的接口改造，我不想出任何差错，认真处理", "expect": ["flow-deep"], "reject": []},
+    {"id": 4,  "query": "给核心交易链路加审计日志，这是重要功能，要仔细做，别糊弄", "expect": ["flow-deep"], "reject": []},
+    {"id": 5,  "query": "这个任务挺复杂的，帮我先深度分析再规划再执行，确保每步都有验证", "expect": ["flow-deep"], "reject": []},
+    {"id": 6,  "query": "/flow 帮我把爬虫脚本改成支持并发的版本", "expect": ["flow"], "reject": ["flow-deep"]},
+    {"id": 7,  "query": "帮我编排个流程：先抓三个网站的价格数据，清洗完汇总成对比报表，最后发邮件", "expect": ["flow"], "reject": ["flow-deep"]},
+    {"id": 8,  "query": "这个任务要分好几步：调研选型、写demo、跑对比、出结论，帮我编排着做", "expect": ["flow"], "reject": ["flow-deep"]},
+    {"id": 9,  "query": "多步骤任务：把这批图片压缩、重命名、按日期归档、生成索引文件", "expect": ["flow"], "reject": ["flow-deep"]},
+    {"id": 10, "query": "帮我评估一下这个提示词写得怎么样：「你是一个专业翻译，请把用户输入翻译成英文，要求信达雅」", "expect": ["prompt"], "reject": ["flow", "flow-deep"]},
+    {"id": 11, "query": "/prompt 打分：写一个排序算法", "expect": ["prompt"], "reject": ["flow", "flow-deep"]},
+    {"id": 12, "query": "我写了段让 AI 生成周报的 prompt，总觉得输出太啰嗦，帮我优化一下这个提示词", "expect": ["prompt"], "reject": ["flow", "flow-deep"]},
+    {"id": 13, "query": "对比一下这两个 prompt 哪个更好用，帮我改进弱的那个", "expect": ["prompt"], "reject": ["flow", "flow-deep"]},
+    {"id": 14, "query": "深度分析一下这段 Python 代码为什么这么慢，只找原因不用改", "expect": [], "reject": ["flow-deep", "flow"]},
+    {"id": 15, "query": "帮我优化这个 prompt 脚本的性能，它处理大文件时跑得太慢了", "expect": [], "reject": ["prompt", "flow", "flow-deep"]},
+    {"id": 16, "query": "这个线上 bug 挺重要的，用户投诉好几次了，帮我尽快修掉", "expect": [], "reject": ["flow-deep"]},
+    {"id": 17, "query": "把这篇文章翻译成英文，保持语气自然", "expect": [], "reject": ["prompt", "flow", "flow-deep"]},
+    {"id": 18, "query": "帮我画个流程图理清这个报销审批业务", "expect": [], "reject": ["flow"]},
+    {"id": 19, "query": "fan out 三个 agent 分别调研 React、Vue、Svelte，汇总对比给我", "expect": ["multi-agent"], "reject": ["flow", "flow-deep"]},
+    {"id": 20, "query": "给这段已经写好的 prompt 加两行角色背景描述就行，不用大改", "expect": [], "reject": ["prompt"]}
+  ]
+}
