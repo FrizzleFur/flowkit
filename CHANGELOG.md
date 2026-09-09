@@ -7,6 +7,9 @@ FlowKit 全量版本历史。格式遵循 [Keep a Changelog](https://keepachange
 ### flow-deep
 - Stage 3 新增 **Plan Mode 审批弹窗说明** —— ExitPlanMode 审批后的「执行模式选择」弹窗（auto-accept edits / manually approve / bypass permissions）为 harness 原生行为，skill 无法消除；指引通过 `permissions.defaultMode` 预设（如 `acceptEdits`）或会话启动时 Shift+Tab 预切规避；计划审批弹窗本身为用户控制权红线，不可绕过
 
+### 仓库基础设施
+- 新增 **CLAUDE.md / AGENTS.md** —— Agent 协作规范落库：版本演进纪律（CHANGELOG 全量收敛 + README 滚动保留最近 3 版）、条目写法、提交规范（含并发提交 409 重取 sha 规则）；README / README_EN 日志区同步收敛为最近三版
+
 ### v1.6.1 (2026-09-08)
 
 **全家族多平台适配（Codex CLI）**
