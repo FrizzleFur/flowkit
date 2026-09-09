@@ -11,6 +11,14 @@ FlowKit 全量版本历史。格式遵循 [Keep a Changelog](https://keepachange
 
 ### 仓库基础设施
 - 新增 **CLAUDE.md / AGENTS.md** —— Agent 协作规范落库：版本演进纪律（CHANGELOG 全量收敛 + README 滚动保留最近 3 版）、条目写法、提交规范（含并发提交 409 重取 sha 规则）；README / README_EN 日志区同步收敛为最近三版
+- 新增 **evals 三层体系** —— skill 本体的回归测试（管道验证一切，唯独不验证自己的补位）：L0 静态断言 / L1 触发（T-302 待建）/ L2 行为；五条防漂移规则 + 失效报警信号 + 环境三元组纪律（evals/README.md）
+- **lint_flowkit.py 升级七项断言 + GitHub Actions CI 门禁** —— 新增 L5 引用完整性（技能内/跨技能两种形态）、L6 codex-compat 双向一致、L7 frontmatter 一致；L3 增 budget 线（flow-deep 800 行 = REC-11 下沉触发线，error 级）；CI 零 LLM 成本，push/PR 即跑；首跑抓出并修复 2 条跨技能裸相对引用真断链
+- CLAUDE.md 增 **「谁改契约谁带测试」协作纪律** 与 **引用写法规范**（跨技能引用必须 `~/.claude/skills/<name>/` 全路径）
+- **单一事实来源迁移** —— 本仓成为 5 核心 skill 主本，`~/.claude/skills`（私有仓 clone）对应目录换为反向 symlink；编辑任一侧即同一份文件、git status 即时跟踪，终结三住处拷贝漂移（历史三次事故的结构性根源）；per-skill README 导览层随迁开源，auto-skill 个人数据（experience/knowledge-base）gitignore 隔离
+
+### flow-deep
+- 新增 **行为 evals（T-301）** —— 三类型迷你任务（调研/文档/代码）× 单臂 × Stage 3 确认点截断的回归评测：3 case + 24 机检断言 + fixture + snapshot；首轮三臂全绿建立绿基线（`evals/flow-deep/benchmarks/iteration-1.json`），含 token/duration 与 8 条 analyst 观察
+- **check_context.py 窗口口径修复**（evals 首批战果，两臂独立复现的误报）—— 窗口解析改为「显式传参 > FLOWKIT_CONTEXT_WINDOW > ANTHROPIC_MODEL 推断 > 200K 默认（来源标注）」，零配置随切模型自适应；session 定位加贴近度分组 + fallback 标志；first_msg 兼容 teammate 包装（原「session 疑似误选」系包装剥离缺失的误判，已翻案）；实测误报 96.1% → 19.2%
 
 ### v1.6.1 (2026-09-08)
 
