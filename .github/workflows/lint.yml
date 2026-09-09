@@ -1,0 +1,20 @@
+# FlowKit 宪法 lint 门禁 —— 零 LLM 成本（evals 分层里的 L0 静态断言层）
+# 检查项与修复指引见 scripts/lint_flowkit.py 文件头 docstring；
+# evals 三层体系与防漂移规则见 evals/README.md
+name: lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: FlowKit 宪法 lint（L1-L7 断言清单）
+        run: python3 scripts/lint_flowkit.py

@@ -28,6 +28,16 @@
 README 只保留「30 秒决定要不要用」的内容（架构总览 / 设计亮点 / 快速上手 / 最近 3 版）。
 版本历史细节一律去 CHANGELOG 查，不要往 README 堆。
 
+## Evals 协作纪律（谁改契约谁带测试）
+
+改动若触碰以下任一「合同面」，**同 commit 必须更新对应断言或评测集**（详见 `evals/README.md` 五条防漂移规则）：
+
+- stage 划分 / 五件套协议 / STATE.md schema → 更新 `scripts/lint_flowkit.py` 断言或 `evals/<skill>/` 行为断言
+- 触发 description（frontmatter）→ 触发面变更，标注待 T-302 trigger eval 复验
+- 新增/移动 references/scripts 文件 → 本地跑 `python3 scripts/lint_flowkit.py` 确认 L5 引用完整性（exit 0 才可提交）
+
+跑 eval 后结果留痕（benchmark 报告含环境三元组：flowkit 版本 / CC 版本 / 模型）。
+
 ## 提交规范
 
 - 身份：`mike <16328879+FrizzleFur@users.noreply.github.com>`，不加 AI 协作署名

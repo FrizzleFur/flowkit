@@ -2,3 +2,7 @@
 .DS_Store
 *.swp
 .plan/
+# auto-skill 个人数据（经验库/知识库本地维护，仓库只含协议与骨架——SKILL 自述）
+skills/auto-skill/experience/
+skills/auto-skill/knowledge-base/
+.playwright-mcp/
