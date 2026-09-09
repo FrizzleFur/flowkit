@@ -363,6 +363,8 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
 
 **[Plan Mode 边界]** — 调用 `ExitPlanMode` 提交 plan 供用户审批
 
+> **审批弹窗说明（harness 原生行为，skill 无法消除）**: `ExitPlanMode` 提交后，Claude Code 原生审批 UI 会要求用户批准计划，并顺带选择后续执行模式（auto-accept edits / manually approve / bypass permissions）。该弹窗由 harness 控制而非本 skill 指令——若用户反馈"每次都要选执行模式"，指引其预设：`~/.claude/settings.json` 的 `permissions.defaultMode`（如 `acceptEdits`）或会话启动时 Shift+Tab 预切。计划本身的审批弹窗始终保留，这是 Plan Mode 保障用户控制权的核心设计，不要试图绕过。
+
 **[Plan Mode 外部]** — 用户审批通过后:
 4. 将审批通过的 plan 形式化为:
    - `task_plan.md` — 分阶段任务计划（写入 `--plan-dir` 指定目录）
