@@ -206,5 +206,5 @@ prompt 中明确串行切仓顺序。
 
 1. TaskList 确认所有任务 completed/failed
 2. 对每个已完成且不复用的 Agent 执行 `TaskStop(task_id=<agent名>)`——mailbox 型 agent 完成后静默 idle 不自动退出，TaskStop 是唯一正解（NO_TMUX 降级模式下的唯一动作）
-3. （IN_TMUX 时附加）TaskStop 后按需 kill 残留 pane；完整脚本见 `references/cleanup-procedure.md`
+3. （IN_TMUX 时附加）TaskStop 后按需 kill 残留 pane；完整脚本见 `~/.claude/skills/flow/references/cleanup-procedure.md`
 4. 汇总结果，更新 progress.md

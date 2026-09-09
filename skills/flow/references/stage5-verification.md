@@ -17,7 +17,7 @@
 
 ## 铁律
 
-> **IL-2: Verification Iron Law** — 完整定义和 Rationalization Table 见 `references/iron-laws.md`
+> **IL-2: Verification Iron Law** — 完整定义和 Rationalization Table 见 `~/.claude/skills/flow-deep/references/iron-laws.md`
 >
 > **IRON LAW**: No completion claims without fresh verification evidence.
 > 禁止使用 "should work"、"probably"、"seems to" 等表述。
