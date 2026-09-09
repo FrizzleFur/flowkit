@@ -1,0 +1,58 @@
+{
+  "skill_name": "flow-deep",
+  "version": "T-301 修订版（2026-09-09 用户裁决）：单臂迷你任务 + Stage 3 落盘即截断；双臂降为可选背书件（baseline 缓存制）",
+  "evals": [
+    {
+      "id": 1,
+      "name": "调研型-评论系统选型",
+      "prompt": "我想给自己的个人博客加评论系统，在 giscus 和 utterances 之间纠结。帮我调研对比一下这两个方案，维护成本、数据归属、隐私这几方面都要覆盖，结论要给依据链接，别只给观点。这事对我挺重要，想做扎实点。",
+      "expected_output": "Complexity Gate 识别调研型并裁剪（跳过 TDD/multi-agent 代码执行但保留深读与验证安排）；.plan/ 五件套落盘；Goal Contract 含可验证 Success Criteria；plan 含信息源清单与对比维度矩阵；在 Stage 3 确认点停下等用户裁决，不自行开始抓取",
+      "files": [],
+      "assertions": [
+        ".plan/ 目录存在（planning-with-files 已触发）",
+        ".plan/task_plan.md 存在且 ≥10 行",
+        ".plan/findings.md 与 .plan/progress.md 存在",
+        ".plan/STATE.md 存在且含 stage 进度与 next_action 字段",
+        ".plan/spec.md 存在且含 Success Criteria（Goal Contract 落盘）",
+        "会话以规划确认请求收尾（用户确认点），未自行进入执行阶段"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "文档型-fixture 仓 README",
+      "prompt": "evals/flow-deep/fixtures/mini-tool 这个小工具仓我一直没写文档。你先看看代码，然后给它写一份 README——目标是让人 30 秒明白这仓库是干嘛的、怎么装怎么用。要认真处理，别糊弄。",
+      "expected_output": "文档型任务识别（无代码改动的产出型任务，裁剪 TDD 但保留规划与验证）；.plan/ 五件套落盘；plan 含 README 结构大纲与验收标准（30 秒标准如何被验证）；Stage 3 确认点停下",
+      "files": ["fixtures/mini-tool/wordcount.py", "fixtures/mini-tool/sample.txt"],
+      "assertions": [
+        ".plan/ 目录存在（planning-with-files 已触发）",
+        ".plan/task_plan.md 存在且 ≥10 行",
+        ".plan/findings.md 与 .plan/progress.md 存在",
+        ".plan/STATE.md 存在且含 stage 进度与 next_action 字段",
+        ".plan/spec.md 存在且含 Success Criteria（Goal Contract 落盘）",
+        "task_plan.md 含 README 结构/大纲类规划内容（任务类型正确进入规划而非直接动笔）"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "代码型-TDD 补错误处理",
+      "prompt": "fixtures/mini-tool/wordcount.py 的 count_words 没有任何错误处理，文件不存在时直接 traceback 崩掉。给它补上错误处理，并且必须先写测试——我是 TDD 拥趸，没看到失败测试就动生产代码的话我会不高兴。这个任务要仔细处理。",
+      "expected_output": "代码型任务走完整路径（TDD 注入生效）；.plan/ 五件套落盘；plan 明确 RED→GREEN 安排（先写含不存在文件路径的失败测试，再实现错误处理）；Stage 3 确认点停下，不提前写任何测试或改代码",
+      "files": ["fixtures/mini-tool/wordcount.py"],
+      "assertions": [
+        ".plan/ 目录存在（planning-with-files 已触发）",
+        ".plan/task_plan.md 存在且 ≥10 行",
+        ".plan/findings.md 与 .plan/progress.md 存在",
+        ".plan/STATE.md 存在且含 stage 进度与 next_action 字段",
+        ".plan/spec.md 存在且含 Success Criteria（Goal Contract 落盘）",
+        "task_plan.md 提及测试先行/TDD 安排（铁律注入进入规划而非仅在描述里）",
+        "工作目录的 wordcount.py 未被修改（Stage 3 只规划不改码——截断纪律）"
+      ]
+    }
+  ],
+  "run_protocol": {
+    "arm": "单臂 with_skill（修订版裁决；双臂仅背书场景，baseline 缓存于 workspace/baseline-cache/ 并记录环境三元组）",
+    "truncation": "Stage 3 用户确认点即截断锚（skill 定义该点不可跳过）——subagent 任务书注明：展示 plan 与确认请求后停止，不进入 Stage 4",
+    "grading": "机检断言优先（文件存在性/行数/字段/未改动校验），transcript 复核确认点行为；不使用 LLM-as-judge 评文风",
+    "snapshot": "evals/flow-deep/skill-snapshot/（2026-09-09 原版 25 文件，验收⑤）"
+  }
+}
