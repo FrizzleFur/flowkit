@@ -135,7 +135,7 @@ flow-deep 用以下自检守住"用户控制"。每次新增 Stage / 检查点 /
 Stage -1: 跨会话经验召回 → Stage 0: Superpowers 检查 (强制) → Stage 0.5: Goal Contract (目标契约)
   → Stage 1: Prompt 优化 (--no-prompt)
   → Stage 2: 深度思考 (全开: ST+Mermaid+三角色+技能匹配)
-    → Stage 3: 确定性规划 (Plan Mode 强制 + plan-quality 标准)
+    → Stage 3: 确定性规划 (plan-quality 标准 + 用户确认点; --plan-mode 进 Plan Mode)
       → Stage 3.5: Plan Review (独立 Agent 审查，强制)
         → Stage 3.6: 多角色面板评审 (--no-panel 可跳过)
           → Stage 3.7: 代码级细化 (条件触发)
@@ -146,7 +146,7 @@ Stage -1: 跨会话经验召回 → Stage 0: Superpowers 检查 (强制) → Sta
 ## 与 /flow 的核心差异
 
 - Stage 0 强制前置 + Stage 2 全开（ST+Mermaid+三角色+技能匹配）
-- **Stage 3 Plan Mode 强制**（flow 中为 --strict-plan 默认启用，可 --no-strict-plan 禁用；flow-deep 不可禁用）
+- **Stage 3 规划审批模式（2026-09-09 反转默认）**: 默认不进 Plan Mode——plan 落盘 + 对话内确认点把关，无 harness 审批弹窗；`--plan-mode` 显式进入 Plan Mode（对应 flow 的 --strict-plan）。规划产出与质量标准不变，仅审批载体从弹窗换为对话内确认
 - Stage 3.5 Plan Review 强制启用（flow 中为可选 --plan-review）
 - Stage 3.6 多角色面板评审（默认启用，--no-panel 可跳过）
 - Stage 3.7 代码级细化 + Stage 4 TDD 注入 + 退回 Plan 协议 + Stage 5 不可跳过
@@ -346,35 +346,37 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
 
 根据任务类型自动选择三个最相关角色，两轮讨论后综合最佳方案。结果记录到 findings.md。**禁用**: `--no-discuss`
 
-### Stage 3: 确定性规划（Plan Mode 强制）
+### Stage 3: 确定性规划（用户确认点把关）
 
 **遵循**: `planning-with-files` 模板格式 + `references/plan-quality.md` 质量标准
 
 > **SDD 增强**: 如果 `--plan-dir/spec.md` 存在，基于 FR-xxx 和 US-xxx 组织 plan（生成 Coverage Matrix）；如果 `references/constitution-checklist.md` 存在，规划前执行 Constitution Gates 检查。
 
-> flow-deep 定位为高风险任务，Stage 3 强制使用 Plan Mode（只读沙箱）确保设计质量。
+> **默认不进 Plan Mode（2026-09-09 反转默认，用户裁定）**: 规划纪律不变——本 Stage 仍只做探索与设计，不改任何代码；审批由「plan 落盘 + 质量自检 + 用户确认点 + Stage 3.5/3.6 审查」多道关承担。反转依据（2026-09-09 官方文档核实）：`ExitPlanMode` 审批弹窗属 permission prompt（"Permission required: Yes"，"never auto-resolve on idle"），无任何配置/环境变量/flags 可抑制；且 bypass 会话中 Plan Mode 只读封锁本就不强制（"doesn't enforce plan mode's blocks"）——保留 Plan Mode 只剩弹窗打断，无沙箱收益。符合设计宪法第 3/4 条（可跳过性/控制权）：审批点留在 skill 内，批准权始终在用户。
 
-**行为**:
+**行为（默认路径，无弹窗）**:
 
-**[Plan Mode 内部]** — 调用 `EnterPlanMode` 进入只读沙箱:
-1. 用 Glob/Grep/Read 探索代码库，理解现有结构（**多仓/跨文件任务**：先按 `references/multi-repo-toolchain.md` 做环境与准备分档，探索优先 codegraph 定位、修改规划按 C36 四段式）
-2. 基于优化后的表述和深度思考结论，设计实现方案
-3. 将方案写入系统指定的 plan 文件（遵循 planning-with-files 模板 + plan-quality.md Checklist）
-
-**[Plan Mode 边界]** — 调用 `ExitPlanMode` 提交 plan 供用户审批
-
-> **审批弹窗说明（harness 原生行为，skill 无法消除）**: `ExitPlanMode` 提交后，Claude Code 原生审批 UI 会要求用户批准计划，并顺带选择后续执行模式（auto-accept edits / manually approve / bypass permissions）。该弹窗由 harness 控制而非本 skill 指令——若用户反馈"每次都要选执行模式"，指引其预设：`~/.claude/settings.json` 的 `permissions.defaultMode`（如 `acceptEdits`）或会话启动时 Shift+Tab 预切。计划本身的审批弹窗始终保留，这是 Plan Mode 保障用户控制权的核心设计，不要试图绕过。
->
-> **执行模式选择的后果链（2026-09-09 官方文档核实）**: 选 manually approve（default 模式）后，subagent 与主会话一样每次写文件都弹提示，且文件编辑类的批准**不落盘**（「don't ask again」仅会话内有效），编排任务会反复卡在授权上——推荐选 auto-accept edits。subagent 完整继承主会话权限模式与 allow/deny 规则，acceptEdits 下写工作目录及 additionalDirectories 内文件（含新建文件）免提示；例外是作用域外路径与 `.claude/`、`.git/` 等保护路径（任何模式都弹）。详见 `~/.claude/skills/flow/references/agent-dispatch.md` 的「权限与作用域」。
-
-**[Plan Mode 外部]** — 用户审批通过后:
-4. 将审批通过的 plan 形式化为:
-   - `task_plan.md` — 分阶段任务计划（写入 `--plan-dir` 指定目录）
+1. 用 Glob/Grep/Read 探索代码库，理解现有结构（**多仓/跨文件任务**：先按 `references/multi-repo-toolchain.md` 做环境与准备分档，探索优先 codegraph 定位、修改规划按 C36 四段式）。**探索纪律：只读，不修改任何代码**——本 Stage 的产出是 plan 文件，不是代码变更
+2. 基于优化后的表述和深度思考结论，设计实现方案，直接形式化写入 `--plan-dir` 指定目录（遵循 planning-with-files 模板 + plan-quality.md Checklist）:
+   - `task_plan.md` — 分阶段任务计划
    - `findings.md` — 研究发现（含思考/讨论结论）
    - `progress.md` — 执行进度追踪
-   - 可选（show-me）: 方案依赖不熟悉概念、或用户需要人类向方案总览时，用 show-me 生成 HTML 方案页——task_plan.md 是给 agent 执行的（机器向），方案页是给人看懂方案的（人类向），两者不合并（2026-09-07 用户裁定接入）
-5. 对生成的 plan 执行 plan-quality.md 中的 Quality Checklist 自检
-6. 向用户展示质量评分，确认后进入 Stage 3.5
+3. 对 plan 执行 plan-quality.md 中的 Quality Checklist 自检
+4. **用户确认点（Plan Mode 弹窗的替代关卡，不可跳过）**: 向用户展示 plan 全文 + 质量评分，AskUserQuestion 三选:
+   - 批准 → 进入 Stage 3.5 独立审查
+   - 修改 → 按用户意见修订后重新展示确认
+   - 重新规划 → 退回本 Stage 第 1 步
+5. 可选（show-me）: 方案依赖不熟悉概念、或用户需要人类向方案总览时，用 show-me 生成 HTML 方案页——task_plan.md 是给 agent 执行的（机器向），方案页是给人看懂方案的（人类向），两者不合并（2026-09-07 用户裁定接入）
+
+**行为（--plan-mode 路径，显式进入 Plan Mode）**:
+
+**[Plan Mode 内部]** — 调用 `EnterPlanMode` 进入只读沙箱:
+1. 探索代码库 + 设计实现方案（内容同默认路径第 1-2 步，但 plan 先写入系统指定的 plan 文件，批准后再落盘 `--plan-dir`；注意 Plan Mode 内无法调用 Skill tool）
+2. 调用 `ExitPlanMode` 提交 plan 供用户审批
+
+> **审批弹窗说明（harness 原生行为，仅 --plan-mode 路径出现）**: `ExitPlanMode` 官方定性为 permission prompt，无任何配置/环境变量/flags 可抑制；`permissions.defaultMode` 与 bypass 启动只改变弹窗选项文案，不消除弹窗。选 manually approve（default 模式）后，subagent 与主会话一样每次写文件都弹提示，且文件编辑类的批准**不落盘**（「don't ask again」仅会话内有效），编排任务会反复卡在授权上——推荐选 auto-accept edits。subagent 完整继承主会话权限模式与 allow/deny 规则，acceptEdits 下写工作目录及 additionalDirectories 内文件（含新建文件）免提示；例外是作用域外路径与 `.claude/`、`.git/` 等保护路径（任何模式都弹）。详见 `~/.claude/skills/flow/references/agent-dispatch.md` 的「权限与作用域」。
+
+3. 用户批准后，将 plan 形式化落盘 `--plan-dir`（同默认路径第 2 步），再走质量自检 → Stage 3.5
 
 **规划要点**:
 - 每个 Phase 应标注可否并行
@@ -384,7 +386,7 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
 **STATE.md 写入**: 规划完成后，创建或更新 `.plan/STATE.md`:
 - 记录 `current_stage: 3`、Phase 分解结果、Stage 2 核心结论
 - 记录技能匹配矩阵摘要
-- 设置 `next_action` 为 "Stage 3.6 多角色面板评审" 或 "Stage 3.7 代码级细化"（非代码任务）或 "Stage 4 智能执行"
+- 设置 `next_action` 为 "Stage 3.5 Plan Review"（强制，Stage 3 的下一站）；3.5 通过后按序更新: "Stage 3.6 多角色面板评审" → "Stage 3.7 代码级细化"（代码任务）/ "Stage 4 智能执行"（非代码任务）
 - 详见 `references/context-management.md` 的 STATE.md 模板
 
 **跳过条件**: `--no-plan`
@@ -679,7 +681,7 @@ Stage 5 验证通过后的收尾工作:
 → Stage 0: Superpowers 前置检查 ✓
 → Stage 0.5: Goal Contract（目标、成功标准、约束、验证计划）
 → Stage 1: Prompt 优化 → Stage 2: 深度思考 + 技能匹配(TDD+并行+审查)
-→ Stage 3: Plan Mode → Stage 3.5: Plan Review → Stage 3.6: 多角色面板评审
+→ Stage 3: 规划+确认点 → Stage 3.5: Plan Review → Stage 3.6: 多角色面板评审
 → Stage 4: Execution Router 选择 multi-agent（auth-core[TDD] + token-mgr[TDD]）
 → Stage 5: Goal Verification（逐条核对 Success Criteria）✓
 ```
@@ -698,7 +700,7 @@ Stage 5 验证通过后的收尾工作:
 ```
 /flow-deep [options] <任务表述>
 
-阶段: --no-prompt | --no-plan | --no-multi(串行) | --no-recall | --no-context-guard(禁用上下文容量检测弹窗)
+阶段: --no-prompt | --no-plan | --plan-mode(Stage3 进 Plan Mode, 有审批弹窗) | --no-multi(串行) | --no-recall | --no-context-guard(禁用上下文容量检测弹窗)
 思考: --think-hard(10K) | --no-think | --no-mermaid | --no-discuss | --no-skill-match
 执行: --no-tdd | --tdd-dual | --no-review | --no-panel | --panel-roles "R01,R02" | --panel-depth quick|basic|advanced | --no-prime
 迭代: --iterate N | --guard <cmd> | --ralph-max N | --no-ralph | --no-distill
@@ -714,6 +716,6 @@ Stage 5 验证通过后的收尾工作:
 
 ### 通用参数行为
 
-`--dry-run` 仅预览 Stage 0-3 | `--agents <types>` 覆盖 Agent 类型 | `--lang <zh|en>` 输出语言 | `--no-tdd` 禁用 TDD | `--tdd-dual` 双 Agent TDD | `--no-review` 跳过代码审查 | `--no-prime` 禁用 prime-agent 自动路由（security-audit/code-verification 退回 Claude Code 原生）
+`--plan-mode` Stage 3 显式进 Plan Mode（默认不进，对话内确认无弹窗） | `--dry-run` 仅预览 Stage 0-3 | `--agents <types>` 覆盖 Agent 类型 | `--lang <zh|en>` 输出语言 | `--no-tdd` 禁用 TDD | `--tdd-dual` 双 Agent TDD | `--no-review` 跳过代码审查 | `--no-prime` 禁用 prime-agent 自动路由（security-audit/code-verification 退回 Claude Code 原生）
 
 

@@ -18,7 +18,7 @@ Stage 0           (无)                        Superpowers 前置检查 + 能力
 Stage 1           Prompt 优化 (--no-prompt)    Prompt 优化 (不可跳)
 Stage 1.5         需求探索 (条件触发)           需求探索 (条件触发)
 Stage 2           深度思考 (--think 可选)       深度思考 (强制: ST+Mermaid+三角色)
-Stage 3           规划 (Plan Mode 默认开)      规划 (Plan Mode 不可禁)
+Stage 3           规划 (--plan-mode 进 Plan Mode) 规划 (默认对话内确认, 无弹窗)
 Stage 3.5         Plan Review (--plan-review)  Plan Review (强制)
 Stage 3.6         (无)                        多角色面板评审 (默认开)
 Stage 3.7         代码级细化 (--code-plan)     代码级细化 (自动触发)

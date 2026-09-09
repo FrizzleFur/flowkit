@@ -5,7 +5,7 @@ FlowKit 全量版本历史。格式遵循 [Keep a Changelog](https://keepachange
 ## [Unreleased]
 
 ### flow-deep
-- Stage 3 新增 **Plan Mode 审批弹窗说明** —— ExitPlanMode 审批后的「执行模式选择」弹窗（auto-accept edits / manually approve / bypass permissions）为 harness 原生行为，skill 无法消除；指引通过 `permissions.defaultMode` 预设（如 `acceptEdits`）或会话启动时 Shift+Tab 预切规避；计划审批弹窗本身为用户控制权红线，不可绕过
+- Stage 3 **反转默认：默认不再进入 Plan Mode** —— 默认路径改为「plan 落盘 `.plan/` 三件套 + plan-quality 质量自检 + AskUserQuestion 用户确认点（批准/修改/重新规划）」，规划纪律与 Stage 3.5/3.6 审查关卡不变，仅审批载体从 harness 弹窗换为对话内确认；新增 `--plan-mode` 参数显式进入 Plan Mode（对应 flow 的 `--strict-plan`）。依据 2026-09-09 官方文档核实：ExitPlanMode 审批弹窗属 permission prompt，无任何配置/环境变量/flags 可抑制，且 bypass 会话中 Plan Mode 只读封锁本就不强制——保留 Plan Mode 只剩弹窗打断，无沙箱收益（取代本段原「Plan Mode 审批弹窗说明」条目）；附带修正 Stage 3 STATE.md `next_action` 漏 Stage 3.5 的顺序缺陷
 - Stage 4 新增 **分发前置自检**（执行型 agent 必做）—— 派发前扫描写入路径清单识别作用域外路径（新建项目同级文件夹、/tmp 等）并征询用户（`/add-dir` / 绝对路径 allow 规则 / 修改规划），未处理不派发；防 subagent 启动后卡在权限确认上无人察觉（后台 agent 授权等待无面板提示，比主会话弹窗更难发现）
 - agent-dispatch.md 新增 **权限与作用域章节**（flow/flow-deep 共用）—— subagent 权限继承机制速览（继承模式与 allow/deny 规则、acceptEdits 覆盖新建文件、保护路径任何模式都弹、文件编辑类批准不落盘）+ 作用域外写入前置处理协议 + 分发 prompt 约定（写盘用 Write/Edit 工具）+ 弹窗诊断对照表；依据 2026-09-09 官方 permissions/sub-agents/permission-modes 文档核实
 
