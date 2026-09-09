@@ -185,15 +185,21 @@ def main():
         sys.exit(2)
 
     # 窗口口径（2026-09-09 修复，evals eval-1/eval-3 复现误报）：transcript 的
-    # message.model 是裸名（无 [1m] 等窗口标记，实测证实），机器推断不可行——
-    # 按「诚实降级」不猜：显式传参 > FLOWKIT_CONTEXT_WINDOW 环境变量（用户在
-    # ~/.claude/settings.json 的 env 里配一次即全会话生效）> 200K 默认 + 警示。
+    # message.model 是裸名（无窗口标记，实测证实），但 Claude Code 会把 settings.json
+    # env 段注入每个 Bash 子进程——ANTHROPIC_MODEL（如 "glm-5.3[1m]"）天然携带窗口
+    # 标记，随用户切模型自动适应。优先级：显式传参 > FLOWKIT_CONTEXT_WINDOW >
+    # ANTHROPIC_MODEL 推断 > 200K 默认（来源始终输出，诚实降级不静默猜）。
     window_source = "explicit"
     if args.window == 200000:
         env_win = os.environ.get("FLOWKIT_CONTEXT_WINDOW")
+        model_env = (os.environ.get("ANTHROPIC_MODEL")
+                     or os.environ.get("ANTHROPIC_DEFAULT_OPUS_MODEL") or "")
         if env_win and env_win.isdigit() and int(env_win) > 0:
             args.window = int(env_win)
             window_source = "env"
+        elif "[1m]" in model_env.lower() or "[1M]" in model_env:
+            args.window = 1000000
+            window_source = "inferred:ANTHROPIC_MODEL"
         else:
             window_source = "default"
 
