@@ -331,15 +331,6 @@ flowkit 全家已适配 **OpenAI Codex CLI** 运行，Claude Code 体验零变�
 **multi-agent**
 - 同步运行时仓演进：named-only 裁定、派发前 pretrust-cwd.sh 预信任（防 trust 弹窗卡 pane）、Fast Path 补充（118 行差异回补）
 
-### v1.5.0 (2026-09-07)
-
-**ppt-agent（移出）**
-- **ppt-agent 移出 FlowKit** —— 定位分层：五个核心模块均为编排基础设施（服务于任意任务的管道/纪律/记忆），ppt-agent 则是自包含的领域内容生产工作流，与管道零耦合（不被 skill-routing 路由、不读规划文件）。移出后仓库回归纯「工作流编排工具集」定位，模块在作者个人 skills 环境继续维护
-- 已通过 v1.4.0 安装 ppt-agent 的用户不受影响，删除对应 skill 目录即卸载
-
-**multi-agent**
-- 补录 **命名 agent 收尾三步协议**（08-31 漏记）—— teammate 型命名 agent 完成后进程常驻不退出，必须依次执行「进度汇总 → `TaskStop(name)` 收本体（pane 随之自动回收）→ `tmux list-panes` 验证」，防 pane 泄漏
-- 演进说明：pane 管理重心已从 spawn-pane 观察窗体系（v1.3.0 所述，仅适用 unnamed 异步 agent）转向「named agent 完成即收」——named 场景由 harness 自动分配 pane，勿再手动开观察窗
 ## 社区
 
 本项目在 [LINUX DO](https://linux.do) 社区发布与交流，欢迎前来讨论反馈。

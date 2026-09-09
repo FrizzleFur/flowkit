@@ -322,6 +322,16 @@ Design principles: frontmatter and descriptions are untouched (CC triggering beh
 
 > Full version history (since v1.0.0) lives in [CHANGELOG.md](CHANGELOG.md). The Chinese entries are authoritative; version numbers and module names are shared across languages.
 
+### v1.7.0 (2026-09-09)
+
+**Evals system + single source of truth (regression test net for skills themselves)**
+- New **three-layer evals** (L0 static assertions / L1 trigger / L2 behavioral) — filling the gap of "the pipeline verifies everything except itself"; five anti-drift rules + environment-triple discipline (`evals/README.md`)
+- **lint 7 assertions + GitHub Actions CI gate** — reference integrity, codex-compat bidirectional consistency, frontmatter consistency added; zero LLM cost; first run caught 3 real defects
+- **flow-deep behavioral evals (T-301)** — 3 task types × single-arm × Stage-3-checkpoint truncation, 24 machine assertions all green establishing the green baseline (`benchmarks/iteration-1.json`)
+- **check_context.py window fix** (first harvest from evals) — resolution chain: explicit > FLOWKIT_CONTEXT_WINDOW > ANTHROPIC_MODEL inference > default; measured false alarm 96% → 19%
+- **Single source of truth migration** — this repo is now the canonical home of the 5 core skills; `~/.claude/skills` switched to reverse symlinks, ending three-way copy drift; per-skill README guides open-sourced along the way
+- **T-302 trigger eval arena** — near-miss zero false triggers across rounds; explicit-command anchoring adopted as product decision
+
 ### v1.6.1 (2026-09-08)
 
 **Family-wide multi-platform adaptation (Codex CLI)**
@@ -349,15 +359,6 @@ Design principles: frontmatter and descriptions are untouched (CC triggering beh
 **multi-agent**
 - Synced runtime evolution: named-only ruling, pretrust-cwd.sh pre-trust (prevents trust-dialog pane stalls), Fast Path additions (118-line backfill)
 
-### v1.5.0 (2026-09-07)
-
-**ppt-agent (removed)**
-- **ppt-agent removed from FlowKit** — a deliberate layering call: the five core modules are orchestration infrastructure (pipeline / discipline / memory serving any task), while ppt-agent is a self-contained domain content-production workflow with zero pipeline coupling (not routed by skill-routing, never reads planning files). The repo returns to a pure "workflow orchestration toolkit" scope; the module lives on in the author's personal skills environment
-- Users who installed ppt-agent via v1.4.0 are unaffected — deleting the skill directory uninstalls it
-
-**multi-agent**
-- Backfilled **named-agent three-step closing protocol** (missed in the 08-31 sync) — teammate-type named agents stay resident after finishing, so each completion must run "summarize progress → `TaskStop(name)` to reap the agent (pane auto-recycles) → verify with `tmux list-panes`" to prevent pane leaks
-- Evolution note: pane management has shifted from the spawn-pane watcher system (described in v1.3.0, applies to unnamed async agents only) to "named agent: reap on completion" — named agents get panes from the harness automatically; don't spawn watcher panes for them
 ## Community
 
 This project is shared and discussed on the [LINUX DO](https://linux.do) community. Feedback and discussion welcome.
