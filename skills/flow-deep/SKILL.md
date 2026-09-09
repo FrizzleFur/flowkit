@@ -364,6 +364,8 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
 **[Plan Mode 边界]** — 调用 `ExitPlanMode` 提交 plan 供用户审批
 
 > **审批弹窗说明（harness 原生行为，skill 无法消除）**: `ExitPlanMode` 提交后，Claude Code 原生审批 UI 会要求用户批准计划，并顺带选择后续执行模式（auto-accept edits / manually approve / bypass permissions）。该弹窗由 harness 控制而非本 skill 指令——若用户反馈"每次都要选执行模式"，指引其预设：`~/.claude/settings.json` 的 `permissions.defaultMode`（如 `acceptEdits`）或会话启动时 Shift+Tab 预切。计划本身的审批弹窗始终保留，这是 Plan Mode 保障用户控制权的核心设计，不要试图绕过。
+>
+> **执行模式选择的后果链（2026-09-09 官方文档核实）**: 选 manually approve（default 模式）后，subagent 与主会话一样每次写文件都弹提示，且文件编辑类的批准**不落盘**（「don't ask again」仅会话内有效），编排任务会反复卡在授权上——推荐选 auto-accept edits。subagent 完整继承主会话权限模式与 allow/deny 规则，acceptEdits 下写工作目录及 additionalDirectories 内文件（含新建文件）免提示；例外是作用域外路径与 `.claude/`、`.git/` 等保护路径（任何模式都弹）。详见 `~/.claude/skills/flow/references/agent-dispatch.md` 的「权限与作用域」。
 
 **[Plan Mode 外部]** — 用户审批通过后:
 4. 将审批通过的 plan 形式化为:
@@ -506,6 +508,15 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
 适用于 Stage 0~5 所有阶段。检测 `[ -n "$TMUX" ]` 并显式写出判定行后再分发（跳过检测 ≠ NO_TMUX）: Agent(name) 唯一命名并行分发（TeamCreate/team_name 已废弃）；在 tmux 且 pane 正常 → 自动分屏可视化；不在或 pane 故障 → **静默降级**为无分屏并发（不提示安装、不重试；Delegate 协议与规模档位不变）。
 
 核心约束: Agent(name) 唯一命名 + 同消息并发 ≤ 4 + Delegate 协调不变 | IN_TMUX 且 pane 正常 → 自动分屏可视化 + 即时清理 pane；NO_TMUX 或 pane 故障 → 静默降级无分屏并发
+
+#### 分发前置自检：权限模式与写入作用域（执行型 agent 必做）
+
+> 机制细节（继承规则、作用域判定、作用域外写入前置处理协议、弹窗诊断表）见 `~/.claude/skills/flow/references/agent-dispatch.md` 的「权限与作用域」
+
+派发会写文件的 agent 前完成两项自检，避免 subagent 启动后卡在权限确认上无人察觉（后台 subagent 的授权等待没有面板提示，比弹给主会话的问题更难发现）：
+
+1. **写入作用域扫描**: 从 agent_hint / task_plan 提取目标路径清单，识别工作目录与 `permissions.additionalDirectories` 之外的路径（典型：新建项目同级文件夹、/tmp、~ 下其他目录）——存在则先按前置处理协议征询用户（`/add-dir` 扩域 / 绝对路径 allow 规则 / 修改规划），未处理不派发
+2. **权限模式确认**: 会话处于手动批准模式（Plan 审批时选了 manually approve）时，向用户说明后果——subagent 每次写盘都会弹提示且批准不落盘；建议 Shift+Tab 切回 acceptEdits 再分发
 
 #### 技能路由规则（详细指令见 references/skill-routing.md）
 
