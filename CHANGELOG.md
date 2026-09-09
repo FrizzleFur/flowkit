@@ -17,7 +17,7 @@ FlowKit 全量版本历史。格式遵循 [Keep a Changelog](https://keepachange
 
 ### 仓库基础设施
 - 新增 **CLAUDE.md / AGENTS.md** —— Agent 协作规范落库：版本演进纪律（CHANGELOG 全量收敛 + README 滚动保留最近 3 版）、条目写法、提交规范（含并发提交 409 重取 sha 规则）；README / README_EN 日志区同步收敛为最近三版
-- 新增 **T-302 trigger eval 竞技场**（`evals/trigger/`）——20 条竞争口径 eval set（should/near-miss）+ runner（stream-json 早停检测 + command 注入竞技场 + effort 钉住 + 计时器锚点重置）；两轮结果合并判定：**负向边界两轮一致零误触发（precision 稳健），自然语言正向主动触发弱且高方差**（复测 6/8 为「auto-skill 先行加载后仍不调目标技能」的真漏触发，2/8 未明；同 query 两轮异果）。方法局限如实注记：command 注入 ≠ 真实 skill 机制（可能系统性低估主动触发）、每条 1-2 次不足以抗方差——精确测量（3 次取多数 + 真实技能注入）另排期
+- 新增 **T-302 trigger eval 竞技场**（`evals/trigger/`）——20 条竞争口径 eval set（should/near-miss）+ runner（stream-json 早停检测 + effort 钉住 + 计时器锚点重置 + 项目级 skills 注入）。三轮测量后的最终归因（诚实降级记录）：①竞技场注入失效——项目级 `.claude/skills/` 未进 claude -p 的技能视野（显式 /flow 命令也不触发即为此症状），所测「漏触发」不能作为 description 缺陷证据；②行为事实——模型对任务型 query 倾向直接处理（文本证据：自行输出规划+架构图），编排类元技能天然吃亏；③立得住的结论：near-miss 两轮零误触发（负向边界稳健）。产品层裁定：触发以显式命令为主锚（真实使用模式即如此），description 自然语言增强降为低优先级。方法教训三条入库：触发测试必须钉 effort（max 档思考 75s+）、`--disallowedTools` 变长参会吞 prompt、竞技场注入需先验证技能确在视野
 - 新增 **evals 三层体系** —— skill 本体的回归测试（管道验证一切，唯独不验证自己的补位）：L0 静态断言 / L1 触发（T-302 待建）/ L2 行为；五条防漂移规则 + 失效报警信号 + 环境三元组纪律（evals/README.md）
 - **lint_flowkit.py 升级七项断言 + GitHub Actions CI 门禁** —— 新增 L5 引用完整性（技能内/跨技能两种形态）、L6 codex-compat 双向一致、L7 frontmatter 一致；L3 增 budget 线（flow-deep 800 行 = REC-11 下沉触发线，error 级）；CI 零 LLM 成本，push/PR 即跑；首跑抓出并修复 2 条跨技能裸相对引用真断链
 - CLAUDE.md 增 **「谁改契约谁带测试」协作纪律** 与 **引用写法规范**（跨技能引用必须 `~/.claude/skills/<name>/` 全路径）

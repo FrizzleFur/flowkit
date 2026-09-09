@@ -40,15 +40,29 @@ def load_descriptions(skill_names: list[str]) -> dict[str, str]:
 
 
 def inject_commands(descs: dict[str, str]) -> None:
-    """竞技场注入：每技能一个 command 文件（name 保持原名，description 原文）。"""
+    """竞技场注入 v2：项目级 .claude/skills/<name>/SKILL.md（真实 skill 机制）。
+
+    v1 用 .claude/commands/*.md 注入——command 是「用户显式敲的斜杠命令」心智，
+    模型不倾向主动调用；skill 才是「模型可主动 consult」的机制。2026-09-09 复测
+    6/8 真漏触发的疑似主因即此机制错位，本修正对齐真实触发环境。
+    """
+    skills_dir = ARENA / ".claude" / "skills"
+    skills_dir.mkdir(parents=True, exist_ok=True)
+    for old in skills_dir.iterdir():
+        import shutil
+        shutil.rmtree(old) if old.is_dir() else old.unlink()
+    # 清理 v1 残留的 commands 目录（防双机制并存）
     cmd_dir = ARENA / ".claude" / "commands"
-    cmd_dir.mkdir(parents=True, exist_ok=True)
-    for old in cmd_dir.glob("*.md"):
-        old.unlink()
+    if cmd_dir.is_dir():
+        import shutil
+        shutil.rmtree(cmd_dir)
     for name, desc in descs.items():
-        indented = "\n  ".join(desc.split("\n"))
-        (cmd_dir / f"{name}.md").write_text(
-            f"---\ndescription: |\n  {indented}\n---\n", encoding="utf-8")
+        d = skills_dir / name
+        d.mkdir()
+        (d / "SKILL.md").write_text(
+            f"---\nname: {name}\ndescription: |\n  " + "\n  ".join(desc.split("\n"))
+            + "\n---\n\n（触发评测骨架——触发判定只读 metadata）\n",
+            encoding="utf-8")
 
 
 def run_once(qid: int, run_no: int, query: str, watch: set[str], timeout: int) -> dict:

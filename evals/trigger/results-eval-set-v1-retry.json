@@ -21,7 +21,7 @@
       "verdict": "miss",
       "false_positives": [],
       "secs": [
-        300.2
+        186.3
       ]
     },
     {
@@ -37,7 +37,7 @@
       "verdict": "miss",
       "false_positives": [],
       "secs": [
-        208.7
+        185.2
       ]
     },
     {
@@ -53,7 +53,7 @@
       "verdict": "miss",
       "false_positives": [],
       "secs": [
-        186.0
+        178.4
       ]
     },
     {
@@ -69,7 +69,7 @@
       "verdict": "miss",
       "false_positives": [],
       "secs": [
-        186.9
+        170.2
       ]
     },
     {
@@ -87,7 +87,7 @@
       "verdict": "miss",
       "false_positives": [],
       "secs": [
-        202.8
+        179.8
       ]
     },
     {
@@ -105,7 +105,7 @@
       "verdict": "miss",
       "false_positives": [],
       "secs": [
-        255.4
+        139.3
       ]
     },
     {
@@ -123,7 +123,7 @@
       "verdict": "miss",
       "false_positives": [],
       "secs": [
-        189.8
+        254.6
       ]
     },
     {
@@ -142,7 +142,7 @@
       "verdict": "miss",
       "false_positives": [],
       "secs": [
-        173.1
+        163.1
       ]
     }
   ],
@@ -152,31 +152,31 @@
       "run": 1,
       "skills": [],
       "any_skill_seen": false,
-      "secs": 300.2,
+      "secs": 186.3,
       "error": null
     },
     {
       "qid": 2,
       "run": 1,
       "skills": [],
-      "any_skill_seen": true,
-      "secs": 208.7,
+      "any_skill_seen": false,
+      "secs": 185.2,
       "error": null
     },
     {
       "qid": 4,
       "run": 1,
       "skills": [],
-      "any_skill_seen": true,
-      "secs": 186.0,
+      "any_skill_seen": false,
+      "secs": 178.4,
       "error": null
     },
     {
       "qid": 5,
       "run": 1,
       "skills": [],
-      "any_skill_seen": true,
-      "secs": 186.9,
+      "any_skill_seen": false,
+      "secs": 170.2,
       "error": null
     },
     {
@@ -184,7 +184,7 @@
       "run": 1,
       "skills": [],
       "any_skill_seen": true,
-      "secs": 202.8,
+      "secs": 179.8,
       "error": null
     },
     {
@@ -192,7 +192,7 @@
       "run": 1,
       "skills": [],
       "any_skill_seen": true,
-      "secs": 255.4,
+      "secs": 139.3,
       "error": null
     },
     {
@@ -200,7 +200,7 @@
       "run": 1,
       "skills": [],
       "any_skill_seen": true,
-      "secs": 189.8,
+      "secs": 254.6,
       "error": null
     },
     {
@@ -208,7 +208,7 @@
       "run": 1,
       "skills": [],
       "any_skill_seen": false,
-      "secs": 173.1,
+      "secs": 163.1,
       "error": null
     }
   ]
