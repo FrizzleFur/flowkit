@@ -36,6 +36,11 @@ README 只保留「30 秒决定要不要用」的内容（架构总览 / 设计�
 - 触发 description（frontmatter）→ 触发面变更，标注待 T-302 trigger eval 复验
 - 新增/移动 references/scripts 文件 → 本地跑 `python3 scripts/lint_flowkit.py` 确认 L5 引用完整性（exit 0 才可提交）
 
+### 引用写法规范（L5 断链防再发，2026-09-09 首跑抓到 2 条真断链后立）
+
+- **技能内引用**：写 `references/xxx.md`（按本技能根解析）
+- **跨技能引用**：必须写全路径 `~/.claude/skills/<name>/references/xxx.md`——裸相对路径会被运行时按「本技能根」解析而 404（lint L5 判 error）。两条历史断链均属此形态（skill-routing.md 引 flow 的 cleanup-procedure、stage5-verification 引 flow-deep 的 iron-laws）
+
 跑 eval 后结果留痕（benchmark 报告含环境三元组：flowkit 版本 / CC 版本 / 模型）。
 
 ## 提交规范

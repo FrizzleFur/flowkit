@@ -1,0 +1,220 @@
+{
+  "metadata": {
+    "skill_name": "flow-deep",
+    "skill_path": "/Users/new/Documents/Repos/flowkit/skills/flow-deep",
+    "executor_model": "glm-5.3（subagent 会话主模型）",
+    "analyzer_model": "same-as-session",
+    "timestamp": "2026-09-09T21:30:00+08:00",
+    "evals_run": [
+      1,
+      2,
+      3
+    ],
+    "runs_per_configuration": 1,
+    "protocol": "T-301 修订版（2026-09-09 用户裁决）：单臂 with_skill × 迷你任务 × Stage 3 确认点截断。双臂 baseline 不在本轮范围（缓存制，留待对外背书场景）。",
+    "env_triple": {
+      "flowkit_commit": "28c9794",
+      "skill_source": "flowkit 主本（~/.claude/skills/flow-deep 为 symlink）",
+      "claude_code": "会话版本未离线统计（改进项）"
+    }
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "调研型-评论系统选型",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 896,
+        "tokens": 15355768,
+        "tool_calls": null,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": ".plan/ 目录存在（planning-with-files 已触发）",
+          "passed": true,
+          "evidence": "cwd/.plan 存在"
+        },
+        {
+          "text": ".plan/task_plan.md 存在且 ≥10 行",
+          "passed": true,
+          "evidence": "259 行"
+        },
+        {
+          "text": ".plan/findings.md 与 .plan/progress.md 存在",
+          "passed": true,
+          "evidence": "均存在"
+        },
+        {
+          "text": ".plan/STATE.md 存在且含 stage/next_action 字段",
+          "passed": true,
+          "evidence": "命中 stage/next action"
+        },
+        {
+          "text": ".plan/spec.md 存在且含 Success Criteria",
+          "passed": true,
+          "evidence": "spec.md 115 行，SC 关键词命中，SC-1..4 可验证式"
+        },
+        {
+          "text": "工作目录无执行期产物（截断纪律）",
+          "passed": true,
+          "evidence": "无额外产物"
+        },
+        {
+          "text": "会话以规划确认请求收尾",
+          "passed": true,
+          "evidence": "subagent 报告：Stage 3 确认点三选全文呈现后停止（transcript 末段）"
+        }
+      ],
+      "notes": [
+        "管道完整足迹：前置→Stage -1→0→0.5→1→1.5→2(全开)→3，全部落盘",
+        "经验召回杠杆实证：industry-research-wiki 的「横评口径先行」被召回后实际改变 plan 结构（Phase 0 独立成串行前置）——Stage -1 经验 loop 非摆设",
+        "偏离 7 项全为无交互通道环境适配（文本呈现确认/推荐默认继续），无实质违规"
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "文档型-fixture 仓 README",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 518,
+        "tokens": 7529589,
+        "tool_calls": null,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": ".plan/ 目录存在（planning-with-files 已触发）",
+          "passed": true,
+          "evidence": "cwd/.plan 存在"
+        },
+        {
+          "text": ".plan/task_plan.md 存在且 ≥10 行",
+          "passed": true,
+          "evidence": "126 行"
+        },
+        {
+          "text": ".plan/findings.md 与 .plan/progress.md 存在",
+          "passed": true,
+          "evidence": "均存在"
+        },
+        {
+          "text": ".plan/STATE.md 存在且含 stage/next_action 字段",
+          "passed": true,
+          "evidence": "Run ID flow-deep-20260909-2118，next_action 指 Stage 3.5"
+        },
+        {
+          "text": ".plan/spec.md 存在且含 Success Criteria",
+          "passed": true,
+          "evidence": "spec.md 87 行含 Goal Contract + US/FR"
+        },
+        {
+          "text": "工作目录无执行期产物（截断纪律）",
+          "passed": true,
+          "evidence": "无额外产物（A6 口径修正后；首轮误报为 fixtures 预置目录，断言脚本 bug 非行为违规）"
+        },
+        {
+          "text": "task_plan.md 含 README 结构/大纲类规划内容",
+          "passed": true,
+          "evidence": "命中 readme/结构"
+        },
+        {
+          "text": "未写 README 正文（截断纪律）",
+          "passed": true,
+          "evidence": "outputs 无 README 产物"
+        }
+      ],
+      "notes": [
+        "文档型裁剪正确：识别无代码产出任务，规划保留 TDD 不适用于本任务的记录",
+        "质量自检 9.4/10；Context Guard 实测 65.9% 未误报"
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "代码型-TDD 补错误处理",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 9,
+        "failed": 0,
+        "total": 9,
+        "time_seconds": 651,
+        "tokens": 8665790,
+        "tool_calls": null,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": ".plan/ 目录存在（planning-with-files 已触发）",
+          "passed": true,
+          "evidence": "cwd/.plan 存在"
+        },
+        {
+          "text": ".plan/task_plan.md 存在且 ≥10 行",
+          "passed": true,
+          "evidence": "323 行（4 Phase/8 Task 全代码级）"
+        },
+        {
+          "text": ".plan/findings.md 与 .plan/progress.md 存在",
+          "passed": true,
+          "evidence": "均存在"
+        },
+        {
+          "text": ".plan/STATE.md 存在且含 stage/next_action 字段",
+          "passed": true,
+          "evidence": "next_action=Stage 3.5 Plan Review"
+        },
+        {
+          "text": ".plan/spec.md 存在且含 Success Criteria",
+          "passed": true,
+          "evidence": "spec.md 85 行含 FR/US/SC"
+        },
+        {
+          "text": "工作目录无执行期产物（截断纪律）",
+          "passed": true,
+          "evidence": "无额外产物"
+        },
+        {
+          "text": "task_plan.md 提及测试先行/TDD 安排",
+          "passed": true,
+          "evidence": "命中 tdd/失败测试/red；RED 证据留存（red-evidence.txt）设为 Phase 2 前置门"
+        },
+        {
+          "text": "wordcount.py 未被修改（Stage 3 只规划不改码）",
+          "passed": true,
+          "evidence": "与 fixture 原版逐字节一致（subagent 侧另有 git status 零改动自证）"
+        },
+        {
+          "text": "未写任何测试文件",
+          "passed": true,
+          "evidence": "沙箱无测试文件产物"
+        }
+      ],
+      "notes": [
+        "TDD 注入进入规划而非停在描述：最小 GREEN 故意只含 FileNotFoundError 以保住 Phase 3 边界的 RED 机会——铁律被理解为设计约束",
+        "pytest 本机缺失被实测发现→unittest 决策落 spec（环境事实进契约）"
+      ]
+    }
+  ],
+  "analyst_observations": [
+    "【断言区分度】本轮为单臂回归基线（iteration-1），pass_rate 全 1.0 建立的是「绿基线」——后续 skill 改动的回归对照即此。区分度断言（双臂 delta）留待背书场景。",
+    "【skill 真实缺陷信号】check_context.py 窗口口径问题在两臂独立复现（eval-1: 默认 200K 窗口误报 95.5%；eval-3: session 文件疑似误选报 95.2%）——非评测噪声，列 skill 改进候选（窗口自适应探测 / session 文件定位修正）。",
+    "【依赖鲁棒性】superpowers 族缺失在三臂均出现且降级路径不一（如实记录继续 / 等价替代路由）——Stage 0 检测对插件缺失环境的处理已有协议但路径不统一，可观察。",
+    "【经验 loop 杠杆】eval-1 提供一手证据：召回经验实际改变 plan 结构（横评口径先行 → Phase 0 独立）。",
+    "【评测基建改进】token/duration 三臂均缺失（teammate 通知未携带计数）——验收③ 部分缺口如实记录；改进项：回收 self-reported 计数或 transcript 离线统计。",
+    "【断言脚本自身】两轮口径修正（L5 跨技能引用 / A6 fixtures 预置）——评测基建也需要自己的回归，已随 grade_eval.py 入库固化。",
+    "【回填 2026-09-09】token/duration 已从 transcript 离线统计补齐（全量 usage 口径含 cache_read；峰值 context 166K-224K 见各 timing.json）——验收③缺口闭环。",
+    "【缺陷闭环 2026-09-09】check_context.py 两症状均已修复并四场景验证：①窗口口径改为「显式传参 > FLOWKIT_CONTEXT_WINDOW env > 200K default（输出 window_source 标注）」——transcript 的 message.model 为裸名无窗口标记（实测证实），机器推断不可行故按诚实降级提供显式配置通道；②session「疑似误选」翻案：贴近度分组 + fallback=true 标志 + first_msg 兼容 teammate 包装——5aeed92a 实为 eval3-run 自身 transcript，原「未找到」系包装剥离缺失导致的误判。"
+  ]
+}
