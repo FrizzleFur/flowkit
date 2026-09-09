@@ -60,11 +60,15 @@ def run_once(qid: int, run_no: int, query: str, watch: set[str], timeout: int) -
     # low 下 ~77s 出首个 Skill 决策；口径注记于结果 JSON）
     env["CLAUDE_CODE_EFFORT_LEVEL"] = "low"
     t0 = time.time()
+    # 计时器锚点：检测到任何 Skill 调用（含 auto-skill 先行）即重置——决策链在推进
+    # 的证据，继续等下一个决策（2026-09-09 全量 8 miss 全部顶格 150s 的截断教训：
+    # auto-skill 77s + 目标技能第二个决策常落在 150-250s 区间）
+    anchor = t0
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
                             cwd=str(ARENA), env=env)
-    triggered, buf = [], ""
+    triggered, any_skill_seen, buf = [], False, ""
     try:
-        while time.time() - t0 < timeout:
+        while time.time() - anchor < timeout:
             if proc.poll() is not None:
                 rest = proc.stdout.read()
                 if rest:
@@ -77,19 +81,19 @@ def run_once(qid: int, run_no: int, query: str, watch: set[str], timeout: int) -
             if not chunk:
                 break
             buf += chunk.decode("utf-8", errors="replace")
-            # 流事件检测：content_block_start 的 tool_use name 含 Skill
-            for m in re.finditer(r'"type":"content_block_start".*?"name":"(Skill)"', buf):
-                pass  # tool 名确认；input.skill 在后续 input_json_delta 中渐进出现
             for m in re.finditer(r'"skill":\s*"([a-z0-9-]+)"', buf):
                 s = m.group(1)
                 if s in watch and s not in triggered:
                     triggered.append(s)
+            if re.search(r'"skill":\s*"', buf) and not any_skill_seen:
+                any_skill_seen = True
+                anchor = time.time()  # 首个 Skill 决策出现，计时器重置
             if triggered:  # 早停：首个目标技能决策已捕捉
                 break
     finally:
         proc.kill()
         proc.wait()
-    return {"qid": qid, "run": run_no, "skills": triggered,
+    return {"qid": qid, "run": run_no, "skills": triggered, "any_skill_seen": any_skill_seen,
             "secs": round(time.time() - t0, 1), "error": None}
 
 

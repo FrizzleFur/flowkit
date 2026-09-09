@@ -301,7 +301,7 @@ flowkit 全家已适配 **OpenAI Codex CLI** 运行，Claude Code 体验零变�
 - **flow-deep 行为 evals（T-301）**——三类型迷你任务 × 单臂 × Stage 3 确认点截断，24 机检断言全绿建立绿基线（`benchmarks/iteration-1.json`）；token/duration 从 transcript 离线统计
 - **check_context.py 窗口口径修复**（evals 首批战果，两臂独立复现的误报）——窗口解析「显式 > FLOWKIT_CONTEXT_WINDOW > ANTHROPIC_MODEL 推断 > 默认」，零配置随切模型自适应；实测误报 96% → 19%
 - **单一事实来源迁移**——本仓成为 5 核心 skill 主本，`~/.claude/skills` 对应目录换反向 symlink，终结三住处拷贝漂移；per-skill README 导览层随迁开源，个人数据 gitignore 隔离
-- **T-302 trigger eval 竞技场**——20 条竞争口径测得 12/20：near-miss 零误触发（precision 满分），漏触发为主；runner 支持 stream-json 早停 + effort 钉住（触发测试必须钉 effort，max 档思考 75s+ 的发现）
+- **T-302 trigger eval 竞技场**——两轮测得：负向边界零误触发（precision 稳健）、自然语言主动触发弱且高方差（真漏触发 6/8 + 方法局限注记：command 注入≠真实 skill 机制）；runner 支持 stream-json 早停 + effort 钉住 + 计时器锚点重置
 - CLAUDE.md 增「谁改契约谁带测试」纪律与跨技能引用全路径规范
 
 ### v1.6.1 (2026-09-08)

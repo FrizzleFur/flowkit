@@ -1,0 +1,215 @@
+{
+  "set": "eval-set-v1-retry.json",
+  "runs": 1,
+  "arena": "/tmp/trigger-eval-arena",
+  "watch": [
+    "flow",
+    "flow-deep",
+    "prompt"
+  ],
+  "summary": [
+    {
+      "qid": 1,
+      "expect": [
+        "flow-deep"
+      ],
+      "reject": [],
+      "triggered_per_run": [
+        []
+      ],
+      "task_skills": [],
+      "verdict": "miss",
+      "false_positives": [],
+      "secs": [
+        300.2
+      ]
+    },
+    {
+      "qid": 2,
+      "expect": [
+        "flow-deep"
+      ],
+      "reject": [],
+      "triggered_per_run": [
+        []
+      ],
+      "task_skills": [],
+      "verdict": "miss",
+      "false_positives": [],
+      "secs": [
+        208.7
+      ]
+    },
+    {
+      "qid": 4,
+      "expect": [
+        "flow-deep"
+      ],
+      "reject": [],
+      "triggered_per_run": [
+        []
+      ],
+      "task_skills": [],
+      "verdict": "miss",
+      "false_positives": [],
+      "secs": [
+        186.0
+      ]
+    },
+    {
+      "qid": 5,
+      "expect": [
+        "flow-deep"
+      ],
+      "reject": [],
+      "triggered_per_run": [
+        []
+      ],
+      "task_skills": [],
+      "verdict": "miss",
+      "false_positives": [],
+      "secs": [
+        186.9
+      ]
+    },
+    {
+      "qid": 6,
+      "expect": [
+        "flow"
+      ],
+      "reject": [
+        "flow-deep"
+      ],
+      "triggered_per_run": [
+        []
+      ],
+      "task_skills": [],
+      "verdict": "miss",
+      "false_positives": [],
+      "secs": [
+        202.8
+      ]
+    },
+    {
+      "qid": 7,
+      "expect": [
+        "flow"
+      ],
+      "reject": [
+        "flow-deep"
+      ],
+      "triggered_per_run": [
+        []
+      ],
+      "task_skills": [],
+      "verdict": "miss",
+      "false_positives": [],
+      "secs": [
+        255.4
+      ]
+    },
+    {
+      "qid": 9,
+      "expect": [
+        "flow"
+      ],
+      "reject": [
+        "flow-deep"
+      ],
+      "triggered_per_run": [
+        []
+      ],
+      "task_skills": [],
+      "verdict": "miss",
+      "false_positives": [],
+      "secs": [
+        189.8
+      ]
+    },
+    {
+      "qid": 11,
+      "expect": [
+        "prompt"
+      ],
+      "reject": [
+        "flow",
+        "flow-deep"
+      ],
+      "triggered_per_run": [
+        []
+      ],
+      "task_skills": [],
+      "verdict": "miss",
+      "false_positives": [],
+      "secs": [
+        173.1
+      ]
+    }
+  ],
+  "raw": [
+    {
+      "qid": 1,
+      "run": 1,
+      "skills": [],
+      "any_skill_seen": false,
+      "secs": 300.2,
+      "error": null
+    },
+    {
+      "qid": 2,
+      "run": 1,
+      "skills": [],
+      "any_skill_seen": true,
+      "secs": 208.7,
+      "error": null
+    },
+    {
+      "qid": 4,
+      "run": 1,
+      "skills": [],
+      "any_skill_seen": true,
+      "secs": 186.0,
+      "error": null
+    },
+    {
+      "qid": 5,
+      "run": 1,
+      "skills": [],
+      "any_skill_seen": true,
+      "secs": 186.9,
+      "error": null
+    },
+    {
+      "qid": 6,
+      "run": 1,
+      "skills": [],
+      "any_skill_seen": true,
+      "secs": 202.8,
+      "error": null
+    },
+    {
+      "qid": 7,
+      "run": 1,
+      "skills": [],
+      "any_skill_seen": true,
+      "secs": 255.4,
+      "error": null
+    },
+    {
+      "qid": 9,
+      "run": 1,
+      "skills": [],
+      "any_skill_seen": true,
+      "secs": 189.8,
+      "error": null
+    },
+    {
+      "qid": 11,
+      "run": 1,
+      "skills": [],
+      "any_skill_seen": false,
+      "secs": 173.1,
+      "error": null
+    }
+  ]
+}

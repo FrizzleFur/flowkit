@@ -1,0 +1,80 @@
+{
+  "version": "T-302 v1-miss-retry（8 条 miss 复测：300s + 计时器锚点重置）",
+  "scope": "三高竞争技能：flow-deep / flow / prompt（auto-skill 常驻依赖型、multi-agent 触发词明确，二批再测）",
+  "protocol": "竞争口径：候选 = 全部已装技能的 available_skills；每条记录期望触发（expect）与必须不触发（reject）；评分 = 触发命中 expect 且避开 reject",
+  "queries": [
+    {
+      "id": 1,
+      "query": "这个支付模块的重构很关键，改错了很难恢复，我要确保万无一失，帮我仔细深度处理，一步一步来",
+      "expect": [
+        "flow-deep"
+      ],
+      "reject": []
+    },
+    {
+      "id": 2,
+      "query": "/flow-deep 重新设计用户认证体系，要支持多租户和单点登录",
+      "expect": [
+        "flow-deep"
+      ],
+      "reject": []
+    },
+    {
+      "id": 4,
+      "query": "给核心交易链路加审计日志，这是重要功能，要仔细做，别糊弄",
+      "expect": [
+        "flow-deep"
+      ],
+      "reject": []
+    },
+    {
+      "id": 5,
+      "query": "这个任务挺复杂的，帮我先深度分析再规划再执行，确保每步都有验证",
+      "expect": [
+        "flow-deep"
+      ],
+      "reject": []
+    },
+    {
+      "id": 6,
+      "query": "/flow 帮我把爬虫脚本改成支持并发的版本",
+      "expect": [
+        "flow"
+      ],
+      "reject": [
+        "flow-deep"
+      ]
+    },
+    {
+      "id": 7,
+      "query": "帮我编排个流程：先抓三个网站的价格数据，清洗完汇总成对比报表，最后发邮件",
+      "expect": [
+        "flow"
+      ],
+      "reject": [
+        "flow-deep"
+      ]
+    },
+    {
+      "id": 9,
+      "query": "多步骤任务：把这批图片压缩、重命名、按日期归档、生成索引文件",
+      "expect": [
+        "flow"
+      ],
+      "reject": [
+        "flow-deep"
+      ]
+    },
+    {
+      "id": 11,
+      "query": "/prompt 打分：写一个排序算法",
+      "expect": [
+        "prompt"
+      ],
+      "reject": [
+        "flow",
+        "flow-deep"
+      ]
+    }
+  ]
+}
