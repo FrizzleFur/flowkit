@@ -291,6 +291,8 @@ flowkit 全家已适配 **OpenAI Codex CLI** 运行，Claude Code 体验零变�
 
 ## 更新日志 (Changelog)
 
+> 完整版本历史（v1.0.0 起）见 [CHANGELOG.md](CHANGELOG.md)。
+
 ### v1.6.1 (2026-09-08)
 
 **全家族多平台适配（Codex CLI）**
@@ -327,69 +329,6 @@ flowkit 全家已适配 **OpenAI Codex CLI** 运行，Claude Code 体验零变�
 **multi-agent**
 - 补录 **命名 agent 收尾三步协议**（08-31 漏记）—— teammate 型命名 agent 完成后进程常驻不退出，必须依次执行「进度汇总 → `TaskStop(name)` 收本体（pane 随之自动回收）→ `tmux list-panes` 验证」，防 pane 泄漏
 - 演进说明：pane 管理重心已从 spawn-pane 观察窗体系（v1.3.0 所述，仅适用 unnamed 异步 agent）转向「named agent 完成即收」——named 场景由 harness 自动分配 pane，勿再手动开观察窗
-
-### v1.4.0 (2026-09-04)
-
-**ppt-agent（新模块）**
-- 新增 **ppt-agent** —— 借鉴 linux.do 精华帖《应该是目前最强的PPT Agent》（sandun）的策划师工作流：需求调研 → 金字塔原理大纲（强制确认点）→ Bento Grid 卡片布局 → 逐页 SVG 设计稿（可直接拖入 Office 2016+ 编辑）
-- 内置 **4 套风格色板预设**（商务深色/简约浅色/科技/活泼），开工定义一次全篇复用，解决 AI 生成 PPT 常见的"每页配色漂移"
-- 内置 **文字防溢出约束**（估宽公式 + 字号层级表）与无外部依赖纪律，保证 SVG 拖入 PowerPoint 不丢资源
-- 交付自带 **preview.html 翻页查看器**（键盘导航）与布局选型速查表（页面内容类型 → 推荐布局直接映射）
-
-### v1.3.0 (2026-08-28)
-
-**flow-deep**
-- 新增 **Auto Handoff（75% 自动交接）** —— Context Guard 弹窗新增「交接并记住自动」（armed 状态写入 STATE.md，续接会话继承偏好）；armed 后边界实测 ≥75% 免弹窗自动交接：五件套 + HANDOFF.md → tmux 新窗口 spawn 续接会话（`CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1` 保证嵌套会话可追溯）
-- 新增 `--no-auto-handoff` / `--handoff-max N` 参数（接力上限默认 3 代，防无限接力环）
-- 宪法 #4 决议修订：由"只询问不自动交接"改为"弹窗但可记忆"
-- 链路实测闭环：真实 tmux spawn → 新会话读 HANDOFF.md → 从 Next Action 恢复
-
-**multi-agent**
-- 新增 **Fast Path 风险路由** —— 分发前按任务性质（只读 vs 写入）路由：一句话 fan-out（调研/审查/比对）走分片分解 + 告知式预告 + 直接分批分发 + 分片清单勾销核对，写入任务仍走 Step 0-5 完整流程；判定需显式锚点（`路由判定: 只读 → Fast Path`），并发 ≤2 硬约束不变
-- 触发词对齐官方 Tip 与中文口语（"fan out subagents"、"派团队"、"扇出"等）
-- agent 映射表重写为**动态发现优先**（旧 voltagent 插件映射已失效，不在可用列表一律降级 general-purpose），修复照抄旧表导致 Agent 调用直接失败的问题
-- 新增 **pane 生命周期自动化** —— `scripts/spawn-pane.sh` 一条命令开观察窗（自动命名、登记表、静默降级），watcher 检测输出静默 120s 自杀回收 pane，`reap-panes.sh` 登记表制兜底（绝不触碰主 pane）；修正"harness 自动分配 pane"的失效声明
-- 正文新增 **Agent 深度要求（digs deep）** 章节 + Prompt 模板深度块 —— 穷尽分片不抽样、结论带证据锚点（file:line / URL）、深挖优先于罗列，写进每个 fan-out Agent 的 prompt
-
-### v1.2.1 (2026-08-21)
-
-**multi-agent / flow / flow-deep**
-- **弱化 tmux 硬依赖** —— 执行模式改为环境自适应双模式：有 tmux 走 tmux-split 团队分屏；无 tmux **静默降级**为同消息无分屏并发（不提示安装、不要求重试）
-- 降级模式保留规模档位硬约束（同消息 ≤ 4 防 429）与 Delegate 协调协议；pane 清理步骤自动跳过
-- why: tmux 只是可视化增强而非能力前提，多数环境本就没有 tmux，强制提示会打断任务流
-
-### v1.2.0 (2026-08-21)
-
-**flow**
-- Grilling 新增 **防拷打三律** —— 增量披露（每问前说明上一答更新了什么判断）、改变结论判据（只问可能改变结论的问题）、显式停止（信息足够立刻收束不凑满）；吸收自苏格拉底提问法，解决"无限追问导致用户被问爆"
-- 需求探索收束新增 **问诊六件套** —— 原问题/真问题/已确认事实/未验证假设/关键变量/可行动新问题，后续 Stage 直接拿到澄清后的新问题
-- 三角色讨论升级 —— 每角色四项陈述（新增**可证伪声明**：什么证据会让我改变判断）；第二轮先挖**分歧三件套**（共同事实/真正分歧/分歧背后假设）再调和，未消解的分歧显式记录而非过早掩盖
-
-**prompt**
-- 新增 **交互节奏控制** 检查项（多轮对话型专项）—— 延迟结论 / 一次一问 / 反形式主义 / 信息密度判据，补齐 Johari+3S 之外的多轮交互质量维度
-
-### v1.1.0 (2026-08-21)
-
-**flow-deep**
-- 新增 **Context Guard（上下文容量守卫）** —— Stage/Phase 边界用 `scripts/check_context.py` 从会话 transcript usage 真值检测 context 占用百分比（精确值，非模型自估），超 70% 时 AskUserQuestion 三选项：保存并继续 / 保存并交接（生成 HANDOFF.md 衔接 prompt 给下一个 agent）/ 跳过
-- 新增 **主动 Checkpoint 与 Handoff 协议** —— 保存动作清单、HANDOFF.md 模板（路径引用不复制内容）、同 Stage 节流、AskUserQuestion 不可用时的无交互降级、检测失败静默降级（exit 0/1/2 契约）
-- 新增 **prime-agent 集成（C34）** —— capability-registry 注册 + skill-routing 自动路由：`security-audit` / `code-verification` 任务在 C34 可用时自动走 prime-agent（IPython 实际运行代码验证），`--no-prime` 可禁用
-- 触发条件表 P0 升级为脚本实测，替换不可靠的"人工判断"预估
-
-### v1.0.0 (2026-07-16)
-
-**flow-deep**
-- 新增 **Goal Contract（目标契约）** —— 防止 agent 做大量"看起来正确但偏离用户真实目标"的工作；提供 Objective / Success Criteria / Non-goals / Verification Plan 模板
-- 新增 **Workflow Script Patterns（工作流脚本模式）** —— Stage 4 选 Workflow 后端时的 Review Workflow / Execution Workflow 模式参考
-- `SKILL.md` 大幅更新（532 → 694 行）；capability-registry / context-management / panel-review 同步增强
-
-**flow**
-- 新增 **选型指南（selection-guide）** —— flow-deep vs flow vs grill-me 的入口决策依据、升级/降级信号、组合用法与三种误用
-- `SKILL.md` 更新；cleanup-procedure / needs-exploration / stage55-iteration 同步增强
-
-**multi-agent**
-- `SKILL.md` 更新（315 → 328 行）
-
 ## 社区
 
 本项目在 [LINUX DO](https://linux.do) 社区发布与交流，欢迎前来讨论反馈。
