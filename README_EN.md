@@ -320,6 +320,8 @@ Design principles: frontmatter and descriptions are untouched (CC triggering beh
 
 ## Changelog
 
+> Full version history (since v1.0.0) lives in [CHANGELOG.md](CHANGELOG.md). The Chinese entries are authoritative; version numbers and module names are shared across languages.
+
 ### v1.6.1 (2026-09-08)
 
 **Family-wide multi-platform adaptation (Codex CLI)**
@@ -356,69 +358,6 @@ Design principles: frontmatter and descriptions are untouched (CC triggering beh
 **multi-agent**
 - Backfilled **named-agent three-step closing protocol** (missed in the 08-31 sync) — teammate-type named agents stay resident after finishing, so each completion must run "summarize progress → `TaskStop(name)` to reap the agent (pane auto-recycles) → verify with `tmux list-panes`" to prevent pane leaks
 - Evolution note: pane management has shifted from the spawn-pane watcher system (described in v1.3.0, applies to unnamed async agents only) to "named agent: reap on completion" — named agents get panes from the harness automatically; don't spawn watcher panes for them
-
-### v1.4.0 (2026-09-04)
-
-**ppt-agent (new module)**
-- Added **ppt-agent** — a planner-style PPT workflow adapted from the linux.do featured post "应该是目前最强的PPT Agent" (sandun): requirement research → pyramid-principle outline (mandatory confirmation gate) → Bento Grid card layouts → page-by-page SVG deliverables (drag straight into Office 2016+ and edit)
-- Ships **4 preset style palettes** (business dark / minimal light / tech / playful) defined once and reused across all pages, fixing the classic AI-generated-deck problem of per-slide color drift
-- Enforces **text-overflow guards** (width estimation + font-size hierarchy) and a no-external-dependency rule so SVGs never lose resources when imported into PowerPoint
-- Deliverables include a **preview.html pager** (keyboard navigation) and a layout cheat sheet mapping content types to recommended Bento layouts
-
-### v1.3.0 (2026-08-28)
-
-**flow-deep**
-- Added **Auto Handoff (75% automatic context relay)** — the Context Guard dialog gains a "hand off and remember" option (armed state written to STATE.md, inherited by successor sessions); when armed, boundary measurements ≥ 75% relay automatically without prompting: five plan files + HANDOFF.md → tmux new-window spawn of the successor session (`CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1` keeps nested sessions resumable)
-- Added `--no-auto-handoff` / `--handoff-max N` flags (relay cap defaults to 3 generations to prevent infinite loops)
-- Constitution principle #4 amended: from "ask, never auto-handoff" to "prompt with a rememberable choice"
-- Chain verified end-to-end: real tmux spawn → new session reads HANDOFF.md → resumes from Next Action
-
-**multi-agent**
-- Added **Fast Path risk routing** — routes by task nature (read-only vs write) before dispatching: one-phrase fan-outs (research / review / comparison) go through shard decomposition + informational preview + direct batched dispatch + shard-checklist verification, while write tasks still run the full Step 0-5 flow; the routing decision requires an explicit anchor line (`路由判定: 只读 → Fast Path`), and the ≤2 concurrency hard cap stays unchanged
-- Trigger words aligned with official Tips and Chinese colloquial phrasing ("fan out subagents", "派团队", "扇出", etc.)
-- Agent mapping table rewritten to **dynamic-discovery-first** (the old voltagent plugin mappings are dead; anything not in the available list degrades to general-purpose) — fixing broken Agent calls caused by copying the old table
-- Added **pane lifecycle automation** — `scripts/spawn-pane.sh` opens a labeled watch pane in one command (auto-named, registry-tracked, silent degradation); the watcher self-exits after 120s of output silence, reclaiming the pane; `reap-panes.sh` provides registry-based cleanup that never touches the main pane; fixed the stale "Agent tool auto-assigns panes" claim
-- Added the **Agent depth requirements (digs deep)** section plus a depth block in the prompt template — exhaust your shard without sampling, anchor every conclusion (file:line / URL), dig deep over listing wide — written into every fan-out agent's prompt
-
-### v1.2.1 (2026-08-21)
-
-**multi-agent / flow / flow-deep**
-- **Softened the hard tmux dependency** — execution mode is now environment-adaptive dual-mode: with tmux it runs the tmux-split team layout; without tmux it **silently degrades** to same-message concurrent agents (no install prompt, no retry request)
-- The degraded mode keeps the scale-tier hard constraint (≤ 4 concurrent per message against 429) and the Delegate coordination protocol; pane cleanup steps are skipped automatically
-- Why: tmux is a visualization enhancement, not a capability prerequisite — most environments simply don't have it, and forcing a prompt interrupts the task flow
-
-### v1.2.0 (2026-08-21)
-
-**flow**
-- Grilling adds **anti-interrogation rules** — incremental disclosure (state what judgment the last answer updated before each question), conclusion-changing criterion (only ask questions whose answers could change the conclusion), explicit stopping (stop as soon as information suffices, never pad the count); absorbed from Socratic questioning to fix "endless grilling exhausts the user"
-- Requirements exploration closing adds a **six-part consultation summary** — original question / real problem / confirmed facts / unverified assumptions / key variables / an accurate actionable new question, handing later Stages a clarified question instead of scattered Q&A
-- Three-role discussion upgraded — each role states four items (adding a **falsifiability declaration**: what new evidence would change its judgment); round two surfaces the **disagreement triad** (shared facts / real disagreements / underlying assumptions) before synthesizing; unresolved disagreements are recorded explicitly instead of being prematurely smoothed over
-
-**prompt**
-- Added **interaction pacing control** checklist (multi-turn conversational prompts) — delayed conclusions / one question at a time / anti-formalism / information-density criterion, covering the multi-turn quality dimension beyond Johari+3S
-
-### v1.1.0 (2026-08-21)
-
-**flow-deep**
-- Added **Context Guard** — detects real context usage at Stage/Phase boundaries via `scripts/check_context.py` (reads actual token usage from the session transcript, not model self-estimation); above 70% it prompts three options: save & continue / save & hand off (generates HANDOFF.md as the continuation prompt for the next agent) / skip
-- Added **Proactive Checkpoint & Handoff protocol** — save checklist, HANDOFF.md template (references plan files by path instead of duplicating), per-Stage throttling, non-interactive fallback when AskUserQuestion is unavailable, silent degradation on detection failure (exit 0/1/2 contract)
-- Added **prime-agent integration (C34)** — registered in capability-registry with auto-routing in skill-routing: `security-audit` / `code-verification` tasks route to prime-agent (IPython runs code for real verification) when available; disable with `--no-prime`
-- Context trigger table P0 upgraded to script-based measurement, replacing unreliable "manual estimation"
-
-### v1.0.0 (2026-07-16)
-
-**flow-deep**
-- Added **Goal Contract** — prevents the agent from doing correct-looking work that misses the user's actual outcome; provides Objective / Success Criteria / Non-goals / Verification Plan template
-- Added **Workflow Script Patterns** — Review Workflow / Execution Workflow patterns for when Stage 4 Execution Router selects the Workflow backend
-- Major `SKILL.md` update (532 → 694 lines); capability-registry / context-management / panel-review enhancements
-
-**flow**
-- Added **Selection Guide** — decision criteria for flow-deep vs flow vs grill-me, upgrade/downgrade signals, composition patterns, and three misuse cases
-- `SKILL.md` update; cleanup-procedure / needs-exploration / stage55-iteration enhancements
-
-**multi-agent**
-- `SKILL.md` update (315 → 328 lines)
-
 ## Community
 
 This project is shared and discussed on the [LINUX DO](https://linux.do) community. Feedback and discussion welcome.
