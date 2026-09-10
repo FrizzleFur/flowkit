@@ -322,6 +322,13 @@ Design principles: frontmatter and descriptions are untouched (CC triggering beh
 
 > Full version history (since v1.0.0) lives in [CHANGELOG.md](CHANGELOG.md). The Chinese entries are authoritative; version numbers and module names are shared across languages.
 
+### v1.8.0 (2026-09-10)
+
+**Loops layer (first step of graph-loop adoption) + flow-deep environment degradation protocol**
+- New **Loops layer** — `evals/loops/` two loop contracts + CI cron trigger: repo-integrity-loop (weekly automated lint, the first mounted scheduled loop of the whole system; no-op is a valid run) and brain-integrity-loop (local shared-brain watchdog, mounting up to the user); signal registry makes five cross-loop edges explicit — tasks and loops are orthogonal kinds of being; start single-layer, no evolve
+- flow-deep **environment degradation protocol** — unified 3-step degradation for non-interactive channels (subagent/headless/Ralph) and missing dependencies; driven by T-301 three-arm behavioral evals, verified by iteration-2 regression
+- Constitution Gates timing clarified + Stage 2 ordering note + TOC added to three large references
+
 ### v1.7.0 (2026-09-09)
 
 **Evals system + single source of truth (regression test net for skills themselves)**
@@ -339,25 +346,6 @@ Design principles: frontmatter and descriptions are untouched (CC triggering beh
 - Four-piece mechanism mapping: AskUserQuestion→numbered plain-language options, Plan Mode approval→plan presentation + manual toggle, Task system→planning-with-files file protocol, Agent orchestration→spawn_agent tool family
 - Zero impact on Claude Code: frontmatter/description untouched; adaptation content loaded via progressive disclosure only on non-CC platforms
 - SKILL.md format shares the agentskills.io open standard — one entity, multi-platform symlinks
-
-### v1.6.0 (2026-09-07)
-
-**flow-deep / flow / auto-iterate (humanlayer mechanism absorption)**
-- Deep-researched 4 humanlayer/skills (show-me / build-iterated-agentic-loop / design-control-loop / improve-claude-md); verdict "1 install, 3 borrow" — mechanisms absorbed into existing files for full benefit at zero trigger-surface cost
-- **Loop Memory file** (auto-iterate) — TSV logs history, memory stores future rules; durable-vs-oneoff discrimination + standing-feedback admission test
-- **on-the-loop async steering** (flow Stage 5.5) — mid-iteration corrections go to loop-memory without breaking the loop; effective from next Pick
-- **Guard vs Dampener duality** (auto-iterate) — Guard guards your own changes, Dampener guards external degradation; advisory→blocking graduation
-- **Controller spectrum + fused criterion** (auto-iterate) — countable goals get deterministic controllers, fuzzy goals use agentic Pick; strategy evolves across campaigns
-- **One-sentence job gate** (flow plan-quality) — a goal that can't be stated as one verifiable sentence goes back to rethink, no plan written
-- **Unattended output gate** (flow-deep ralph-integration) — "output rate ≤ review rate" before headless Ralph runs, complementing the anti-giving-up lower bound
-- show-me capability hints at flow-deep Stage 2b/3 (optional, non-mandatory)
-
-**show-me (new skill)**
-- Installed humanlayer show-me v1.0.1 — visual explanation vocabulary (pseudocode / call tree / diff / HTML solution pages)
-- Description enhanced: proactively appears when a plan involves unfamiliar concepts (verified live during an AST migration task)
-
-**multi-agent**
-- Synced runtime evolution: named-only ruling, pretrust-cwd.sh pre-trust (prevents trust-dialog pane stalls), Fast Path additions (118-line backfill)
 
 ## Community
 

@@ -4,6 +4,10 @@ FlowKit 全量版本历史。格式遵循 [Keep a Changelog](https://keepachange
 
 ## [Unreleased]
 
+（暂空——v1.8.0 刚发版）
+
+## [v1.8.0] - 2026-09-10
+
 ### 仓库基础设施
 - 新增 **Loops 层：graph loop 吸收第一步（cron trigger + signal 登记）** —— `evals/loops/` 两个 loop contract（repo-integrity: CI cron 每周一跑 lint，no-op 是有效 run；brain-integrity: 本机双库监守，挂载由用户定）+ CI workflow 加 schedule 触发 + signal 登记总表入 evals/README（谁写谁读——边从「事实长出来」升级为「事实+登记」）。纪律：任务与 loop 两种本体正交共存，单层起步不加 evolve
 
@@ -12,6 +16,7 @@ FlowKit 全量版本历史。格式遵循 [Keep a Changelog](https://keepachange
 - **Constitution Gates 时点澄清** —— 明确为 task_plan.md 落盘前的准入检查（原「规划前」措辞被执行者在落盘后补做）
 - **Stage 2 顺序说明** —— 2a-2d 编号是主题划分而非强制顺序，按数据依赖编排并如实记录
 - **三大 reference 补 TOC** —— panel-review(17)/context-management(23)/capability-registry(34) 条目目录（9-01 遗留速赢）
+
 
 ## [v1.7.0] - 2026-09-09
 

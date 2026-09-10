@@ -293,6 +293,13 @@ flowkit 全家已适配 **OpenAI Codex CLI** 运行，Claude Code 体验零变�
 
 > 完整版本历史（v1.0.0 起）见 [CHANGELOG.md](CHANGELOG.md)。
 
+### v1.8.0 (2026-09-10)
+
+**Loops 层（graph loop 吸收第一步）+ flow-deep 环境降级协议**
+- 新增 **Loops 层**——`evals/loops/` 两个 loop contract + CI cron 触发：repo-integrity-loop（每周一自动跑 lint，全体系第一个挂载的定时 loop，no-op 是有效 run）与 brain-integrity-loop（本机双库监守，挂载由用户定）；signal 登记总表五条跨 loop 边显式化——任务与 loop 两种本体正交共存，单层起步不加 evolve
+- flow-deep 新增 **环境降级协议**——无交互通道（子代理/headless/Ralph）与依赖缺失场景统一三步降级（推荐默认值 + findings 偏离留痕 + 确认点汇呈报）；设计依据为 T-301 三臂 evals 的行为数据，iteration-2 回归验证协议全程留痕可追溯
+- Constitution Gates 时点澄清 + Stage 2 顺序说明 + 三大 reference 补 TOC（17/23/34 条目）
+
 ### v1.7.0 (2026-09-09)
 
 **Evals 体系 + 单一事实来源（skill 本体的回归测试网）**
@@ -311,25 +318,6 @@ flowkit 全家已适配 **OpenAI Codex CLI** 运行，Claude Code 体验零变�
 - 机制映射四件套：AskUserQuestion→编号选项自然语言、Plan Mode 审批→plan 呈现+人工切换、Task 系统→planning-with-files 文件协议、Agent 编排→spawn_agent 工具族
 - Claude Code 侧零影响：frontmatter/description 零变更，适配内容按渐进披露仅在非 CC 环境加载
 - SKILL.md 格式同源 agentskills.io 开放标准，一份实体多平台 symlink 共用
-
-### v1.6.0 (2026-09-07)
-
-**flow-deep / flow / auto-iterate（humanlayer 机制吸收）**
-- 深研 humanlayer/skills 四 skill（show-me / build-iterated-agentic-loop / design-control-loop / improve-claude-md），结论「1 装 3 借鉴」——机制吸收进现有文件获得全部收益、零触发面成本
-- 新增 **Loop Memory 文件**（auto-iterate）—— TSV 记历史、memory 存未来规则；durable-vs-oneoff 判别 + standing-feedback 准入删除测试
-- 新增 **on-the-loop 异步纠偏通道**（flow Stage 5.5）—— 迭代运行中插话纠正写 loop-memory，不打断循环、下轮 Pick 生效
-- 新增 **Guard vs Dampener 对偶**（auto-iterate）—— Guard 防自己改坏，Dampener 防外部恶化，advisory→blocking 渐进
-- 新增 **Controller 谱系 + fused 判据**（auto-iterate）—— 可数目标外置确定性 controller，模糊目标才用 agentic Pick；策略跨 campaign 可演化
-- 新增 **单句任务定义门**（flow plan-quality）—— 目标压不成一句可验证的话，退回不写 plan
-- 新增 **无人值守产出闸门**（flow-deep ralph-integration）—— 挂机跑 Ralph 前「产出速率 ≤ 评审速率」，与防"过早放弃"互补
-- flow-deep Stage 2b/3 接入 **show-me capability 提示**（可选，非强制）
-
-**show-me（新 skill）**
-- 安装 humanlayer show-me v1.0.1 —— 视觉讲解形态词汇表（pseudocode / call tree / diff / HTML 方案页）
-- description 增强：方案依赖不熟悉概念时主动出现做视觉讲解（实测：AST 迁移任务 Stage 2b 自动命中）
-
-**multi-agent**
-- 同步运行时仓演进：named-only 裁定、派发前 pretrust-cwd.sh 预信任（防 trust 弹窗卡 pane）、Fast Path 补充（118 行差异回补）
 
 ## 社区
 
