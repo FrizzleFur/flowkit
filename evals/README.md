@@ -40,6 +40,27 @@ eval 有效性不靠「任务不变」来保证——flow-deep 的设计目标�
 2. 改契约忘了改断言，CI 却还绿 → 触发规则 2
 3. 同一断言连续多版本 pass 率恒 100% 且从没 catch 过任何东西 → 断言退化为恒真，删或收紧
 
+## Loops 层（2026-09-10 吸收 graph loop：cron trigger + signal 登记）
+
+flowkit 的 loop graph 定位（研究仓 09 收官篇裁决）：**任务（flow/flow-deep）与 loop（永续监守）是两种本体，正交共存**。已有循环资产：管道 = L2 执行 loop、evals = 其 verifier、auto-skill = 共享 brain。本目录补的是 trigger 维度与跨 loop 边的显式登记：
+
+| Loop | Trigger | 监控对象 | Contract |
+|---|---|---|---|
+| repo-integrity | CI cron（每周一） | 仓内 skills 结构（lint L1-L7） | `loops/repo-integrity-loop.md` |
+| brain-integrity | launchd/手动（挂载由用户定） | auto-skill 双库断链/陈旧度 | `loops/brain-integrity-loop.md` |
+
+### signal 登记总表（谁写谁读——边的事实+登记）
+
+| 信号 | 写者 | 读者 | 载体 |
+|---|---|---|---|
+| lint 战果 | repo-integrity loop | L3 研究吸收 loop | Actions 日志 + CHANGELOG |
+| 行数台账（P3 触发数据） | repo-integrity loop | 下沉决策 | Actions 日志 L3 节 |
+| 双库健康报告 | brain-integrity loop | L1 召回置信 / REC-8 健康分 | integrity-report.md |
+| evals benchmark | L2 行为 evals | L3 改进迭代（绿基线对照） | `flow-deep/benchmarks/` |
+| trigger 测量结果 | T-302 竞技场 | description 优化（低优先级） | `trigger/results-*.json` |
+
+新 loop 的准入纪律：one loop = one separable workstream；单层起步（"Build the 1-layer version first"），no-op 是有效 run，验证靠确定性脚本（evidence not vibes）。
+
 ## 目录约定
 
 ```

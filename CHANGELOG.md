@@ -4,6 +4,9 @@ FlowKit 全量版本历史。格式遵循 [Keep a Changelog](https://keepachange
 
 ## [Unreleased]
 
+### 仓库基础设施
+- 新增 **Loops 层：graph loop 吸收第一步（cron trigger + signal 登记）** —— `evals/loops/` 两个 loop contract（repo-integrity: CI cron 每周一跑 lint，no-op 是有效 run；brain-integrity: 本机双库监守，挂载由用户定）+ CI workflow 加 schedule 触发 + signal 登记总表入 evals/README（谁写谁读——边从「事实长出来」升级为「事实+登记」）。纪律：任务与 loop 两种本体正交共存，单层起步不加 evolve
+
 ### flow-deep
 - 新增 **环境降级协议**（SKILL.md 执行流程首节）—— 无交互通道（子代理/headless/Ralph）与依赖缺失场景的统一降级三步：推荐默认值 + findings.md 偏离留痕 + 确认点汇呈报。设计依据：T-301 三臂 evals 中三个执行者各自发明了三种降级方式，本协议收编为标准。iteration-2 回归验证：既有 24 断言不破，新协议 D1-D8 全程留痕可追溯
 - **Constitution Gates 时点澄清** —— 明确为 task_plan.md 落盘前的准入检查（原「规划前」措辞被执行者在落盘后补做）

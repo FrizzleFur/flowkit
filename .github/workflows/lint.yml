@@ -7,6 +7,10 @@ on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    # repo-integrity-loop（evals/loops/repo-integrity-loop.md）：每周一 04:23 UTC = 北京周一 12:23
+    # no-op 是有效 run；红灯时 Actions 日志即报告（内嵌修复指引）
+    - cron: '23 4 * * 1'
 
 jobs:
   lint:
