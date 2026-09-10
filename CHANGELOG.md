@@ -4,7 +4,11 @@ FlowKit 全量版本历史。格式遵循 [Keep a Changelog](https://keepachange
 
 ## [Unreleased]
 
-（暂空——v1.7.0 刚发版）
+### flow-deep
+- 新增 **环境降级协议**（SKILL.md 执行流程首节）—— 无交互通道（子代理/headless/Ralph）与依赖缺失场景的统一降级三步：推荐默认值 + findings.md 偏离留痕 + 确认点汇呈报。设计依据：T-301 三臂 evals 中三个执行者各自发明了三种降级方式，本协议收编为标准。iteration-2 回归验证：既有 24 断言不破，新协议 D1-D8 全程留痕可追溯
+- **Constitution Gates 时点澄清** —— 明确为 task_plan.md 落盘前的准入检查（原「规划前」措辞被执行者在落盘后补做）
+- **Stage 2 顺序说明** —— 2a-2d 编号是主题划分而非强制顺序，按数据依赖编排并如实记录
+- **三大 reference 补 TOC** —— panel-review(17)/context-management(23)/capability-registry(34) 条目目录（9-01 遗留速赢）
 
 ## [v1.7.0] - 2026-09-09
 

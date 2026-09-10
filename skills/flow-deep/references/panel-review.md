@@ -3,6 +3,26 @@
 > 本文件由 flow-deep SKILL.md 引用。定义 Stage 3.6 的多角色面板评审流程。
 > 核心理念: "Design Review Board"——多视角交叉验证，消除单角色盲区。
 
+## 目录
+
+- 概述
+- 与 Stage 3.5 的分工
+- 角色目录
+  - 完整角色列表
+  - 自动选择规则
+- Agent Prompt 模板
+  - 通用框架
+  - 角色特定维度
+- Auto-Decide Layer
+  - 6 个决策原则
+  - 判定流程
+  - Taste Decision 分类
+- 执行流程
+- Final Approval Gate 报告格式
+  - 报告生成规则
+- Agent 配置
+- 注意事项
+
 ## 概述
 
 Panel Review 在 Stage 3.5（快速审查）通过后、Stage 3.7（代码级细化）之前，启动多个并行 Agent，每个扮演不同专家角色，从各自专业维度深度评审 plan。评审结果综合后提交用户决策。

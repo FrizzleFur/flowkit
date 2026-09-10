@@ -2,6 +2,43 @@
 
 > flow-deep 的能力索引。Stage 0 扫描时与此文件交叉比对，生成当前会话的可用能力矩阵。
 
+## 目录
+
+- 层级二分（Orchestrate vs Discipline）
+  - 能力关系图（REC-4 — registry 的显式图化，2026-08-30）
+- L1: 管道必需能力（缺失则报错）
+  - C01: using-superpowers
+  - C02: /prompt
+  - C03: Sequential Thinking
+  - C04: /mermaid
+  - C05: planning-with-files
+  - C06: /multi-agent
+- L2: 代码质量能力（自动匹配）
+  - C10: TDD（test-driven-development）
+  - C11: writing-plans
+  - C12: code-review
+  - C13: auto-iterate
+  - C14: verification-before-completion
+  - C15: systematic-debugging
+- L3: 思考模式配置（L1-C03 的参数变体）
+  - C20: Sequential Thinking 默认深度
+  - C21: Sequential Thinking --think-hard
+  - C22: 三角色讨论（默认）
+  - C23: reason 盲评法官团
+- L4: 领域特定能力（关键词匹配）
+  - C30: web-access
+  - C31: harmonyos-app
+  - C32: gstack / browse
+  - C33: linear
+  - C34: prime-agent
+  - C35: zread MCP
+  - C36: dual-graph code navigation（多仓双图工具链）
+- L5: 安全防护能力（自动触发）
+  - C40: guard
+  - C41: careful
+  - C42: freeze
+- 覆盖审计模板
+
 ## 注册表结构
 
 每个能力条目格式：

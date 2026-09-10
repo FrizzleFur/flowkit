@@ -175,6 +175,16 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
 
 ## 执行流程
 
+### 环境降级协议（无交互通道 / 依赖缺失场景）
+
+flow-deep 默认在有用户在环的交互式会话运行，但真实执行环境还包括子代理、headless（`claude -p`）、无人值守（Ralph）三类无 AskUserQuestion 通道的场景。检测依据：AskUserQuestion 调用失败 / 任务书来自 teammate 消息 / `--permission-prompts none`。命中任一时，所有原本需要询问的决策点（前置确认、Stage 1 ≥8 分是否跳过优化、Grilling 追问、消歧提问、Stage 3 确认点、依赖缺失处置）统一走三步降级，不要各自发明：
+
+1. **取推荐默认值继续**——用各决策点文档标注的默认项
+2. **偏离留痕**——把「本应询问 X，因无交互通道取默认 Y」逐条记入 findings.md 偏离节
+3. **确认点汇呈报**——被降级的决策在 Stage 3 用户确认点集中呈现（确认点也被降级时并入最终报告），用户可事后推翻
+
+依赖缺失（superpowers 族、C01/C14 等检测不到）同协议处理：记录缺失项 + 采用等价替代路径 + 继续执行——不阻塞、不静默。设计依据（2026-09-09 三臂行为 evals）：三个执行者在无交互环境各自发明了三种降级方式（汇入确认点 / 合理默认附带裁决 / 等价替代路由），本协议将其收编为统一标准。
+
 ### 前置处理
 
 1. **解析参数**: 从用户输入中提取 `--` 参数和任务表述
@@ -296,6 +306,8 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
 
 ### Stage 2: 深度思考（强制启用）
 
+> 2a-2d 的编号是主题划分而非强制执行顺序——各子步按数据依赖自由编排（如消歧 2d 的对象是 spec.md 静态产物、与 2a 思考无数据依赖时可先行落盘），落盘时各自如实记录实际顺序。
+
 #### 2a. Sequential Thinking
 
 调用 Sequential Thinking MCP（默认 4K，`--think-hard` 升级为 10K），覆盖 6 个维度：
@@ -350,7 +362,7 @@ STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协�
 
 **遵循**: `planning-with-files` 模板格式 + `references/plan-quality.md` 质量标准
 
-> **SDD 增强**: 如果 `--plan-dir/spec.md` 存在，基于 FR-xxx 和 US-xxx 组织 plan（生成 Coverage Matrix）；如果 `references/constitution-checklist.md` 存在，规划前执行 Constitution Gates 检查。
+> **SDD 增强**: 如果 `--plan-dir/spec.md` 存在，基于 FR-xxx 和 US-xxx 组织 plan（生成 Coverage Matrix）；如果 `references/constitution-checklist.md` 存在，执行 Constitution Gates 检查——时点是 **task_plan.md 开始落盘之前**（作为规划的准入检查，而非落盘后补做）。
 
 > **默认不进 Plan Mode（2026-09-09 反转默认，用户裁定）**: 规划纪律不变——本 Stage 仍只做探索与设计，不改任何代码；审批由「plan 落盘 + 质量自检 + 用户确认点 + Stage 3.5/3.6 审查」多道关承担。反转依据（2026-09-09 官方文档核实）：`ExitPlanMode` 审批弹窗属 permission prompt（"Permission required: Yes"，"never auto-resolve on idle"），无任何配置/环境变量/flags 可抑制；且 bypass 会话中 Plan Mode 只读封锁本就不强制（"doesn't enforce plan mode's blocks"）——保留 Plan Mode 只剩弹窗打断，无沙箱收益。符合设计宪法第 3/4 条（可跳过性/控制权）：审批点留在 skill 内，批准权始终在用户。
 

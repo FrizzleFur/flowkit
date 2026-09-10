@@ -2,6 +2,32 @@
 
 > 本文件由 flow-deep SKILL.md 引用，在长时间运行时按需执行。
 
+## 目录
+
+  - 概念
+  - 文件模板
+  - 更新规则
+  - 恢复协议
+  - 大小控制
+- 触发条件
+- 主动 Checkpoint 与 Handoff 协议（Context Guard）
+  - 检测方法
+  - 四选项语义（超阈值时 AskUserQuestion）
+  - 保存动作清单（选项 a/b 共同部分）
+  - 自动交接协议（Auto Handoff，2026-08-28 新增）
+  - HANDOFF.md 模板（选项 b 生成，写入 `<plan-dir>/HANDOFF.md` 并在终端展示全文）
+  - 与恢复协议的衔接
+  - 设计宪法自检记录（2026-08-20 新增本协议时）
+- 压缩矩阵
+  - Stage 2 输出压缩
+  - Stage 3.7 输出压缩
+  - Stage 4 中间结果压缩
+- 符号系统（快速压缩）
+- 恢复检查点
+- 与 /compact 的协作
+- 避免压缩的内容
+- 示例：Stage 2 完成后压缩
+
 ## STATE.md 活记忆
 
 ### 概念
