@@ -11,7 +11,7 @@ Agent Teams 方案生成与执行引擎：通过 `Agent(name)` + `SendMessage(to
 | 失败面 | 后果 | 本 skill 的对策 |
 |--------|------|----------------|
 | 分片随意 | agent 范围重叠或遗漏——分片有遗漏，汇总必有遗漏 (SKILL.md:L57) | 分片互斥且完备 + 显式分片清单 + 返回后逐项勾销 (SKILL.md:L57, L64) |
-| 并发失控 | 429/1302 限流——实测 6 并发必触发，4 并发加主会话同样触发 (SKILL.md:L154) | 同消息分发默认 ≤2、规模档位、触发后退避恢复 (SKILL.md:L63, L146-150) |
+| 并发失控 | 429/1302 限流——实测 6 并发必触发，4 并发加主会话同样触发 (SKILL.md:L154) | 同消息分发默认 ≤3、规模档位、触发后退避恢复 (SKILL.md:L63, L146-150) |
 
 一句话定位：把 "fan out subagents" 从全权委托变成**可控的并行深挖**——只读任务立即分发（Fast Path），写入任务先出完整方案经用户确认再执行（Full Path），两条通道最终都落到「nothing gets missed」的分片覆盖验收 (SKILL.md:L42, L64)。
 
@@ -87,7 +87,7 @@ Step 0 项目上下文 → Step 1 资源检测 → Step 2 角色匹配    派发
 | 机制 | 规则 | 锚点 |
 |------|------|------|
 | 执行模式判定 | `$TMUX` 检测 → `IN_TMUX → tmux-split` / `NO_TMUX → no-split`；判定行必须显式写出，**跳过检测 ≠ NO_TMUX**，未判定就按降级启动属流程违规 | SKILL.md:L220-227 |
-| 规模档位 | small 1-2 / medium 2（默认安全上限）/ large 3-4（必须分批，每批 2，前批完成 ≥60% 再发下批）；硬约束：同消息 subagent 分发默认 ≤2，存在其他活跃会话时降为 1 或串行 | SKILL.md:L146-158 |
+| 规模档位 | small 1-2 / medium 3（默认安全上限）/ large >3（必须分批，每批 ≤3，前批完成 ≥60% 再发下批）；硬约束：同消息 subagent 分发默认 ≤3，存在其他活跃会话时降为 1 或串行 | SKILL.md:L146-158 |
 | named-only | tmux 内一律 `Agent(name=...)`——harness 自动分配 pane，且 pane 是独立进程真交互 UI；旧观察窗脚本体系已退役，unnamed 仅保留 NO_TMUX 与纯后台批量场景 | SKILL.md:L260 |
 | 预信任 cwd | 派发前必跑 `scripts/pretrust-cwd.sh "$PWD"`（Fast/Full Path 一致），防 trust 弹窗卡 pane；回复中须出现三个合法出口（成功/显式跳过/失败降级）之一 | SKILL.md:L237-250 |
 | Delegate 模式 | 主 Agent 是 Coordinator 不是 Implementor：只做任务分配、进度追踪、依赖协调、结果汇总；禁止自己写业务代码、抢占编辑同一文件 | SKILL.md:L319-323 |
@@ -119,7 +119,7 @@ Step 0 项目上下文 → Step 1 资源检测 → Step 2 角色匹配    派发
 路由判定: 只读 → Fast Path
 （轻量上下文：目标目录 src/payment/*；项目规范以必读路径写进 prompt）
 预信任完成: 注入 N 跳过 M
-分片分发: [输入校验] [鉴权链路] [历史漏洞考古] → 3 agent 分 2 批（并发 ≤2）
+分片分发: [输入校验] [鉴权链路] [历史漏洞考古] → 3 agent 单批（并发 ≤3）
 （每个 agent prompt 内嵌深度要求三要点：穷尽分片 / 证据锚点 / 深挖优先）
 
 agent 返回 → 分片清单逐项勾销；[鉴权链路] 证据不足 → SendMessage 补查

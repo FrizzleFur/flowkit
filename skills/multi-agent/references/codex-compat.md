@@ -15,7 +15,7 @@
 ## 不变项
 
 - tmux 分屏与 pane 清理：OS 层能力，与 harness 无关，规则照旧
-- 并发约束：同批次 spawn ≤2 防 429（Codex `[agents] max_concurrent_threads_per_session` 可按套餐调整）
+- 并发约束：同批次 spawn ≤3 防 429（Codex `[agents] max_concurrent_threads_per_session` 可按套餐调整）
 - Delegate 协议（主会话是 Coordinator 不是 Implementor）：平台无关
 
 ## 架构差异提醒

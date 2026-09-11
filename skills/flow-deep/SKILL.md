@@ -504,7 +504,7 @@ flow-deep 默认在有用户在环的交互式会话运行，但真实执行环�
 
 **默认调用**: `/multi-agent` 技能（注入 superpowers 技能指令）；当 Workflow Fit Gate 命中且用户授权时，使用 Workflow 作为执行后端。
 
-**规模档位（与 Claude Code 原生 `/config` 动态工作流规模对齐）**: 选择 `/multi-agent` 时，按 multi-agent SKILL.md 的规模档位表设定并发代理数 —— small(1-2) / medium(2，默认安全上限) / large(3-4，必须分批每批 2)。**硬约束**（2026-08-24 二次校准，官方文档+两次实测）: 有效并发 = 主会话（恒 1 路）+ 运行中 subagent + 其他活跃会话，同一条消息并发 agent 默认 ≤ 2 防 429/1302（4 并发+主会话实测触发、6 并发必触发；GLM Coding Plan 套餐口径 Lite 1 项目 / Pro 1-2 / Max 2+）；触发后暂停分发新 agent、主 Agent 用 Bash/grep/Tavily 接管关键路径、退避恢复。
+**规模档位（与 Claude Code 原生 `/config` 动态工作流规模对齐）**: 选择 `/multi-agent` 时，按 multi-agent SKILL.md 的规模档位表设定并发代理数 —— small(1-2) / medium(3，默认安全上限) / large(>3，必须分批每批 ≤3)。**硬约束**（2026-08-24 二次校准，官方文档+两次实测；2026-09-11 上调同消息上限 2→3）: 有效并发 = 主会话（恒 1 路）+ 运行中 subagent + 其他活跃会话，同一条消息并发 agent 默认 ≤ 3 防 429/1302（4 并发+主会话实测触发、6 并发必触发；GLM Coding Plan 套餐口径 Lite 1 项目 / Pro 1-2 / Max 2+）；触发后暂停分发新 agent、主 Agent 用 Bash/grep/Tavily 接管关键路径、退避恢复。
 
 **行为**:
 1. 读取 Goal Contract、task_plan.md 中的任务分解
@@ -521,7 +521,7 @@ flow-deep 默认在有用户在环的交互式会话运行，但真实执行环�
 
 适用于 Stage 0~5 所有阶段。检测 `[ -n "$TMUX" ]` 并显式写出判定行后再分发（跳过检测 ≠ NO_TMUX）: Agent(name) 唯一命名并行分发（TeamCreate/team_name 已废弃）；在 tmux 且 pane 正常 → 自动分屏可视化；不在或 pane 故障 → **静默降级**为无分屏并发（不提示安装、不重试；Delegate 协议与规模档位不变）。
 
-核心约束: Agent(name) 唯一命名 + 同消息并发 ≤ 4 + Delegate 协调不变 | IN_TMUX 且 pane 正常 → 自动分屏可视化 + 即时清理 pane；NO_TMUX 或 pane 故障 → 静默降级无分屏并发
+核心约束: Agent(name) 唯一命名 + 同消息并发 ≤ 3 + Delegate 协调不变 | IN_TMUX 且 pane 正常 → 自动分屏可视化 + 即时清理 pane；NO_TMUX 或 pane 故障 → 静默降级无分屏并发
 
 #### 分发前置自检：权限模式与写入作用域（执行型 agent 必做）
 
