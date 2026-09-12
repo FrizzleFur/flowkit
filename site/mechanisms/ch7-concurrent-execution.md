@@ -12,6 +12,12 @@
 - 写入型任务（改代码/改配置）自动走 Full Path: Step 0-5 完整流程，协作式方案经用户确认后才分发（`skills/multi-agent/SKILL.md:47-50`）
 - 上面的计算器就是本章主角之一: 拖动数字，看有效并发怎么被三路计数吃掉、什么时候变红
 
+分发之前还有一道前置岔路: 风险路由。下面的演示把判定过程画了出来——任务先过复杂度闸门，再决定走轻量管道还是全量管道:
+
+<div class="fs-replay" data-script="assets/scripts/ch7-routing.json"></div>
+
+点破: 判定标准是任务性质（可回滚 vs 重要/不可逆），不是触发词——两条分支是同一条管道的两种裁剪，命令只差几个参数，差的全是防错关卡; 细节见下文「先路由」一节。
+
 ## 为什么：执行模型的四要素
 
 先把全景摆正。multi-agent 的执行模型可以拆成四个要素，加一条贯穿的预算线:
@@ -92,6 +98,12 @@ fan-out 的验收口号是 **nothing missed**，而它的前提在分发之前: 
 | 深挖优先 | 宁可单个问题挖到根因，不要广而浅的清单 | 清单式伪交付 |
 
 汇总侧的验收落点是**逐项勾销**: 每个 agent 返回后对照分片清单逐项核对，未覆盖或证据不足 → SendMessage 补查该分片，全部勾销才算完成（`skills/multi-agent/SKILL.md` Fast Path 清单「汇总核对」条目，:64-65——该清单存在重复编号残留，引用按条目内容定位，勿按序号）。顺带一提，digs deep 三要点在 SKILL.md 里有两份内嵌副本，2026-08-28 审查专门标记了「改一处须同步另一处」的双份漂移风险——多副本问题在本仓无处不在，本章末尾还会回到它。
+
+先动手看——一次 fan-out 的完整生命周期：三张分片卡怎么从「待分派」走到「已验收勾销」，中间那张撞了 429 的卡又怎么被主会话接管救回来（点击播放，10 步自动演示）:
+
+<div class="fs-replay" data-script="assets/scripts/ch7-shards.json"></div>
+
+注意左列那张「验收清单」卡：它从分发前就钉在那里——分片清单即验收清单，nothing missed 不是汇总时才想起来核对，是清单从第一步就挂在泳道里，等三张分片卡逐张走来被勾销。
 
 写入型分发还有两道前置。**预信任 cwd**: named agent 的 pane 是独立 claude 进程，启动时对 cwd 做 workspace trust 检查，未信任路径会弹「Yes, I trust this folder」阻塞等待——N 个 agent 卡 N 个 pane（2026-09-01 FDNote worktree 实测）。派发前必跑 `pretrust-cwd.sh`，出口输出必须出现在回复里（三个合法出口，回复里找不到任何出口输出即为违规）（`skills/multi-agent/SKILL.md:229-256`）。**权限与作用域自检**: 派发会写文件的 agent 前扫描写入作用域（additionalDirectories 之外的路径先处理再派发）、确认权限模式——后台 subagent 的授权等待没有面板提示，比弹给主会话更难发现（`skills/flow-deep/SKILL.md:526-533`）。
 

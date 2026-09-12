@@ -18,6 +18,8 @@
   - [10. 跨会话记忆](mechanisms/ch10-cross-session-memory.md)
   - [11. 编排治理与质量自举](mechanisms/ch11-orchestration-governance.md)
 
+- [Learning Path](path.md)
+
 - **反哺与附录**
 
   - [改进提案（REC）](propositions.md)

@@ -1,0 +1,74 @@
+{
+  "title": "Fast/Full 风险路由分流: 一道闸门, 两条管道",
+  "version": 2,
+  "flow": {
+    "nodes": [
+      { "id": "entry", "label": "任务进来", "x": 150, "y": 10, "w": 140, "h": 34, "type": "rect" },
+      { "id": "gate", "label": "复杂度闸门: 做错了多难恢复?", "x": 115, "y": 90, "w": 210, "h": 64, "type": "diamond" },
+      { "id": "flowhead", "label": "flow 轻量管道（可回滚中等任务）", "x": 10, "y": 205, "w": 195, "h": 34, "type": "rect" },
+      { "id": "f1", "label": "Prompt 优化", "x": 35, "y": 268, "w": 150, "h": 26, "type": "rect" },
+      { "id": "f2", "label": "思考", "x": 35, "y": 302, "w": 150, "h": 26, "type": "rect" },
+      { "id": "f3", "label": "规划", "x": 35, "y": 336, "w": 150, "h": 26, "type": "rect" },
+      { "id": "f4", "label": "执行", "x": 35, "y": 370, "w": 150, "h": 26, "type": "rect" },
+      { "id": "deephead", "label": "flow-deep 全量管道（重要/不可逆）", "x": 240, "y": 205, "w": 195, "h": 34, "type": "rect" },
+      { "id": "d1", "label": "规划（用户确认点把关）", "x": 265, "y": 268, "w": 150, "h": 26, "type": "rect" },
+      { "id": "d2", "label": "审查（独立 Agent + 面板）", "x": 265, "y": 312, "w": 150, "h": 26, "type": "rect" },
+      { "id": "d3", "label": "验证（按目标契约）", "x": 265, "y": 356, "w": 150, "h": 26, "type": "rect" }
+    ],
+    "edges": [
+      { "from": "entry", "to": "gate", "label": "判定" },
+      { "from": "gate", "to": "flowhead", "label": "可回滚" },
+      { "from": "gate", "to": "deephead", "label": "重要/不可逆" },
+      { "from": "flowhead", "to": "f1" },
+      { "from": "f1", "to": "f2" },
+      { "from": "f2", "to": "f3" },
+      { "from": "f3", "to": "f4" },
+      { "from": "deephead", "to": "d1" },
+      { "from": "d1", "to": "d2" },
+      { "from": "d2", "to": "d3" }
+    ]
+  },
+  "steps": [
+    {
+      "title": "任务进来",
+      "desc": "一切从一句话任务开始。不管后面走哪条管道，入口都是同一个: 用户的原始任务表述——分流发生在任务理解之后、动手之前。",
+      "on": ["entry"]
+    },
+    {
+      "title": "闸门判定",
+      "desc": "判据只有一句话: 做错了多难恢复? 可回滚的中等任务往左走轻量管道，重要或不可逆的往右走全量管道——判定的是任务性质，不是触发词。",
+      "on": ["entry", "gate"],
+      "edgesOn": ["entry>gate"]
+    },
+    {
+      "title": "小改滑入 flow",
+      "desc": "可回滚的中等任务滑入轻量管道——效率这条线的逻辑: 用更少的摩擦换速度，省下的流程开销花在真正动手上。",
+      "on": ["flowhead"],
+      "edgesOn": ["entry>gate", "gate>flowhead"]
+    },
+    {
+      "title": "大工程滑入 flow-deep",
+      "desc": "重要或不可逆的任务滑入全量管道——保险这条线的逻辑: 用更重的摩擦换确定性，在写错就要回滚的领域里，流程本身就是安全预算。",
+      "on": ["deephead"],
+      "edgesOn": ["entry>gate", "gate>deephead"]
+    },
+    {
+      "title": "flow 内部: 四站快闪",
+      "desc": "轻量管道 Prompt 优化、思考、规划、执行四站逐个快闪，一路直通，可选参数按需加减，没有强制确认点拦路——快，是因为做错了可以改。",
+      "on": ["flowhead", "f1", "f2", "f3", "f4"],
+      "edgesOn": ["flowhead>f1", "f1>f2", "f2>f3", "f3>f4"]
+    },
+    {
+      "title": "flow-deep 内部: 三关逐个亮",
+      "desc": "全量管道十几道关卡压缩成三道重关卡: 规划要过用户确认点，审查有强制 Plan Review 加多角色面板，验证按目标契约逐项核对——重，是因为错不起。",
+      "on": ["deephead", "d1", "d2", "d3"],
+      "edgesOn": ["deephead>d1", "d1>d2", "d2>d3"]
+    },
+    {
+      "title": "汇合: 同一条管道的两种裁剪",
+      "desc": "两条分支殊途同归——同一条管道的两种裁剪，/flow 与 /flow-deep 的命令只差几个参数，差的全是防错关卡; 路由的意义就是让每一分摩擦都花在该花的地方。",
+      "on": ["entry", "gate", "flowhead", "f1", "f2", "f3", "f4", "deephead", "d1", "d2", "d3"],
+      "edgesOn": ["entry>gate", "gate>flowhead", "gate>deephead", "flowhead>f1", "f1>f2", "f2>f3", "f3>f4", "deephead>d1", "d1>d2", "d2>d3"]
+    }
+  ]
+}

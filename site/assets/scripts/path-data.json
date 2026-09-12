@@ -1,0 +1,105 @@
+{
+  "title": "Learning Path",
+  "note": "11 章学习路径数据。anchors = 各章「本章源码锚点表」数据行数（章节增删或锚点表更新后需手工同步）。domain 取值见 pathview.js 的 DOMAINS 九域配色表（R3 机制地图域 A-I）。",
+  "chapters": [
+    {
+      "num": 1,
+      "file": "principles/ch1-agent-loop-and-pipeline.md",
+      "title": "Agent Loop 与管道形态",
+      "sub": "Agent 的本体是一个循环——FlowKit 把裸循环升级成一条带关卡的流水线，flow / flow-deep 是同一条管道的两种裁剪。",
+      "domain": "A",
+      "anchors": 4,
+      "quote": "Agent 能力很强，但缺乏纪律性——它们跳过验证、忽略边界情况、用『应该可以』来宣布完成。"
+    },
+    {
+      "num": 2,
+      "file": "principles/ch2-context-three-axes.md",
+      "title": "长时程三板斧",
+      "sub": "context rot 的解法归纳为三板斧——Compaction / 结构化笔记 / 子代理，工程里早有机制在跑同样的活。",
+      "domain": "F",
+      "anchors": 16,
+      "quote": "对映是解释工具，不是设计依据——理论名分是入口，不是全貌。"
+    },
+    {
+      "num": 3,
+      "file": "principles/ch3-memory-loop.md",
+      "title": "记忆与召回闭环",
+      "sub": "任务开始强制召回，验证通过才准沉淀——一读一写之间，经验跨会话复利。",
+      "domain": "H",
+      "anchors": 14,
+      "quote": "召回质量押注在 keywords 上——写歪了没有反馈信号，漏召回是静默的。"
+    },
+    {
+      "num": 4,
+      "file": "mechanisms/ch4-pipeline-overview.md",
+      "title": "管道全景",
+      "sub": "十二道关串成一条流水线——每道关的存在理由，都是一种被实测踩过的漂移。",
+      "domain": "A",
+      "anchors": 25,
+      "quote": "错误不是被掩盖，而是被送回它诞生的那一关。"
+    },
+    {
+      "num": 5,
+      "file": "mechanisms/ch5-input-and-planning.md",
+      "title": "输入质量与思考规划",
+      "sub": "目标写死（契约）、话说到 AI 听得懂（乔哈里 + 3S）、任务想透（六维分解）——三关联手守住『垃圾进，垃圾出』的底线。",
+      "domain": "B",
+      "anchors": 15,
+      "quote": "评分是主观的——它是体检，不是法官。"
+    },
+    {
+      "num": 6,
+      "file": "mechanisms/ch6-review-and-decision.md",
+      "title": "评审与决策",
+      "sub": "独立上下文消沉没成本，多副专业眼镜消单视角盲区，自动判定层滤掉 80% 常规裁决。",
+      "domain": "D",
+      "anchors": 16,
+      "quote": "『过滤』本身也是一次判断——Auto-Decide 不替代用户决策。"
+    },
+    {
+      "num": 7,
+      "file": "mechanisms/ch7-concurrent-execution.md",
+      "title": "并发执行",
+      "sub": "主会话只当 Coordinator——任务切成互斥完备的分片，按并发预算分批派发，完成一个验收一个回收一个。",
+      "domain": "E",
+      "anchors": 27,
+      "quote": "并行收益要先抵掉协调成本——重编排本身不是目的。"
+    },
+    {
+      "num": 8,
+      "file": "mechanisms/ch8-context-engineering.md",
+      "title": "上下文工程",
+      "sub": "锚定→检测→决策→处置→恢复五层闭环——整套体系的出发点是模型感知不到自己的上下文占了多少。",
+      "domain": "F",
+      "anchors": 20,
+      "quote": "交接有真实损耗——默认 3 代的上限，本身就说明交接不能无限续。"
+    },
+    {
+      "num": 9,
+      "file": "mechanisms/ch9-verification-loop.md",
+      "title": "验证与迭代",
+      "sub": "『完成』是一张三列表——每条成功标准、一份新鲜证据、一个状态；拿不出证据就沿三条路回退。",
+      "domain": "G",
+      "anchors": 29,
+      "quote": "强制循环烧的是真金——每轮都是完整的迭代加验证，token 账单不会说谎。"
+    },
+    {
+      "num": 10,
+      "file": "mechanisms/ch10-cross-session-memory.md",
+      "title": "跨会话记忆",
+      "sub": "『文件 + 协议』的极简记忆系统——没有数据库，没有服务，全部机制落在两个目录、两个索引文件里。",
+      "domain": "H",
+      "anchors": 18,
+      "quote": "50 条触发 QMD 升级线，本质是对召回压力的官方承认。"
+    },
+    {
+      "num": 11,
+      "file": "mechanisms/ch11-orchestration-governance.md",
+      "title": "编排治理与质量自举",
+      "sub": "设计宪法防膨胀、能力注册表防重复、evals 回归网防退化——管别人验证的体系给自己上的三道锁。",
+      "domain": "I",
+      "anchors": 5,
+      "quote": "契约测的是『写下来的行为』——写错的行为测不出来。"
+    }
+  ]
+}

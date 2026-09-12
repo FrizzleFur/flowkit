@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@5.0.0/lib/themes/dark.css" integrity="sha384-kxJ035EJ2os5w6E9Ysqnvy67DqD2lpcLU1SFJFDxCZCQerjlT0ULLvB+70KWpikn" crossorigin="anonymous">
   <link rel="stylesheet" href="assets/theme-learncc.css">
   <link rel="stylesheet" href="assets/interactive/replay.css">
+  <link rel="stylesheet" href="assets/interactive/pathview.css">
   <link rel="stylesheet" href="assets/interactive/components.css">
 </head>
 <body>
@@ -43,6 +44,7 @@
   <script src="assets/interactive/budget429.js"></script>
   <script src="assets/interactive/johari.js"></script>
   <script src="assets/interactive/hero.js"></script>
+  <script src="assets/interactive/pathview.js"></script>
   <script>
     // 组件引导: 聚合各组件注册的 init 函数（单组件失败不拖累其他）
     FlowSite.initAll = function () {
@@ -53,7 +55,7 @@
     // 三保险: doneEach 钩子 + hashchange 兜底 + 自愈轮询（800ms 补扫未初始化组件——彻底免疫渲染时序竞态, 无待初始化时零成本 no-op）
     window.addEventListener('hashchange', function () { setTimeout(FlowSite.initAll, 50); });
     setInterval(function () {
-      if (document.querySelector('.fs-replay[data-script]:not([data-ready]), .fs-autodecide:not([data-ready]), .fs-switch:not([data-ready]), .fs-budget:not([data-ready]), .fs-johari:not([data-ready])')) FlowSite.initAll();
+      if (document.querySelector('.fs-replay[data-script]:not([data-ready]), .fs-autodecide:not([data-ready]), .fs-switch:not([data-ready]), .fs-budget:not([data-ready]), .fs-johari:not([data-ready]), .fs-pathview:not([data-ready])')) FlowSite.initAll();
     }, 800);
   </script>
 </body>
