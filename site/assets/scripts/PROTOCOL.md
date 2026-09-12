@@ -51,3 +51,20 @@
 |---|---|---|
 | ch4-pipeline.json | v1（兼容模式运行） | 单消息 |
 | ch8-autohandoff.json | v1（兼容模式运行） | 单消息 |
+
+## lanes 泳道面板（v2.1 新增——多列并行/条目状态流动类机制）
+
+```json
+"lanes": [ { "id": "lane-main", "title": "主会话" }, { "id": "lane-a", "title": "分片 A" } ],
+"steps": [
+  { "title": "...", "desc": "...",
+    "lanes": { "set": {
+      "shard-1": { "lane": "lane-a", "state": "running", "label": "分片 A: wordsVerb", "note": "验收清单 3 项" },
+      "shard-2": { "removed": true }
+    } } }
+]
+```
+
+- `state` ∈ queued（灰）/ running（蓝）/ done（绿）/ failed（红）; `removed: true` 移除条目
+- 语义: 每步给出条目的**期望位置与状态**（非增量 delta），引擎负责换道/建卡/改色——与 learncc「声明表」哲学一致
+- 适用: 并行分发（multi-agent 分片勾销）、pane 生命周期、预算分配、任何「多实体跨阶段流动」叙事

@@ -96,6 +96,48 @@
     return { els: nodeEls, edges: edgeEls };
   }
 
+  /* ---------- 面板: 泳道（多列并行 + 条目状态流动） ---------- */
+  var LANE_STATE = { queued: 'fs-li-queued', running: 'fs-li-running', done: 'fs-li-done', failed: 'fs-li-failed' };
+  function buildLanes(host, lanes) {
+    var wrap = el('div', 'fs-lanes');
+    var colEls = {};
+    lanes.forEach(function (c) {
+      var col = el('div', 'fs-lane');
+      col.appendChild(el('div', 'fs-lane-title', c.title || c.id));
+      var body = el('div', 'fs-lane-body');
+      col.appendChild(body);
+      wrap.appendChild(col);
+      colEls[c.id] = body;
+    });
+    host.appendChild(wrap);
+    return { cols: colEls, items: {} };
+  }
+  function laneItemEl(id, conf) {
+    var d = el('div', 'fs-laneitem ' + (LANE_STATE[conf.state] || 'fs-li-queued'));
+    d.appendChild(el('span', 'fs-li-label', conf.label || id));
+    if (conf.note) d.appendChild(el('span', 'fs-li-note', conf.note));
+    return d;
+  }
+  function applyLaneSet(lanesObj, set) {
+    if (!set) return;
+    Object.keys(set).forEach(function (id) {
+      var want = set[id];
+      if (want === null || want.removed) {
+        if (lanesObj.items[id]) { lanesObj.items[id].remove(); delete lanesObj.items[id]; }
+        return;
+      }
+      var target = lanesObj.cols[want.lane];
+      if (!target) return;
+      var it = lanesObj.items[id];
+      if (!it) { it = laneItemEl(id, want); lanesObj.items[id] = it; target.appendChild(it); }
+      else {
+        if (it.parentNode !== target) target.appendChild(it); // 换道（离散移动 + 入场动画重放）
+        it.className = 'fs-laneitem ' + (LANE_STATE[want.state] || 'fs-li-queued');
+        if (want.note) it.querySelector('.fs-li-note') ? it.querySelector('.fs-li-note').textContent = want.note : it.appendChild(el('span', 'fs-li-note', want.note));
+      }
+    });
+  }
+
   /* ---------- 面板: 消息 ---------- */
   function buildMsgPanel(host, conf) {
     var box = el('div', 'fs-msgpanel');
@@ -141,11 +183,17 @@
     root.appendChild(stage);
 
     var flowHost = null, flow = null;
+    var lanesObj = null, laneHost = null;
     var msgPanels = {}, msgOrder = [];
     if (script.flow) {
       flowHost = el('div', 'fs-flowhost');
       stage.appendChild(flowHost);
       flow = buildFlow(flowHost, script.flow);
+    }
+    if (script.lanes) {
+      laneHost = el('div', 'fs-lanehost');
+      stage.appendChild(laneHost);
+      lanesObj = buildLanes(laneHost, script.lanes);
     }
     if (script.messagesPanels) {
       var mwrap = el('div', 'fs-msgwrap' + (multi ? ' fs-msgwrap-multi' : ''));
@@ -172,6 +220,7 @@
         flow.edges && Object.keys(flow.edges).forEach(function (k) { flow.edges[k].setAttribute('class', 'fs-edge' + (s.edgesOn && s.edgesOn.indexOf(k) >= 0 ? ' on' : '')); });
       }
       if (s.clear) s.clear.forEach(function (pid) { if (msgPanels[pid]) { msgPanels[pid].body.textContent = ''; msgPanels[pid].count = 0; } });
+      if (s.lanes && lanesObj) applyLaneSet(lanesObj, s.lanes.set);
       if (s.append) Object.keys(s.append).forEach(function (pid) {
         var p = msgPanels[pid]; if (!p) return;
         s.append[pid].forEach(function (b) { p.body.appendChild(chipFor(b)); p.count++; });
@@ -209,6 +258,7 @@
     reset.onclick = function () {
       stop(); st.idx = -1;
       Object.keys(msgPanels).forEach(function (pid) { msgPanels[pid].body.textContent = ''; msgPanels[pid].count = 0; msgPanels[pid].len.textContent = 'len=0'; });
+      if (lanesObj) { Object.keys(lanesObj.items).forEach(function (id) { lanesObj.items[id].remove(); delete lanesObj.items[id]; }); }
       note.textContent = ''; renderDots();
     };
     speed.onchange = function () { st.speed = parseFloat(speed.value); };
