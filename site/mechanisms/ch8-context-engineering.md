@@ -1,9 +1,10 @@
 # 第 8 章 · 上下文工程：从容量检测到断点恢复的操作闭环
 
-> **机制篇 · 第 8 章** · 上下文
+> **机制篇 · 第 8 章** · F · 上下文工程
 
 *Hand Off Before You Rot*
-`~20 anchors` · `248 行` · 组件 `replay`×3 · 约 30 分钟
+
+`20 anchors` · `252 行` · 组件 `replay`×3（threelines 9 / autohandoff 10 / recovery 7）· 约 30 分钟
 
 <div class="fs-callout">
 
@@ -12,8 +13,6 @@
 **机制定位**: 上下文工程的工程细节层——理论坐标系见[原理篇第 2 章](../principles/ch2-context-three-axes.md)，本章每个操作都能对回主源 context-management.md。
 
 </div>
-
-`20` 条源码锚点 · 回放 ×3（`ch8-threelines` 9 步 / `ch8-autohandoff` 10 步 / `ch8-recovery` 7 步）· 约 `30` 分钟
 
 ### 三线分岔: 三条曲线同一个任务
 
@@ -209,9 +208,13 @@ agent_hints:
 
 两个收尾细节: HANDOFF.md 是一次性文件，恢复完成后可删除（STATE.md 才是持久锚点）; STATE.md 里的 `Auto Handoff: enabled` 随恢复带入续接会话——偏好跨代继承，防每代重复弹窗，用户随时可口头关闭。多会话串扰的最后一道防线: spawn 后旧会话不再做 Guard 检测，check_context.py 的 mtime 竞争由 first_msg 核对 + `--session` 纠偏兜底。
 
-### 回放对照: 10 步（接力细节） ↔ 协议
+### 回放对照: 三部剧本 ↔ 协议
 
-顶部回放器 10 步与本章各层的对应: 步 1-2 检测层（边界实测 + first_msg 核对）/ 步 3-4 决策层（四选项 + 选 d 的 opt-in 语义）/ 步 5 锚定层（五件套保存，Next Action 写法）/ 步 6-8 交接（HANDOFF 薄指引 + spawn + 移交报告）/ 步 9-10 恢复协议（按序读三件套 + 从 Next Action 直达断点 + 偏好继承）。剧本里的百分比、代数、命令均可对照上文协议逐项核对。
+autohandoff 的 10 步（接力细节）与本章各层的对应: 步 1-2 检测层（边界实测 + first_msg 核对）/ 步 3-4 决策层（四选项 + 选 d 的 opt-in 语义）/ 步 5 锚定层（五件套保存，Next Action 写法）/ 步 6-8 交接（HANDOFF 薄指引 + spawn + 移交报告）/ 步 9-10 恢复协议（按序读三件套 + 从 Next Action 直达断点 + 偏好继承）。剧本里的百分比、代数、命令均可对照上文协议逐项核对。
+
+threelines 9 步对照: 步 1-3 三线同起点与 context rot（模型感知不到占用，质量随液位下滑）/ 步 4-5 断崖 413 自救与压缩台阶 ↔ auto-compact 的窗口边界触发与压缩矩阵「每次压缩都丢一块」/ 步 6-8 Context Guard 告警 → 交接旗 → 新会话质量回高位 ↔ 70/75 阈值分工、跑在 auto-compact 前面 / 步 9 三种结局即三条处置路线（不做 / 只压缩 / 主动交接）的分野。
+
+recovery 7 步对照: 步 2 容量告警 ↔ 边界实测 75%（armed 动作链阈值）/ 步 3 主动 Checkpoint ↔ 保存动作清单的五件套落盘 / 步 5-6 新会话 B 从 HANDOFF 进入、按续接清单零重复劳动 ↔ 必读文件按序（STATE.md → task_plan.md → findings.md）/ 步 7 交接的是状态不是历史 ↔ Next Action 具体可执行、不依赖读其他文件。
 
 ## 批判小节（局限与成本）
 

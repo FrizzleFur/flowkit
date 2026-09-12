@@ -11,3 +11,16 @@
 
 ## 审查采纳记录（Phase F）
 F1/F2 当轮完成（CDP 复验待主题审计一并做）；F3 派 audit agent；F4 引擎增强由主会话随波次 B 实施——新增面板类型进 PROTOCOL.md 后，C9/C7/C10 只写声明表。
+
+## Phase G: 六幕旗舰动效（2026-09-12 用户裁定「六幕全做」）
+
+| 幕 | 内容 | 隐喻 | 依赖 | 批 |
+|---|---|---|---|---|
+| F1 | 三线分岔（ch8 主视觉, 价值5） | 赛跑+接力 | curve 面板 | G2 |
+| F2 | 回弹轨道（ch9, 价值5） | 弹球+安全网 | curve 面板 | G2 |
+| F3 | 吞噬漏斗（ch6 升级, 价值5） | 漏斗+分拣 | 独立组件 autodecide v2 | G1 |
+| F4 | 令牌旅程（ch4 质感升级） | 巡游 | 引擎 token 巡游模式 | G2 |
+| F5 | 预算液位（ch7, 可选转正） | 液体 | curve 特例 | G2 |
+| F6 | 复利雪球（ch10, 可选转正） | 雪球 | curve 特例 | G2 |
+
+运动语法五动词: 移动（getPointAtLength+rAF 沿路径）/ 生长（stroke-dashoffset 补间）/ 反弹（cubic-bezier 过冲）/ 流动（高度 transition 液位）/ 呼吸（2.5s alternate 微脉冲, 仅 hero 与活跃面板）。全部零依赖; reduce-motion 静态出终帧。三拍节奏纪律: 铺垫-张力-释放, 旁白落张力点。

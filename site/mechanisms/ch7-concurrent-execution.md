@@ -1,9 +1,10 @@
 # 第 7 章 · 并发执行：multi-agent 的分片与治理
 
-> **机制篇 · 第 7 章** · 并发
+> **机制篇 · 第 7 章** · E · 执行与并发
 
 *Parallel by Design, Budget by Default*
-`~27 anchors` · `248 行` · 组件 `budget` + `replay`×4 · 约 30 分钟
+
+`27 anchors` · `248 行` · 组件 `budget` 计算器 + `replay`×4（budget 9 / routing 7 / shards 10 / panes 8）· 约 30 分钟
 
 <div class="fs-callout">
 
@@ -12,8 +13,6 @@
 **机制定位**: Stage 4 Execution Router 的 multi-agent 后端——执行模型四要素，加一条被 429 实测钉死的并发预算线。
 
 </div>
-
-`27` 条源码锚点 · `fs-budget` 计算器 + 回放 ×4（`ch7-budget` 9 步 / `ch7-routing` 7 步 / `ch7-shards` 10 步 / `ch7-panes` 8 步）· 约 `30` 分钟
 
 ### 计算器与液位计: 并发预算的两种读法
 

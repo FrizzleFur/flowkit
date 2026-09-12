@@ -1,9 +1,10 @@
 # 第 6 章 · 评审与决策：两个 Claude、八副眼镜与六条原则
 
-> **机制篇 · 第 6 章** · 决策
+> **机制篇 · 第 6 章** · D · 评审与决策
 
 *Fresh Eyes, Fewer Blind Spots*
-`~16 anchors` · `236 行` · 组件 `autodecide` + `funnel` + `replay` · 约 25 分钟
+
+`16 anchors` · `236 行` · 组件 `autodecide` + `funnel` + `replay ch6-sunkcost`（7 步）· 约 25 分钟
 
 <div class="fs-callout">
 
@@ -12,8 +13,6 @@
 **机制定位**: 评审区三关展开的前两关（Stage 3.5 独立审查 / Stage 3.6 面板评审）+ Auto-Decide——回答「自己写的方案，凭什么自己检查自己可信」。
 
 </div>
-
-`16` 条源码锚点 · `fs-autodecide`（8 题判定）+ `fs-funnel` + 回放 `ch6-sunkcost`（7 步）· 约 `25` 分钟
 
 <div class="fs-autodecide"></div>
 

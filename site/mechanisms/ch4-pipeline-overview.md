@@ -1,9 +1,10 @@
 # 第 4 章 · 管道全景：从 Stage -1 到 5.8 的一条龙
 
-> **机制篇 · 第 4 章** · 管道
+> **机制篇 · 第 4 章** · A · 编排与治理
 
 *Twelve Gates, One Journey*
-`~25 anchors` · `217 行` · 组件 `replay` · 约 30 分钟
+
+`25 anchors` · `217 行` · 组件 `replay ch4-pipeline`（12 步）· 约 30 分钟
 
 <div class="fs-callout">
 
@@ -12,8 +13,6 @@
 **机制定位**: flow-deep 全量管道的主干地图——十二道关「为什么存在、防什么漂移、过了会怎样」; 后续各章按支线展开，本章只讲主干。
 
 </div>
-
-`25` 条源码锚点 · 回放 `ch4-pipeline`（12 步）· 约 `30` 分钟
 
 <div class="fs-replay" data-script="assets/scripts/ch4-pipeline.json"></div>
 

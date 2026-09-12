@@ -4,7 +4,7 @@
 
 *No Evidence, No Done*
 
-`~29 anchors` · `226 行` · 组件 `replay`×2 · 约 30 分钟
+`29 anchors` · `231 行` · 组件 `replay`×2（redflags 10 / track 9）· 约 30 分钟
 
 <div class="fs-callout">
 
@@ -21,6 +21,7 @@
 - 想让它自己修到达标: `--iterate N` 启用 Stage 5.5; 即使不用参数，Stage 5 出现未达标项也会自动触发（默认 3 轮）
 - 迭代用完仍未达标: **双引擎在这里分叉**——flow-deep 自动进入 Stage 5.7（只要装了 ralph-loop 插件且未设 `--no-ralph`）; flow 侧需要 `--ralph` 显式启用（`skills/flow/SKILL.md:170`; `skills/flow-deep/SKILL.md:632`）——轻量管道把强制持续的开关交还给你，全量管道默认替你摁下
 - 执行中发现 Plan 走不通: Fallback 协议是半自动的——Claude 分析并建议退回，**你确认后才退**（`skills/flow-deep/references/fallback-protocol.md:143-148`）
+- 想先体感再读: 章中「红旗话术闸门」回放器（10 步）把 IL-2 的拦截演了一遍，「回弹轨道」（9 步）演示 keep/revert 的时序与 Guard 渐进三档
 
 ## 为什么：从「应该可以」到证据表
 
@@ -46,6 +47,8 @@ FlowKit 的 README 开篇就给出了这个项目存在的问题定义: **「Age
 <div class="fs-replay" data-script="assets/scripts/ch9-redflags.json"></div>
 
 注意被拦下的四句话术没有一句是谎言——它们甚至可能都是真的。闸门不放行的不是话术，是「无证据的完成宣称」: 证据表三列里 Evidence 栏空着的行，Status 就到不了 Pass。这正是下一节要把「完成」变成一张表的原因。
+
+**步 ↔ 机制对照**: 步 2-3 合规产出进闸放行（SC3 带新鲜证据 → 绿灯）; 步 5-9 四句红旗话术（rf1-rf4）逐一进闸被拦 ↔ Rationalization Table 的「把推理冒充成运行」; 步 10 对照收尾 ↔ Evidence 空着的行 Status 到不了 Pass。
 
 ### Stage 5: 把「完成」变成一张表
 
@@ -136,6 +139,8 @@ direction: higher 或 lower（根据指标语义推断）
 <div class="fs-replay" data-script="assets/scripts/ch9-track.json"></div>
 
 绿线只进不退: revert 的意义不是失败, 是失败不付费。
+
+**步 ↔ 机制对照**: 步 2-4 keep（验证绿）→ revert（验证红）→ 再 keep ↔ 结构化试错与「绿线只进不退」; 步 5-7 Guard 渐进 ↔ 冒烟 → 轻量集成 → 全量三档; 步 8 冲线 88 = target ↔ 参数从 Stage 5 失败项自动构造; 步 9 收尾 ↔ 轨道赌注的算术——落在哪由机械验证说了算。
 
 ### Stage 5.7: 不让你停（Ralph Loop）
 
