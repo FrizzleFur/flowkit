@@ -1,5 +1,8 @@
-/* fs-switch 管道开关面板 — flow vs flow-deep 的参数裁剪可视化
+/* fs-switch 管道开关面板 — flow vs flow-deep 的参数裁剪可视化（iv-c 升级: 裁剪=可见事件）
  * 源: skills/flow/SKILL.md（按需启用/参数控制阶段）+ skills/flow-deep/SKILL.md（全量管道/参数速查）
+ * 裁剪动效: 勾选参数 → 被裁 chip 变红划掉（line-through + 变暗, 停留 ~480ms）→ 收起消失（300ms, 多 chip 依次错峰 70ms）;
+ *           取消勾选 → chip 弹回（scale 回弹 320ms）; chip 为常驻 DOM 复用, 状态类切换驱动动画（整管重建会杀死过渡）;
+ *           reduce-motion: 跳过计时器与回弹, chip 直接消失/出现
  * 用法: <div class="fs-switch"></div>
  */
 (function () {
@@ -21,11 +24,19 @@
     { id: 'no-distill', label: '--no-distill', cut: ['Stage 5.8 经验沉淀'] }
   ];
 
+  var CUT_DWELL = 480;  // 划掉态停留 ms（「被裁掉」要先被看见）
+  var CUT_STAGGER = 70; // 多 chip 收起错峰 ms
+  var CUT_FALL = 300;   // 收起过渡 ms（与 CSS .3s 同步）
+
   function el(tag, cls, text) {
     var e = document.createElement(tag);
     if (cls) e.className = cls;
     if (text != null) e.textContent = text;
     return e;
+  }
+
+  function reduced() {
+    return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   }
 
   function build(root) {
@@ -52,26 +63,98 @@
     var note = el('div', 'fs-sw-note');
     root.appendChild(note);
 
-    function render() {
-      pipe.textContent = '';
-      var active = DEEP.filter(function (stg) {
-        return !PARAMS.some(function (p) {
-          return p.cut.indexOf(stg) >= 0 && ctrl.querySelector('input[value="' + p.id + '"]').checked;
-        });
+    // chip 常驻 DOM: 勾选只做状态类切换, 不再整管重建
+    var chips = {}; // stage -> { chip, arrow, t1, t2 }
+    var emptyEl = el('span', 'fs-sw-empty', '（全部裁掉——这在真实 flow 里不会发生: Stage 0/0.5/5 不可跳过）');
+    emptyEl.style.display = 'none';
+
+    DEEP.forEach(function (stg, i) {
+      var arrow = null;
+      if (i > 0) { arrow = el('span', 'fs-sw-arrow', '→'); pipe.appendChild(arrow); }
+      var chip = el('span', 'fs-sw-chip', stg);
+      if (/Stage 0|Stage 0\.5|Stage 5 /.test(stg)) chip.classList.add('fs-chip-must');
+      pipe.appendChild(chip);
+      chips[stg] = { chip: chip, arrow: arrow, t1: null, t2: null };
+    });
+    pipe.appendChild(emptyEl);
+
+    function isChecked(id) { return ctrl.querySelector('input[value="' + id + '"]').checked; }
+
+    // 收尾: 已收起的 chip 置 display:none 并重排可见箭头（避免 flex gap 在 0 宽元素间残留）
+    function settle() {
+      var seen = false;
+      DEEP.forEach(function (stg) {
+        var c = chips[stg];
+        if (c.chip.style.display === 'none') return;
+        if (c.arrow) c.arrow.style.display = seen ? '' : 'none';
+        seen = true;
       });
-      if (!active.length) {
-        pipe.appendChild(el('span', 'fs-sw-empty', '（全部裁掉——这在真实 flow 里不会发生: Stage 0/0.5/5 不可跳过）'));
+    }
+
+    function cutChip(stg, order) {
+      var c = chips[stg];
+      clearTimeout(c.t1); clearTimeout(c.t2);
+      if (reduced()) {
+        c.chip.style.display = 'none';
+        c.chip.classList.remove('fs-sw-cut');
+        c.chip.classList.remove('fs-sw-gone');
+        settle();
+        return;
       }
-      active.forEach(function (stg, i) {
-        if (i > 0) pipe.appendChild(el('span', 'fs-sw-arrow', '→'));
-        var chip = el('span', 'fs-sw-chip', stg);
-        if (/Stage 0|Stage 0\.5|Stage 5 /.test(stg)) chip.classList.add('fs-chip-must');
-        pipe.appendChild(chip);
+      c.chip.style.display = '';
+      c.chip.classList.remove('fs-sw-gone');
+      c.chip.classList.add('fs-sw-cut');
+      var d = CUT_DWELL + order * CUT_STAGGER;
+      c.t1 = setTimeout(function () { c.chip.classList.add('fs-sw-gone'); }, d);
+      c.t2 = setTimeout(function () {
+        c.chip.style.display = 'none';
+        c.chip.classList.remove('fs-sw-cut');
+        c.chip.classList.remove('fs-sw-gone');
+        settle();
+      }, d + CUT_FALL + 40);
+    }
+
+    function restoreChip(stg) {
+      var c = chips[stg];
+      clearTimeout(c.t1); clearTimeout(c.t2);
+      c.chip.style.display = '';
+      c.chip.classList.remove('fs-sw-cut');
+      c.chip.classList.remove('fs-sw-gone');
+      if (reduced()) { settle(); return; }
+      c.chip.classList.remove('fs-sw-pop');
+      void c.chip.offsetWidth; // 强制 reflow 重启回弹动画
+      c.chip.classList.add('fs-sw-pop');
+      settle();
+    }
+
+    var curActive = null;
+
+    function render() {
+      var cut = {};
+      PARAMS.forEach(function (p) {
+        if (isChecked(p.id)) {
+          p.cut.forEach(function (stg) { cut[stg] = true; });
+        }
       });
+      var nextActive = DEEP.filter(function (stg) { return !cut[stg]; });
+
+      if (curActive) {
+        var order = 0;
+        DEEP.forEach(function (stg) {
+          var was = curActive.indexOf(stg) >= 0;
+          var now = nextActive.indexOf(stg) >= 0;
+          if (was && !now) { cutChip(stg, order); order++; }
+          else if (!was && now) { restoreChip(stg); }
+        });
+      }
+      curActive = nextActive;
+
+      emptyEl.style.display = nextActive.length ? 'none' : '';
       var cmd = '/flow-deep ' + PARAMS.filter(function (p) {
-        return ctrl.querySelector('input[value="' + p.id + '"]').checked;
+        return isChecked(p.id);
       }).map(function (p) { return p.label; }).join(' ');
       note.textContent = '等价命令: ' + (cmd.trim() === '/flow-deep' ? '/flow-deep（全量，无参数）' : cmd);
+      settle();
     }
 
     ctrl.addEventListener('change', render);

@@ -47,3 +47,58 @@
 /* ===== johari 专属（题面文字/注释） ===== */
 .fs-jh-text { font-size: 14px; color: var(--lc-text-h3); margin-bottom: 8px; }
 .fs-jh-note { font-size: 12.5px; color: var(--lc-text2); }
+
+/* ===== johari 2x2 视窗网格（批 4: 一排按钮 → 真田字格, 概念本命图形补齐） ===== */
+.fs-jh-count { font-size: 12.5px; color: var(--lc-blue-300); text-align: right; margin-bottom: 8px; }
+.fs-jh-window { display: grid; grid-template-columns: 22px 1fr 1fr; gap: 5px; }
+.fs-jh-corner { grid-column: 1; }
+.fs-jh-axis { display: flex; align-items: center; justify-content: center; font-size: 11.5px; color: var(--lc-text3); letter-spacing: .04em; transition: color .25s ease; }
+.fs-jh-axis-y { writing-mode: vertical-rl; }
+.fs-jh-window-sub .fs-jh-axis { font-size: 10.5px; opacity: .65; } /* 后续题轴标淡化（首题常驻） */
+.fs-jh-axis-hit { color: var(--lc-emerald-300) !important; opacity: 1 !important; font-weight: 700; }
+.fs-jh-cell { position: relative; text-align: left; background: var(--lc-bg1); border: 1px solid var(--lc-border2); border-radius: 8px; padding: 9px 11px; cursor: pointer; font-family: inherit; transition: border-color .2s ease, background-color .2s ease, transform .15s ease; }
+.fs-jh-cell:hover:not(:disabled) { background: var(--lc-surface-hover); transform: translateY(-1px); }
+.fs-jh-cell:disabled { cursor: default; }
+.fs-jh-qname { font-size: 13.5px; font-weight: 600; }
+.fs-jh-qhint { font-size: 11.5px; color: var(--lc-text3); margin-top: 3px; line-height: 1.5; }
+/* 域色点缀: 宫格左缘色条 + 象限名着色 */
+.fs-jh-tone-emerald { box-shadow: inset 3px 0 0 var(--lc-emerald-border-60); } .fs-jh-tone-emerald .fs-jh-qname { color: var(--lc-emerald-300); }
+.fs-jh-tone-blue    { box-shadow: inset 3px 0 0 var(--lc-blue-border-60); }    .fs-jh-tone-blue    .fs-jh-qname { color: var(--lc-blue-300); }
+.fs-jh-tone-amber   { box-shadow: inset 3px 0 0 var(--lc-amber-border-60); }   .fs-jh-tone-amber   .fs-jh-qname { color: var(--lc-amber-300); }
+.fs-jh-tone-purple  { box-shadow: inset 3px 0 0 var(--lc-purple-border-60); }  .fs-jh-tone-purple  .fs-jh-qname { color: var(--lc-purple-300); }
+/* 判定态: 答对✓亮起, 答错✗闪红 */
+.fs-jh-hit { border-color: var(--lc-emerald-border-60) !important; background: color-mix(in srgb, var(--lc-emerald) 10%, transparent) !important; }
+.fs-jh-hit::after, .fs-jh-miss::after, .fs-jh-miss-flash::after { position: absolute; top: 6px; right: 8px; font-size: 15px; font-weight: 700; line-height: 1; }
+.fs-jh-hit::after { content: '✓'; color: var(--lc-emerald-300); }
+.fs-jh-miss, .fs-jh-miss-flash { border-color: var(--lc-red-border-60) !important; }
+.fs-jh-miss::after, .fs-jh-miss-flash::after { content: '✗'; color: var(--lc-red-300); }
+.fs-jh-hit-pop::after { animation: fs-jh-pop .3s ease; }
+.fs-jh-miss-flash { animation: fs-jh-shake .35s ease; }
+@keyframes fs-jh-pop { from { transform: scale(.3); opacity: 0; } }
+@keyframes fs-jh-shake { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+@media (max-width: 420px) { .fs-jh-window { grid-template-columns: 16px 1fr 1fr; } .fs-jh-qhint { display: none; } }
+@media (prefers-reduced-motion: reduce) { .fs-jh-cell, .fs-jh-axis, .fs-jh-hit-pop::after, .fs-jh-miss-flash { transition: none; animation: none; } }
+
+/* ===== feedsplit 喂模式前后对比（C11 · P8 对比分屏） ===== */
+.fs-feedsplit { border: 1px solid var(--lc-border); border-radius: 12px; margin: 1.2em 0; background: var(--lc-card); padding: 14px 16px; }
+.fs-fs-q { font-size: 14px; font-weight: 600; color: var(--lc-text-h3); margin-bottom: 12px; }
+.fs-fs-go { margin-bottom: 12px; }
+.fs-fs-grid { display: grid; grid-template-columns: 1fr 1px 1fr; gap: 12px; align-items: stretch; }
+.fs-fs-div { background: var(--lc-border2); }
+.fs-fs-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.fs-fs-tag { font-size: 13.5px; font-weight: 700; }
+.fs-fs-side-plain .fs-fs-tag { color: var(--lc-text2); }
+.fs-fs-side-fed .fs-fs-tag { color: var(--lc-emerald-300); }
+.fs-fs-mark { font-size: 11.5px; padding: 2px 9px; border-radius: 999px; }
+.fs-fs-side-plain .fs-fs-mark { color: var(--lc-amber-300); border: 1px solid var(--lc-amber-border-30); background: color-mix(in srgb, var(--lc-amber) 8%, transparent); }
+.fs-fs-side-fed .fs-fs-mark { color: var(--lc-emerald-300); border: 1px solid var(--lc-emerald-border-30); background: color-mix(in srgb, var(--lc-emerald) 8%, transparent); }
+.fs-fs-item { font-size: 13px; line-height: 1.55; color: var(--lc-text-body); background: var(--lc-bg1); border: 1px solid var(--lc-border); border-radius: 8px; padding: 8px 11px; margin-bottom: 6px; }
+.fs-fs-item:last-child { margin-bottom: 0; }
+.fs-fs-item b { color: var(--lc-text-h3); }
+.fs-fs-side-fed .fs-fs-item { border-color: var(--lc-emerald-border-30); }
+.fs-fs-grid:not(.fs-fs-on) .fs-fs-item { opacity: 0; }
+.fs-fs-on .fs-fs-item { animation: fs-fs-in .35s ease both; animation-delay: calc(var(--fs-i, 0) * .13s); }
+@keyframes fs-fs-in { from { opacity: 0; transform: translateY(6px); } }
+.fs-fs-note { margin-top: 12px; font-size: 12.5px; color: var(--lc-text2); }
+@media (max-width: 640px) { .fs-fs-grid { grid-template-columns: 1fr; } .fs-fs-div { height: 1px; } }
+@media (prefers-reduced-motion: reduce) { .fs-fs-on .fs-fs-item { animation: none; } }

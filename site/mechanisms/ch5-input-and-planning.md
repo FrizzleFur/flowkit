@@ -4,7 +4,7 @@
 
 *Garbage In, Governance In*
 
-`15 anchors` · `210 行` · 组件 `johari`（象限判定）· 约 25 分钟
+`15 anchors` · `210 行` · 组件 `johari`（2x2 象限判定）+ `feedsplit`（喂模式对比）· 约 25 分钟
 
 <div class="fs-callout">
 
@@ -17,6 +17,10 @@
 <div class="fs-johari"></div>
 
 > 上面的象限判定是**简化版直觉训练**（只练「这段话落在哪个象限」），不是完整评分——维度权重、场景检测、四级诊断见 `skills/prompt/SKILL.md`，本章只展开其中最有杠杆的两块: 第四象限与 3S。
+
+<div class="fs-feedsplit"></div>
+
+> 看对比: 同一问句的两种命运——左边没喂模式，AI 只能泛泛而谈（评不了内部概念）; 右边喂了定义与示例，结构化作答（回答有据）。
 
 ## 怎么用（30 秒上手）
 

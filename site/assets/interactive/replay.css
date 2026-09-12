@@ -156,3 +156,53 @@
 .fs-cta-ghost:hover { opacity: 1; }
 .fs-tokenbadge { display: inline-block; background: rgba(139,92,246,.16); color: #c4b5fd; border: 1px solid rgba(139,92,246,.35); border-radius: 5px; padding: 1px 7px; font-family: ui-monospace, Menlo, monospace; font-size: 11px; }
 h2 .fs-tokenbadge { vertical-align: 3px; }
+
+/* ===== fs-budget 预算槽（iv-c 升级 2026-09-12: 数字行+槽体双出口同函数驱动） =====
+ * 三色液面 = 主会话蓝恒 1 格 / subagent 绿 / 其他会话橙; height/bottom 随 judge() 过渡;
+ * =4 第 4 格闪黄（fs-bd-crit）; ≥5 红框脉冲 + 429 横幅（fs-bd-over）; 请求球飞入为纯装饰 */
+.fs-bd-body { display: flex; gap: 18px; }
+.fs-bd-col { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.fs-bd-dot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 6px; }
+.fs-bd-dot-main { background: var(--lc-blue); }
+.fs-bd-dot-subs { background: var(--lc-emerald); }
+.fs-bd-dot-others { background: var(--lc-orange); }
+.fs-bd-gaugecol { flex: 0 0 104px; display: flex; flex-direction: column; gap: 6px; }
+.fs-bd-gcap { font-size: 10.5px; color: var(--lc-text2); text-align: center; }
+.fs-bd-gwrap { position: relative; width: 86px; margin: 0 auto; }
+.fs-bd-gauge { position: relative; width: 64px; height: 224px; background: var(--lc-code-bg); border: 1px solid var(--lc-border2); border-radius: 9px; overflow: hidden; transition: border-color .3s ease; }
+.fs-bd-ticks { position: absolute; inset: 0; }
+.fs-bd-tick { position: absolute; left: 0; right: 0; height: 1px; background: var(--lc-border); opacity: .7; }
+.fs-bd-seg { position: absolute; left: 0; right: 0; transition: height .35s ease, bottom .35s ease; }
+.fs-bd-seg-main { background: var(--lc-blue-900-30); border-top: 2px solid var(--lc-blue-border-60); }
+.fs-bd-seg-subs { background: var(--lc-emerald-900-30); border-top: 2px solid var(--lc-emerald-border-60); }
+.fs-bd-seg-others { background: var(--lc-orange-900-30); border-top: 2px solid var(--lc-orange-border-60); }
+.fs-bd-safeline { position: absolute; left: 0; right: 0; border-top: 2px dashed var(--lc-red-border-60); }
+.fs-bd-mark { position: absolute; left: 68px; transform: translateY(50%); font-size: 10px; font-family: ui-monospace, Menlo, monospace; }
+.fs-bd-mark-3 { color: var(--lc-red-300); }
+.fs-bd-mark-4 { color: var(--lc-amber-300); }
+.fs-bd-cell4 { position: absolute; left: 0; right: 0; opacity: 0; pointer-events: none; background: var(--lc-amber-900-30); border-top: 2px solid var(--lc-amber-border-60); }
+.fs-bd-gauge.fs-bd-crit { border-color: var(--lc-amber-border-60); }
+.fs-bd-gauge.fs-bd-crit .fs-bd-cell4 { opacity: 1; animation: fs-bd-flashy .9s ease; }
+@keyframes fs-bd-flashy { 0% { opacity: .15; } 30% { opacity: 1; } 60% { opacity: .25; } 100% { opacity: 1; } }
+.fs-bd-gauge.fs-bd-over { border-color: var(--lc-red); animation: fs-bd-pulse 1.1s ease-out infinite; }
+@keyframes fs-bd-pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, .5); } 100% { box-shadow: 0 0 0 7px rgba(239, 68, 68, 0); } }
+.fs-bd-429 { position: absolute; top: 8px; left: 4px; right: 4px; z-index: 3; display: none; text-align: center; background: var(--lc-red-900-30); border: 1px solid var(--lc-red-border-60); border-radius: 6px; padding: 4px 2px; }
+.fs-bd-429 b { display: block; font-size: 14px; line-height: 1.2; color: var(--lc-red-300); }
+.fs-bd-429 span { display: block; font-size: 8px; letter-spacing: .3px; color: var(--lc-red-300); }
+.fs-bd-gauge.fs-bd-over .fs-bd-429 { display: block; animation: fs-bd-429in .8s ease; }
+@keyframes fs-bd-429in { 0% { opacity: 0; } 25% { opacity: 1; } 50% { opacity: .15; } 75% { opacity: 1; } 100% { opacity: 1; } }
+.fs-bd-ball { position: fixed; z-index: 999; width: 11px; height: 11px; margin: -5px 0 0 -5px; border-radius: 50%; pointer-events: none; opacity: 1; transition: transform .4s cubic-bezier(.45, .05, .55, .95), opacity .4s ease; will-change: transform; }
+.fs-bd-ball-main { background: var(--lc-blue); box-shadow: 0 0 8px var(--lc-blue-border-60); }
+.fs-bd-ball-subs { background: var(--lc-emerald); box-shadow: 0 0 8px var(--lc-emerald-border-60); }
+.fs-bd-ball-others { background: var(--lc-orange); box-shadow: 0 0 8px var(--lc-orange-border-60); }
+@media (max-width: 640px) { .fs-bd-body { flex-direction: column; } .fs-bd-gaugecol { align-self: center; } }
+@media (prefers-reduced-motion: reduce) { .fs-bd-ball { display: none; } .fs-bd-gauge.fs-bd-over, .fs-bd-gauge.fs-bd-crit .fs-bd-cell4, .fs-bd-gauge.fs-bd-over .fs-bd-429 { animation: none; } }
+
+/* ===== fs-switch 裁剪动效（iv-c 升级 2026-09-12: 勾选=物理裁剪——变红划掉→收起, 恢复=弹回）
+ * 注: components.css 在本文件之后加载, 同名单类会被覆盖, 故 chip 状态规则用 2 级选择器压住 */
+.fs-sw-pipe .fs-sw-chip { max-width: 240px; transition: max-width .3s ease, padding .3s ease, border-width .3s ease, opacity .25s ease, border-color .2s ease, color .2s ease, background-color .2s ease; }
+.fs-sw-pipe .fs-sw-chip.fs-sw-cut { border-color: var(--lc-red); color: var(--lc-red-300); background: var(--lc-red-900-30); text-decoration: line-through; opacity: .72; }
+.fs-sw-pipe .fs-sw-chip.fs-sw-gone { max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; opacity: 0; overflow: hidden; white-space: nowrap; }
+.fs-sw-pipe .fs-sw-chip.fs-sw-pop { animation: fs-sw-pop .32s cubic-bezier(.35, 1.4, .55, 1); }
+@keyframes fs-sw-pop { 0% { transform: scale(.7); opacity: .3; } 100% { transform: scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .fs-sw-pipe .fs-sw-chip { transition: none; } .fs-sw-pipe .fs-sw-chip.fs-sw-pop { animation: none; } }
