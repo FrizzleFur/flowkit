@@ -10,7 +10,7 @@
 | 3 | principles/ch3-memory-loop.md | 记忆与召回闭环 | `200` | `~24` | — |
 | 4 | mechanisms/ch4-pipeline-overview.md | 管道全景：从 Stage -1 到 5.8 的一条龙 | `205` | `~49` | replay |
 | 5 | mechanisms/ch5-input-and-planning.md | 输入质量与思考规划：先立约，再喂饱，后想清 | `198` | `~40` | johari |
-| 6 | mechanisms/ch6-review-and-decision.md | 评审与决策：两个 Claude、八副眼镜与六条原则 | `212` | `~26` | autodecide |
+| 6 | mechanisms/ch6-review-and-decision.md | 评审与决策：两个 Claude、八副眼镜与六条原则 | `252` | `~26` | autodecide |
 | 7 | mechanisms/ch7-concurrent-execution.md | 并发执行：multi-agent 的分片与治理 | `200` | `~64` | budget |
 | 8 | mechanisms/ch8-context-engineering.md | 上下文工程：从容量检测到断点恢复的操作闭环 | `222` | `~20` | replay |
 | 9 | mechanisms/ch9-verification-loop.md | 验证与迭代：不达证据不罢休 | `202` | `~58` | — |

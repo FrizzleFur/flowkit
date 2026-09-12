@@ -30,6 +30,13 @@
 .fs-cq-r-good { color: var(--lc-emerald-300); }
 .fs-cq-rwhy { font-size: 13px; color: var(--lc-text2); line-height: 1.6; }
 
+/* ===== fs-tabs 章内分区容器（sweep R5: learncc 四标签式, active=2px 底线） ===== */
+.fs-tabbar { display: flex; gap: 2px; border-bottom: 1px solid var(--lc-border); margin: 1.4em 0 0; flex-wrap: wrap; }
+.fs-tabbtn { background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--lc-text2); padding: 8px 14px; font-size: 13.5px; cursor: pointer; font-family: inherit; transition: color .15s ease, border-color .15s ease; }
+.fs-tabbtn:hover { color: var(--lc-text); }
+.fs-tabbtn.fs-tab-on { color: var(--lc-text); border-bottom-color: var(--lc-blue); font-weight: 600; }
+.fs-tabpane { padding-top: 14px; }
+
 /* ===== switch 管道开关 ===== */
 .fs-sw-ctrl { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 12px; }
 .fs-sw-param { font-size: 13px; font-family: ui-monospace, Menlo, monospace; cursor: pointer; color: var(--lc-text-h3); }
