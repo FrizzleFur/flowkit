@@ -29,6 +29,12 @@ FlowKit 的 README 开篇就给出了这个项目存在的问题定义: **「Age
 
 有一个细节值得玩味: flowkit 的 evals 把「无 should work 式表述」本身写成了 eval 任务的验收条件（`evals/flow-deep/workspace/iteration-2/eval-1-research/cwd/.plan/task_plan.md:189`）——验证纪律不是只用来验证产出的，**验证纪律自己也被验证**。
 
+这些话术在文字里读是修辞课，放进流水线里看才是纪律。下面这条泳道动画演示同一批话术走到 Stage 5 闸门口的下场——先放两张合规产出过闸，再看红旗话术逐一进闸被拦:
+
+<div class="fs-replay" data-script="assets/scripts/ch9-redflags.json"></div>
+
+注意被拦下的四句话术没有一句是谎言——它们甚至可能都是真的。闸门不放行的不是话术，是「无证据的完成宣称」: 证据表三列里 Evidence 栏空着的行，Status 就到不了 Pass。这正是下一节要把「完成」变成一张表的原因。
+
 ### Stage 5: 把「完成」变成一张表
 
 铁律要落地，需要一个具体格式。Stage 5（Goal Verification）规定: 最终总结前必须输出一张三列表（`skills/flow-deep/SKILL.md:595-599`）:

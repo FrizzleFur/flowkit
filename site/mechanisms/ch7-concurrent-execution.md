@@ -123,6 +123,12 @@ large 档（>3 agent）的调度规则是**滚动补发**: 必须分批、每批
 
 清理因此做成三层: 即时清理（completed 且不复用 → TaskStop）/ Phase 间孤儿清理 / 全局清理（全部完成 → TaskStop 全部本体 → 倒序 kill pane），适用范围明确覆盖 **Stage 0-5 全部分发点**——含 Stage 3.5 plan-reviewer、Stage 3.6 面板这类评审型 agent，非仅 Stage 4 执行 agent。这一条适用范围的扩展本身有实测血案: panel 五席评审返回后 idle 未清——规则原来挂在 Stage 4 语境 + 「kill pane」措辞掩盖了 agent 本体清理，两因叠加未触发（`skills/flow-deep/SKILL.md:554-562`）。
 
+把泄漏全程做成动画——正是 panel 五席评审的真实剧本: 五席 spawn、三席返回后 idle 无人收、pane 挂进泄漏带、巡检发现后逐席 TaskStop 救回:
+
+<div class="fs-replay" data-script="assets/scripts/ch7-panes.json"></div>
+
+点破: 泄漏不是报错，是静默——不收没人报错，任务看似照常推进，pane 越积越多; 治理动作也只有那一句「验收即收，不攒批拖延」。看最后一步的对照: 后返回的两席随到随收，存活归零、回收 5、泄漏带清空——zero-leak 不是运气，是纪律执行的体感。
+
 Phase 之间还有 **Spot-check 三项**快速确认: 报告的文件是否存在、`git log` 是否有新提交、测试是否通过——Agent 的「我做完了」要快速核对（`skills/flow-deep/SKILL.md:545-552`）。
 
 ### 并发预算与 429 防护

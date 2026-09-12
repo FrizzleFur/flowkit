@@ -1,0 +1,89 @@
+{
+  "title": "红旗话术流中拦截——IL-2 铁律闸门",
+  "version": 2,
+  "lanes": [
+    { "id": "lane-out", "title": "产出话术流" },
+    { "id": "lane-gate", "title": "铁律闸门" },
+    { "id": "lane-blocked", "title": "已拦截" }
+  ],
+  "steps": [
+    {
+      "title": "收尾期产出涌入",
+      "desc": "Stage 5 收尾不是口头收尾，是一条过闸流水线：每一句「完成」都以卡片形式产出，逐张过 IL-2 验证铁律闸门。先到的是合规产出——SC3 附着 grep 实测输出。",
+      "lanes": { "set": {
+        "sc3": { "lane": "lane-out", "state": "running", "label": "SC3: 已附 grep 实测输出", "note": "合规卡: 证据随宣称一起出示" }
+      } }
+    },
+    {
+      "title": "SC3 进闸待检",
+      "desc": "闸门不问「写得怎么样」，只问 IL-2 那一句：No completion claims without fresh verification evidence。检查动词全是「看到」——不是「知道」，不是「推断」。",
+      "lanes": { "set": {
+        "sc3": { "lane": "lane-gate", "state": "running", "label": "SC3: 已附 grep 实测输出", "note": "验三件事: 证据新鲜 / 输出可见 / 标准来自 Goal Contract" }
+      } }
+    },
+    {
+      "title": "SC3 放行——第一行绿灯",
+      "desc": "附了实际输出的宣称绿灯放行，卡片留在闸门列亮绿：证据表里这一行的 Evidence 栏是满的。闸门拦的从来不是产出，是空手宣称。",
+      "lanes": { "set": {
+        "sc3": { "lane": "lane-gate", "state": "done", "label": "SC3: 已附 grep 实测输出", "note": "grep 原始输出可见 → 放行" }
+      } }
+    },
+    {
+      "title": "lint 卡同规则过闸",
+      "desc": "第二张合规卡 lint 0 错误附原始输出，同一规则同一结果——闸门对证据一视同仁，也只在证据缺席时才出手。",
+      "lanes": { "set": {
+        "lint": { "lane": "lane-gate", "state": "done", "label": "lint: 0 错误附原始输出", "note": "lint 原始输出可见 → 放行" }
+      } }
+    },
+    {
+      "title": "流水线另一端冒出红旗话术",
+      "desc": "Agent 内部冒出第一句自我辩解：「看起来应该能工作」。iron-laws 的 Rationalization Table 逐句收录这类话术——出现在推理里即触发，立即停下回到铁律。",
+      "lanes": { "set": {
+        "rf1": { "lane": "lane-out", "state": "running", "label": "看起来应该能工作", "note": "话术卡: 没有任何输出可出示" }
+      } }
+    },
+    {
+      "title": "rf1 进闸——直面质问",
+      "desc": "「应该可以」第一次直面闸门的质问：你说能工作——运行输出呢？闸门不寒暄，只要求一件事：运行它，展示输出。",
+      "lanes": { "set": {
+        "rf1": { "lane": "lane-gate", "state": "running", "label": "看起来应该能工作", "note": "闸门索要证据" }
+      } }
+    },
+    {
+      "title": "rf1 被拦，rf2 排队进闸",
+      "desc": "无证据宣称当场拦死，反驳语钉在卡上——这就是 Rationalization Table 的用法：识别话术、念出反驳、回到铁律。话术从不孤立出现，下一句已经在闸门口。",
+      "lanes": { "set": {
+        "rf1": { "lane": "lane-blocked", "state": "failed", "label": "看起来应该能工作", "note": "「看起来」不是证据——运行它，展示输出" },
+        "rf2": { "lane": "lane-gate", "state": "running", "label": "逻辑上是对的", "note": "话术卡: 没有任何输出可出示" }
+      } }
+    },
+    {
+      "title": "rf2 被拦，rf3 排队进闸",
+      "desc": "逻辑自洽是真的，但符号层面的「对」与真实环境里跑出预期输出是两件事——逻辑推理无法替代运行验证。",
+      "lanes": { "set": {
+        "rf2": { "lane": "lane-blocked", "state": "failed", "label": "逻辑上是对的", "note": "逻辑推理无法替代运行验证——运行实际测试" },
+        "rf3": { "lane": "lane-gate", "state": "running", "label": "上一轮已经验证过了", "note": "话术卡: 引用旧证据" }
+      } }
+    },
+    {
+      "title": "rf3 被拦，rf4 排队进闸",
+      "desc": "「新鲜」是关键词：每轮变更都产生新的未验证面，旧证据对新变更无效——上一轮的绿灯不继承到这一轮。",
+      "lanes": { "set": {
+        "rf3": { "lane": "lane-blocked", "state": "failed", "label": "上一轮已经验证过了", "note": "上一轮的验证不覆盖本轮的变更——每次变更后重新验证" },
+        "rf4": { "lane": "lane-gate", "state": "running", "label": "大概通过了", "note": "话术卡: 模糊宣称" }
+      } }
+    },
+    {
+      "title": "rf4 被拦——对照收尾",
+      "desc": "闸门不放行的不是话术，是「无证据的完成宣称」：两张合规卡绿灯放行，四句红旗话术全数躺在已拦截列，对照一目了然。Stage 5 只认证据表——这正是把「完成」写成三列表的原因。",
+      "lanes": { "set": {
+        "sc3": { "lane": "lane-gate", "state": "done", "label": "SC3: 已附 grep 实测输出", "note": "grep 原始输出可见 → 放行" },
+        "lint": { "lane": "lane-gate", "state": "done", "label": "lint: 0 错误附原始输出", "note": "lint 原始输出可见 → 放行" },
+        "rf1": { "lane": "lane-blocked", "state": "failed", "label": "看起来应该能工作", "note": "「看起来」不是证据——运行它，展示输出" },
+        "rf2": { "lane": "lane-blocked", "state": "failed", "label": "逻辑上是对的", "note": "逻辑推理无法替代运行验证——运行实际测试" },
+        "rf3": { "lane": "lane-blocked", "state": "failed", "label": "上一轮已经验证过了", "note": "上一轮的验证不覆盖本轮的变更——每次变更后重新验证" },
+        "rf4": { "lane": "lane-blocked", "state": "failed", "label": "大概通过了", "note": "「大概」不是验证结果——100% 通过或 0% 通过，没有中间态" }
+      } }
+    }
+  ]
+}
