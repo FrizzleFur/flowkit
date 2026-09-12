@@ -4,7 +4,7 @@
 
 *One Pipeline, Two Trims*
 
-`~6 anchors` · `74 行` · 组件 `switch` · 约 5 分钟
+`~6 anchors` · `78 行` · 组件 switch + replay ch1-gate（5 步）` · 组件 `switch` · 约 5 分钟
 
 <blockquote class="fs-callout">
 <p><strong>一句话机制</strong>: Agent 的本体是一个循环——感知→思考→行动→观察，直到任务完成; FlowKit 做的事，是把这个裸循环升级成一条<strong>带关卡的流水线</strong>。</p>
@@ -53,6 +53,10 @@ FlowKit 不改循环本身（智能来自模型，编排只是 harness——这�
 - **flow-deep**（`skills/flow-deep/SKILL.md:132-135`）: 全量十二关（Stage -1 → 5.8）**强制全开**——重要任务用摩擦换确定性
 
 选择逻辑一句话: **做错了多难恢复，就上多重的关卡**。可回滚的小改动用 flow 是效率; 不可逆的大工程用 flow-deep 是保险。
+
+这条选择逻辑，演示出来是一条分岔路（点击播放，5 步自动演示）——
+
+<div class="fs-replay" data-script="assets/scripts/ch1-gate.json"></div>
 
 ## 批判小节（局限与成本）
 

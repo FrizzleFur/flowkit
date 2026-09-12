@@ -4,7 +4,7 @@
 
 *Garbage In, Governance In*
 
-`15 anchors` · `216 行` · 组件 `johari`（2x2 象限判定）+ `feedsplit`（喂模式对比）· 约 25 分钟
+`15 anchors` · `220 行` · 组件 johari + feedsplit + replay ch5-paths（6 步）` · 组件 `johari`（2x2 象限判定）+ `feedsplit`（喂模式对比）· 约 25 分钟
 
 **本章位置**: 机制篇第 2 站 · 管道入口闸门 · 上接[第 4 章 · 全景](ch4-pipeline-overview.md) · 下一站[第 6 章 · 评审与决策](ch6-review-and-decision.md)
 
@@ -124,6 +124,10 @@ Q4 之所以是「最大杀手」，在于它**静默失败**: 你以为 AI 懂�
 Stage 1 在管道里的完整行为（`skills/flow-deep/SKILL.md:276-289`）: 拿优化后的版本作为后续所有阶段的输入; 评分 >= 8 时提示「原始表述已足够好」并询问是否跳过; 若存在 spec-template，还会按模板生成结构化 spec 落盘——供 Stage 1.5 需求探索与 2d 结构化消歧复用。
 
 输入侧还有一环追问机制值得一提: Stage 1.5 需求探索按认知状态走双路径（`skills/flow-deep/SKILL.md:291-305`）——主干明确（有实现路径/技术选型）走轻量 Grilling（一次一问）; 模糊想法（3+ 不确定项）走选项式（3-4 选项带推荐）。它接的是 Q3/模糊表述的兜底: 评分和喂模式解决「说出来的部分」，需求探索解决「没说出来的部分」。本章不展开，机制细节见 needs-exploration.md。
+
+分诊的实例——同一个需求两种来法，Stage 1.5 的双路径怎么选（点击播放，6 步自动演示）——
+
+<div class="fs-replay" data-script="assets/scripts/ch5-paths.json"></div>
 
 ## 第二道防线: 思考规划（Stage 0.5 立约 + Stage 2a 六维）
 

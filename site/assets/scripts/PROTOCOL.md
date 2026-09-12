@@ -51,6 +51,10 @@
 |---|---|---|
 | ch4-pipeline.json | v2 | 单消息 |
 | ch8-autohandoff.json | v1（annotation 已补 {title, desc} 结构，兼容模式运行） | 单消息 |
+| ch1-gate.json | v2 | flow+消息（闸门分岔） |
+| ch5-paths.json | v2 | 双消息对比（需求双路径） |
+
+> 其余剧本随章演进, 以 `assets/scripts/` 目录与各章挂载为准（15+ 部不逐一列表）。
 
 ## lanes 泳道面板（v2.1 新增——多列并行/条目状态流动类机制）
 
