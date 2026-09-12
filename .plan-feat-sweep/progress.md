@@ -13,3 +13,9 @@
 - [x] 插入任务: 交互性与流畅性严苛评审（用户指令）→ notes/review-interaction-fluidity.md（F1 双播放器实锤 P0/结构诊断「缺 motion 基建层」/P0×3+P1×5 清单; 强制帧法突破后台 tab IO 假象; 活体实测纠正静态误读）
 - [ ] T3 挂账批修: 工作清单 = 评审报告 P0/P1/P2 + 对账挂账非交互项, 待用户裁定范围
 - [ ] T4 终验与同步
+
+## 交接（2026-09-12 晚）
+
+- 本周期 P0 三件套（仲裁/去蓝/焦点环）+ progress 系统已并入 redesign 波 1 交付（3d081d9）; ch12 前身 constquiz 已在波 2 前落地
+- 其余挂账（S8 圆角/S16 文件名栏/C2-C7 PROTOCOL 条款族等非交互项）保留本清单, 待 redesign 波 4 后与本周期 Phase 4 终验合并执行
+- 活跃计划目录已切换 → ../.plan-feat-redesign/（恢复入口 = 其 STATE.md）
