@@ -5,7 +5,7 @@
 
 - [关于本站](about.md)
 
-- **原理篇**
+- **原理篇 · 地基三讲**（熟手可[直通机制篇](mechanisms/ch4-pipeline-overview.md)）
 
   - [1. Agent Loop 与管道形态](principles/ch1-agent-loop-and-pipeline.md)
   - [2. 长时程三板斧](principles/ch2-context-three-axes.md)

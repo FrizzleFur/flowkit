@@ -4,7 +4,9 @@
 
 *Hand Off Before You Rot*
 
-`20 anchors` · `252 行` · 组件 `replay`×3（threelines 9 / autohandoff 10 / recovery 7）· 约 30 分钟
+`20 anchors` · `254 行` · 组件 `replay`×3（threelines 9 / autohandoff 10 / recovery 7）· 约 30 分钟
+
+**本章位置**: 横切层 · 上下文工程（贯穿全程）· 承[第 7 章 · 并发执行](ch7-concurrent-execution.md)的并发现场 · 启[第 9 章 · 验证与迭代](ch9-verification-loop.md)
 
 <div class="fs-callout">
 

@@ -4,7 +4,7 @@
 
 *Three Pairings, One Enemy: Context Rot*
 
-`~25 anchors` · `199 行` · 组件 `replay` · 约 25 分钟
+`~25 anchors` · `219 行` · 组件 `replay` · 约 25 分钟
 
 <blockquote class="fs-callout">
 <p><strong>一句话机制</strong>: 长任务会撞上 context rot——上下文越满质量越差; hello-agents 把解法归纳为「三板斧」（Compaction / 结构化笔记 / 子代理），而 flowkit 仓里早有三个机制在跑同样的活——本章给工程穿上概念的鞋，也用工程细节反过来检验概念。</p>

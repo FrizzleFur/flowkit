@@ -4,7 +4,7 @@
 
 *Forced Recall, Gated Distillation*
 
-`~24 anchors` · `200 行` · 组件 — · 约 20 分钟
+`~24 anchors` · `218 行` · 组件 — · 约 20 分钟
 
 <blockquote class="fs-callout">
 <p><strong>一句话机制</strong>: 会话天然失忆——任务结束，这次踩的坑与想通的方案就随上下文蒸发; auto-skill 用「召回-沉淀」闭环把教训变成资产: <strong>任务开始强制召回（Stage -1），验证通过才准沉淀（Stage 5.8）</strong>，一读一写之间，经验跨会话复利。</p>

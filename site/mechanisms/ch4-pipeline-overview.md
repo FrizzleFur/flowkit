@@ -4,7 +4,9 @@
 
 *Twelve Gates, One Journey*
 
-`25 anchors` · `217 行` · 组件 `replay ch4-pipeline`（12 步）· 约 30 分钟
+`25 anchors` · `219 行` · 组件 `replay ch4-pipeline`（12 步）· 约 30 分钟
+
+**本章位置**: 机制篇第 1 站 · 管道全景总览 · 下一站[第 5 章 · 输入与规划](ch5-input-and-planning.md)
 
 <div class="fs-callout">
 

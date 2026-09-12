@@ -4,7 +4,9 @@
 
 *No Evidence, No Done*
 
-`29 anchors` · `231 行` · 组件 `replay`×2（redflags 10 / track 9）· 约 30 分钟
+`29 anchors` · `233 行` · 组件 `replay`×2（redflags 10 / track 9）· 约 30 分钟
+
+**本章位置**: 机制篇第 5 站 · Stage 5 验证闸门 · 上接[第 8 章 · 上下文工程](ch8-context-engineering.md) · 下一站[第 10 章 · 跨会话记忆](ch10-cross-session-memory.md)
 
 <div class="fs-callout">
 

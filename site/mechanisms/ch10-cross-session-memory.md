@@ -4,7 +4,9 @@
 
 *Two Folders, One Protocol*
 
-`18 anchors` · `231 行` · 组件 `replay`×2（compound 10 / snowball 8）· 约 25 分钟
+`18 anchors` · `233 行` · 组件 `replay`×2（compound 10 / snowball 8）· 约 25 分钟
+
+**本章位置**: 横切层 · 跨会话记忆（auto-skill 经验闭环）· 承[第 9 章 · 验证与迭代](ch9-verification-loop.md) · 启[第 11 章 · 编排治理](ch11-orchestration-governance.md)
 
 <div class="fs-callout">
 

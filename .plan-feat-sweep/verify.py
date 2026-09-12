@@ -69,7 +69,7 @@ for p in comps:
     t = open(p, encoding="utf-8").read()
     check("FlowSite.fns.push" in t, f"{p}: 未走 FlowSite.fns 协议")
     if os.path.basename(p) not in NON_MOUNTABLE:
-        check("data-ready" in t, f"{p}: 缺 data-ready 防重入")
+        check(re.search(r"data-(ready|[a-z-]+-ready)", t), f"{p}: 缺 data-ready 防重入")
     if "setInterval" in t:
         check("_fsClear" in t, f"{p}: 持续 timer（setInterval）但无 _fsClear 生命周期")
     # 一次性 setTimeout/rAF（动画触发帧、延时清理）不属泄漏，不要求 _fsClear

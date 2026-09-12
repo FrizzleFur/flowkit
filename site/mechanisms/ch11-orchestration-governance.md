@@ -4,7 +4,9 @@
 
 *Three Locks on Itself*
 
-`5 anchors` · `76 行` · 组件 constquiz（宪法四问）· 约 5 分钟
+`5 anchors` · `78 行` · 组件 constquiz（宪法四问）· 约 5 分钟
+
+**本章位置**: 元层 · 治理与质量自举（管道给自己上的三道锁）· 上接[第 10 章 · 跨会话记忆](ch10-cross-session-memory.md) · 机制篇至此收官
 
 <div class="fs-callout">
 

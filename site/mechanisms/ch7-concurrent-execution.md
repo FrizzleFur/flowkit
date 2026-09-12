@@ -4,7 +4,9 @@
 
 *Parallel by Design, Budget by Default*
 
-`27 anchors` · `248 行` · 组件 `budget` 计算器 + `replay`×4（budget 9 / routing 7 / shards 10 / panes 8）· 约 30 分钟
+`27 anchors` · `250 行` · 组件 `budget` 计算器 + `replay`×4（budget 9 / routing 7 / shards 10 / panes 8）· 约 30 分钟
+
+**本章位置**: 机制篇第 4 站 · Stage 4 并发执行 · 上接[第 6 章 · 评审与决策](ch6-review-and-decision.md) · 下一站[第 8 章 · 上下文工程](ch8-context-engineering.md)
 
 <div class="fs-callout">
 

@@ -4,7 +4,7 @@
 
 *One Pipeline, Two Trims*
 
-`~6 anchors` · `65 行` · 组件 `switch` · 约 5 分钟
+`~6 anchors` · `74 行` · 组件 `switch` · 约 5 分钟
 
 <blockquote class="fs-callout">
 <p><strong>一句话机制</strong>: Agent 的本体是一个循环——感知→思考→行动→观察，直到任务完成; FlowKit 做的事，是把这个裸循环升级成一条<strong>带关卡的流水线</strong>。</p>

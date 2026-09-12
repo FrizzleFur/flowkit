@@ -4,7 +4,9 @@
 
 *Garbage In, Governance In*
 
-`15 anchors` · `210 行` · 组件 `johari`（2x2 象限判定）+ `feedsplit`（喂模式对比）· 约 25 分钟
+`15 anchors` · `216 行` · 组件 `johari`（2x2 象限判定）+ `feedsplit`（喂模式对比）· 约 25 分钟
+
+**本章位置**: 机制篇第 2 站 · 管道入口闸门 · 上接[第 4 章 · 全景](ch4-pipeline-overview.md) · 下一站[第 6 章 · 评审与决策](ch6-review-and-decision.md)
 
 <div class="fs-callout">
 

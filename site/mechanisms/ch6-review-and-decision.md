@@ -4,7 +4,7 @@
 
 *Fresh Eyes, Fewer Blind Spots*
 
-`16 anchors` · `252 行` · 组件 `autodecide` + `funnel` + `replay ch6-sunkcost`（7 步）· 约 25 分钟
+`16 anchors` · `251 行` · 组件 `autodecide` + `funnel` + `replay ch6-sunkcost`（7 步）· 约 25 分钟
 
 **本章位置**: 管道评审区 · 机制篇第 3 站 · 上接[第 4 章 · 全景](ch4-pipeline-overview.md)与[第 5 章 · 输入闸门](ch5-input-and-planning.md) · 下一站[第 7 章 · 并发执行](ch7-concurrent-execution.md)
 
