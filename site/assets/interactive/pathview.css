@@ -24,6 +24,7 @@
 
 /* 章卡片（G2: 卡 = 页底色 + border 1px + 4px 页底色 ring, 与节点同构分层） */
 .fs-pv-card { flex: 1; min-width: 0; background: var(--lc-bg0); border: 1px solid var(--lc-border); border-radius: 12px; padding: 13px 16px; margin: 10px 0; box-shadow: 0 0 0 4px var(--lc-bg0); }
+.fs-pv-card:hover { border-color: var(--lc-border-hi); }
 /* G1: 域徽章改暗态实底（域色 900/30 底 + 域色 300 字）, 替换原描边式 */
 .fs-pv-badge { display: inline-block; font-size: 11px; font-family: ui-monospace, Menlo, monospace; border: none; border-radius: 9999px; padding: 2px 10px; margin-bottom: 8px; background: var(--fs-pv-dom-badge, color-mix(in srgb, var(--lc-border) 60%, transparent)); color: var(--fs-pv-dom-300, var(--lc-text2)); }
 .fs-pv-title { font-size: 16.5px; font-weight: 700; color: var(--lc-text); margin: 0 0 4px; border: none; padding: 0; }
@@ -40,7 +41,7 @@
 .fs-pv-quote { border-left: 3px solid var(--fs-pv-dom, var(--lc-border2)); background: var(--lc-code-bg); color: var(--lc-text2); font-size: 13px; margin: 10px 0; padding: 8px 12px; border-radius: 0 8px 8px 0; }
 .fs-pv-quote p { margin: 0; }
 .fs-pv-link { font-size: 13px; color: var(--lc-link); text-decoration: none; }
-.fs-pv-link:hover { color: var(--lc-blue-300); text-decoration: underline; }
+.fs-pv-link:hover { color: var(--lc-text); text-decoration: underline; }
 
 /* reduce-motion: 关闭入场动画（卡片直接显示, 无过渡） */
 @media (prefers-reduced-motion: reduce) {

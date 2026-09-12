@@ -9,7 +9,7 @@
  */
 :root {
   --lc-bg0: #09090b; --lc-bg1: #18181b; --lc-card: #18181b;
-  --lc-border: #27272a; --lc-border2: #3f3f46;
+  --lc-border: #27272a; --lc-border2: #3f3f46; --lc-border-hi: #71717a;
   --lc-text: #fafafa; --lc-text-body: #d4d4d8; --lc-text2: #a1a1aa; --lc-text3: #71717a;
   --lc-link: #60a5fa; --lc-link-deco: rgba(96,165,250,.4);
   --lc-code-bg: #0f172a; --lc-code-inline-bg: #27272a;
@@ -125,7 +125,7 @@ body.close .sidebar-toggle { width: auto; }
 .cover .cover-main h1 { color: var(--lc-text); font-weight: 700; }
 .cover .cover-main blockquote { color: var(--lc-text2); border: none; background: transparent; }
 .cover .cover-main a { color: var(--lc-text); border: 1px solid var(--lc-border2); background: rgba(255,255,255,.04); border-radius: 8px; }
-.cover .cover-main a:hover { border-color: var(--lc-blue); color: var(--lc-blue-300); }
+.cover .cover-main a:hover { border-color: var(--lc-border-hi); color: var(--lc-text); }
 .cover .cover-main a.fs-cta { background: var(--lc-text); border-color: var(--lc-text); color: var(--lc-bg0); font-weight: 600; }
 .cover .cover-main a.fs-cta:hover { background: var(--lc-text-h3); color: var(--lc-bg0); }
 
@@ -182,3 +182,14 @@ body.close .sidebar-toggle { width: auto; }
   .fs-codehead { background: #f1f3f5; border-bottom-color: #ddd; }
   .cover, .sidebar, .sidebar-toggle, .gh-corner, .github-corner { display: none !important; }
 }
+
+/* ===== 交互基建（sweep P0: 焦点环 / hover 提亮统一 / 过渡常态声明） ===== */
+/* 焦点环: 键盘可达（focus 用 blue=强调语义, 与 hover 反馈 zinc 分层——议点 2 的分层原则） */
+:focus-visible { outline: 2px solid var(--lc-blue-300); outline-offset: 2px; }
+/* hover 反馈统一: 边框提亮一档（--lc-border-hi）; transition 声明在常态（修复「进有出无」半程过渡） */
+.fs-grid3-card, .fs-pv-card { transition: border-color .15s ease, background-color .15s ease, color .15s ease; }
+.fs-cta-ghost { transition: opacity .15s ease; }
+/* 阅读进度: 侧栏/path 完成标记 + 重置钮 */
+.sidebar ul li a[data-done]::after { content: '✓'; color: var(--lc-emerald-300); margin-left: 6px; font-size: 12px; }
+.fs-pv-card[data-done] { border-color: var(--lc-emerald-border-60); }
+.fs-progress-reset { margin-top: 2em; text-align: right; }

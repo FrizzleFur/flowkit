@@ -9,7 +9,7 @@
 .fs-replay-ctrl { display: flex; gap: 6px; align-items: center; }
 .fs-replay-speed { border: 1px solid var(--lc-border2); border-radius: 6px; padding: 3px 6px; font-size: 12.5px; background: var(--lc-bg1); color: var(--lc-text-h3); }
 .fs-btn { border: 1px solid var(--lc-border2); background: var(--lc-bg1); border-radius: 6px; padding: 4px 12px; font-size: 12.5px; cursor: pointer; color: var(--lc-text-h3); transition: color .15s ease, background-color .15s ease, border-color .15s ease; }
-.fs-btn:hover:not(:disabled) { border-color: var(--lc-blue); color: var(--lc-blue-300); }
+.fs-btn:hover:not(:disabled) { border-color: var(--lc-border-hi); color: var(--lc-text); }
 .fs-btn:disabled { opacity: .5; cursor: default; }
 .fs-btn-primary { background: var(--lc-blue); border-color: var(--lc-blue); color: #fff; }
 .fs-btn-primary:hover:not(:disabled) { color: #fff; opacity: .88; }
@@ -151,7 +151,7 @@
 .fs-grid3-card { display: block; background: #131316; border: 1px solid #27272a; border-radius: 10px; padding: 12px 14px; text-decoration: none; }
 .fs-grid3-card b { color: #fafafa; display: block; margin-bottom: 3px; }
 .fs-grid3-card span { font-size: 12.5px; color: #a1a1aa; }
-.fs-grid3-card:hover { border-color: #3b82f6; }
+.fs-grid3-card:hover { border-color: var(--lc-border-hi); }
 .fs-cta-ghost { opacity: .75; }
 .fs-cta-ghost:hover { opacity: 1; }
 .fs-tokenbadge { display: inline-block; background: rgba(139,92,246,.16); color: #c4b5fd; border: 1px solid rgba(139,92,246,.35); border-radius: 5px; padding: 1px 7px; font-family: ui-monospace, Menlo, monospace; font-size: 11px; }

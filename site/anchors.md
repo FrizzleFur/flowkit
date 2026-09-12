@@ -15,7 +15,7 @@
 | 8 | mechanisms/ch8-context-engineering.md | 上下文工程：从容量检测到断点恢复的操作闭环 | `222` | `~20` | replay |
 | 9 | mechanisms/ch9-verification-loop.md | 验证与迭代：不达证据不罢休 | `202` | `~58` | — |
 | 10 | mechanisms/ch10-cross-session-memory.md | 跨会话记忆：auto-skill 双库的机制手册 | `202` | `~37` | — |
-| 11 | mechanisms/ch11-orchestration-governance.md | 编排治理与质量自举 | `59` | `~5` | — |
+| 11 | mechanisms/ch11-orchestration-governance.md | 编排治理与质量自举 | `76` | `~5` | — |
 | — | **合计** | **11 章** | `1964` | `~354` | **6 处落位** |
 
 > 剧本 JSON: `assets/scripts/`（管道流转 + Auto Handoff 两部, 经 python json 校验）。组件库: `assets/interactive/` 五件, `node --check` 全过。

@@ -443,6 +443,13 @@
 
     var st = { idx: -1, playing: false, timer: null, speed: 1, total: script.steps.length };
 
+    // P0-1 全局互斥: 任一时刻至多一部回放器在播; 手动点播谁点谁接管（含自动播放起点）
+    function begin() {
+      if (FlowSite._activeReplay && FlowSite._activeReplay.root !== root) FlowSite._activeReplay.stop();
+      FlowSite._activeReplay = { root: root, stop: stop };
+      st.playing = true; play.textContent = '暂停'; tick();
+    }
+
     function renderDots() {
       dots.textContent = '';
       for (var i = 0; i < st.total; i++) dots.appendChild(el('span', 'fs-dot' + (i <= st.idx ? ' fs-dot-on' : ''), '●'));
@@ -477,7 +484,7 @@
       if (st.idx >= st.total - 1) { stop(); return; }
       st.idx++; applyStep(st.idx);
     }
-    function stop() { st.playing = false; clearTimer(st); play.textContent = '播放'; }
+    function stop() { st.playing = false; clearTimer(st); play.textContent = '播放'; if (FlowSite._activeReplay && FlowSite._activeReplay.root === root) FlowSite._activeReplay = null; }
     function tick() {
       if (!st.playing) return;
       advance();
@@ -491,7 +498,7 @@
         stopCruise(); if (curveObj) curveObj.reset(); // 重播前归零巡游与曲线
         Object.keys(msgPanels).forEach(function (pid) { msgPanels[pid].body.textContent = ''; msgPanels[pid].count = 0; msgPanels[pid].len.textContent = 'len=0'; });
       }
-      st.playing = true; play.textContent = '暂停'; tick();
+      begin();
     };
     step.onclick = function () { stop(); advance(); };
     reset.onclick = function () {
@@ -516,11 +523,25 @@
     if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       var io = new IntersectionObserver(function (entries) {
         entries.forEach(function (en) {
-          if (en.isIntersecting && !played) { played = true; io.disconnect(); setTimeout(function () { if (!st.playing) { stopCruise(); if (curveObj) curveObj.reset(); st.idx = -1; Object.keys(msgPanels).forEach(function (pid) { msgPanels[pid].body.textContent = ''; msgPanels[pid].count = 0; msgPanels[pid].len.textContent = 'len=0'; }); st.playing = true; play.textContent = '暂停'; tick(); } }, 400); }
+          if (en.isIntersecting && !played) { played = true; io.disconnect(); setTimeout(function () { if (!st.playing) { stopCruise(); if (curveObj) curveObj.reset(); st.idx = -1; Object.keys(msgPanels).forEach(function (pid) { msgPanels[pid].body.textContent = ''; msgPanels[pid].count = 0; msgPanels[pid].len.textContent = 'len=0'; }); begin(); } }, 400); }
         });
       }, { threshold: 0.35 });
       io.observe(root);
     }
+
+    // P0-1 pause-on-exit: 滚出视口 2s 后自动暂停（保留进度, 回到视口不自动续播——防注意力错位）
+    var exitTimer = null;
+    if ('IntersectionObserver' in window) {
+      var ioExit = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) { if (exitTimer) { clearTimeout(exitTimer); exitTimer = null; } }
+          else if (st.playing && !exitTimer) { exitTimer = setTimeout(function () { if (st.playing) stop(); exitTimer = null; }, 2000); }
+        });
+      }, { threshold: 0.05 });
+      ioExit.observe(root);
+    }
+    var prevClear2 = root._fsClear;
+    root._fsClear = function () { if (prevClear2) prevClear2(); if (exitTimer) clearTimeout(exitTimer); if (FlowSite._activeReplay && FlowSite._activeReplay.root === root) FlowSite._activeReplay = null; };
   }
 
   function initAll() {

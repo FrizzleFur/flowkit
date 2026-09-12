@@ -4,7 +4,7 @@
 
 *Three Locks on Itself*
 
-`5 anchors` · `71 行` · 组件 — · 约 5 分钟
+`5 anchors` · `76 行` · 组件 constquiz（宪法四问）· 约 5 分钟
 
 <div class="fs-callout">
 
@@ -19,7 +19,7 @@
 - 你在给 flowkit 加新 Stage/新强制步骤 → 先过宪法四问，答案写进 plan（可追溯，非走形式）
 - 你在写新能力 → 先查 `skills/flow-deep/references/capability-registry.md`——已有覆盖就不新建; 新建则注册
 - 你改了 skill 本体 → 跑 evals（`evals/README.md`）确认机制没退化
-- 本章无可运行动画——治理是判断题不是演示题，文末「本章源码锚点表」即本章的『演示』
+- 本章唯一交互是「宪法四问自检」小测（锁一末尾）——治理是判断题不是演示题，小测把判断变成可操作的自检; 文末「本章源码锚点表」即本章的『演示』
 
 ## 为什么：三道锁各防一种死法
 
@@ -37,6 +37,10 @@
 配三条铁律: 编排层（决定调用什么）与纪律层（被调用的复用能力）职责不混; 宁做「registry 里默认不启用的条目」不默认塞管道; **任何「强制不可跳过」的 Stage 必须写清 why，否则默认可跳过**——这条直接决定了你在[第 4 章](ch4-pipeline-overview.md)看到的「为什么有的 Stage 标注『不可跳过』有的标 `--no-xxx`」。
 
 > 宪法的启发源头: skill 应 small / composable / adaptable，不应「接管流程」（owning the process）——治理对象不是用户，是管道自己。
+
+<div class="fs-constquiz"></div>
+
+*宪法四问不必背——用三个提案把上面的小测走一遍，你就知道四问怎么拦人、怎么放行。*
 
 ### 锁二: 能力注册表——防「重复造轮子」
 
