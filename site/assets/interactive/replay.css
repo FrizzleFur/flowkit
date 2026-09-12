@@ -7,8 +7,8 @@
 .fs-replay-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 14px; border-bottom: 1px solid var(--lc-border); background: var(--lc-bg1); }
 .fs-replay-title { font-weight: 600; color: #fafafa; font-size: 13.5px; }
 .fs-replay-ctrl { display: flex; gap: 6px; align-items: center; }
-.fs-replay-speed { border: 1px solid var(--lc-border2); border-radius: 6px; padding: 3px 6px; font-size: 12.5px; background: var(--lc-bg1); color: #e4e4e7; }
-.fs-btn { border: 1px solid var(--lc-border2); background: var(--lc-bg1); border-radius: 6px; padding: 4px 12px; font-size: 12.5px; cursor: pointer; color: #e4e4e7; transition: color .15s ease, background-color .15s ease, border-color .15s ease; }
+.fs-replay-speed { border: 1px solid var(--lc-border2); border-radius: 6px; padding: 3px 6px; font-size: 12.5px; background: var(--lc-bg1); color: var(--lc-text-h3); }
+.fs-btn { border: 1px solid var(--lc-border2); background: var(--lc-bg1); border-radius: 6px; padding: 4px 12px; font-size: 12.5px; cursor: pointer; color: var(--lc-text-h3); transition: color .15s ease, background-color .15s ease, border-color .15s ease; }
 .fs-btn:hover:not(:disabled) { border-color: var(--lc-blue); color: var(--lc-blue-300); }
 .fs-btn:disabled { opacity: .5; cursor: default; }
 .fs-btn-primary { background: var(--lc-blue); border-color: var(--lc-blue); color: #fff; }
@@ -33,7 +33,7 @@
 .fs-block { display: flex; align-items: baseline; gap: 6px; animation: fs-blockin .35s ease; }
 @keyframes fs-blockin { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 .fs-chip { font-family: ui-monospace, Menlo, monospace; font-size: 9.5px; border-radius: 5px; padding: 2px 7px; color: #fff; flex: 0 0 auto; }
-.fs-chip-user { background: var(--lc-blue); } .fs-chip-asst { background: #52525b; } .fs-chip-tool { background: var(--lc-emerald); }
+.fs-chip-user { background: var(--lc-blue); } .fs-chip-asst { background: var(--lc-text-dim); } .fs-chip-tool { background: var(--lc-emerald); }
 .fs-chip-sys { background: var(--lc-red); } .fs-chip-task { background: var(--lc-amber); color: #18181b !important; } .fs-chip-final { background: var(--lc-purple); }
 .fs-blocklabel { font-size: 11px; color: var(--lc-text2); font-family: ui-monospace, Menlo, monospace; word-break: break-all; }
 
@@ -81,7 +81,7 @@
 .fs-funnel-title { font-weight: 600; color: #fafafa; font-size: 13.5px; }
 .fs-fn-counts { display: flex; gap: 12px; }
 .fs-fn-count { font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: var(--lc-text3); font-variant-numeric: tabular-nums; }
-.fs-fn-count b { display: inline-block; font-size: 14px; color: #e4e4e7; margin-left: 3px; min-width: 18px; text-align: right; font-variant-numeric: tabular-nums; }
+.fs-fn-count b { display: inline-block; font-size: 14px; color: var(--lc-text-h3); margin-left: 3px; min-width: 18px; text-align: right; font-variant-numeric: tabular-nums; }
 .fs-fn-count b.fs-fn-bump { animation: fs-fn-bump .25s ease; }
 @keyframes fs-fn-bump { from { transform: scale(1.45); color: #fff; } }
 .fs-funnel-ctrl { display: flex; gap: 6px; align-items: center; padding: 8px 14px 0; }
@@ -112,7 +112,7 @@
 @keyframes fs-fn-drop { 0% { opacity: 0; transform: translateY(-12px); } 55% { transform: translateY(3px); } 100% { opacity: 1; transform: none; } }
 .fs-fn-ttag { flex: 0 0 auto; font-family: ui-monospace, Menlo, monospace; font-size: 9px; border-radius: 4px; padding: 0 5px; background: var(--lc-amber-900-30); color: var(--lc-amber-300); }
 .fs-fn-trow-red .fs-fn-ttag { background: var(--lc-red-900-30); color: var(--lc-red-300); }
-.fs-fn-trow-dim { color: #52525b; } .fs-fn-trow-dim .fs-fn-ttag { background: var(--lc-border); color: var(--lc-text3); }
+.fs-fn-trow-dim { color: var(--lc-text-dim); } .fs-fn-trow-dim .fs-fn-ttag { background: var(--lc-border); color: var(--lc-text3); }
 .fs-fn-note { margin: 8px 14px 0; font-size: 12px; color: var(--lc-text2); min-height: 18px; }
 .fs-fn-done { display: none; margin: 8px 14px 12px; border: 1px solid #92400e; background: var(--lc-amber-900-30); border-radius: 8px; padding: 8px 12px; font-size: 12.5px; color: var(--lc-amber-300); font-weight: 600; }
 .fs-fn-done.fs-fn-done-on { display: block; animation: fs-fn-in .35s ease; }

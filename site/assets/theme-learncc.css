@@ -13,6 +13,8 @@
   --lc-text: #fafafa; --lc-text-body: #d4d4d8; --lc-text2: #a1a1aa; --lc-text3: #71717a;
   --lc-link: #60a5fa; --lc-link-deco: rgba(96,165,250,.4);
   --lc-code-bg: #0f172a; --lc-code-inline-bg: #27272a;
+  --lc-text-h3: #e4e4e7; --lc-text-dim: #52525b; --lc-surface-hover: rgba(39,39,42,.5);
+  --lc-indigo: #6366f1; --lc-indigo-300: #c7d2fe; --lc-indigo-soft: rgba(99,102,241,.1);
   --lc-blue: #3b82f6;    --lc-blue-300: #93c5fd;    --lc-blue-900-30: rgba(30,58,138,.3);    --lc-blue-border-30: rgba(59,130,246,.3);    --lc-blue-border-60: rgba(59,130,246,.6);
   --lc-emerald: #10b981; --lc-emerald-300: #6ee7b7; --lc-emerald-900-30: rgba(6,78,59,.3);   --lc-emerald-border-30: rgba(16,185,129,.3); --lc-emerald-border-60: rgba(16,185,129,.6);
   --lc-amber: #f59e0b;   --lc-amber-300: #fcd34d;   --lc-amber-900-30: rgba(120,53,15,.3);   --lc-amber-border-30: rgba(245,158,11,.3);   --lc-amber-border-60: rgba(245,158,11,.6);
@@ -42,8 +44,8 @@ strong, b { color: var(--lc-text); }
 body.close .sidebar { transform: translateX(-224px); }
 body.close .sidebar-toggle { width: auto; }
 .sidebar ul li a { color: var(--lc-text2) !important; font-size: 14px; padding: 2px 10px; border-radius: 6px; text-decoration: none; transition: color .15s ease, background-color .15s ease; }
-.sidebar ul li a:hover { color: var(--lc-text) !important; background: rgba(39,39,42,.5); text-decoration: none; }
-.sidebar ul li.active > a { color: var(--lc-text) !important; background: #27272a; font-weight: 500; }
+.sidebar ul li a:hover { color: var(--lc-text) !important; background: var(--lc-surface-hover); text-decoration: none; }
+.sidebar ul li.active > a { color: var(--lc-text) !important; background: var(--lc-border); font-weight: 500; }
 .sidebar > h1 { color: var(--lc-text) !important; font-weight: 600; }
 .search input { background: var(--lc-bg0) !important; border: 1px solid var(--lc-border) !important; color: var(--lc-text) !important; }
 .search .results-panel { background: var(--lc-bg1) !important; border-color: var(--lc-border) !important; }
@@ -60,16 +62,16 @@ body.close .sidebar-toggle { width: auto; }
 /* T6: 仅 h2 带分隔线, 章题 h1 靠 header 组合建立身份 */
 .markdown-section h2 { border-bottom: 1px solid var(--lc-border); padding-bottom: .4em; }
 /* T7: 标题内部半档降 —— h3 zinc-200 / h4 zinc-300·15px */
-.markdown-section h3 { color: #e4e4e7; }
-.markdown-section h4 { color: #d4d4d8; font-size: 15px; font-weight: 600; }
+.markdown-section h3 { color: var(--lc-text-h3); }
+.markdown-section h4 { color: var(--lc-text-body); font-size: 15px; font-weight: 600; }
 /* T10: 普通引用回归 indigo 系（blue 渐变位让给 hero-callout） */
-.markdown-section blockquote { border-left: 3px solid #6366f1; background: rgba(99,102,241,.1); color: #c7d2fe; border-radius: 0 8px 8px 0; padding: 10px 16px 10px 20px; }
-.markdown-section blockquote p { color: #c7d2fe; }
+.markdown-section blockquote { border-left: 3px solid var(--lc-indigo); background: var(--lc-indigo-soft); color: var(--lc-indigo-300); border-radius: 0 8px 8px 0; padding: 10px 16px 10px 20px; }
+.markdown-section blockquote p { color: var(--lc-indigo-300); }
 /* S6/G3: 引用三档之二 —— hero-callout 金句卡（渐变底 + 左 4px blue→emerald 竖条）
  * 与 fs-quote-soft（说明引用, 弱档）分工; md 侧按 class 挂载 */
-.markdown-section .fs-callout { position: relative; border: none; border-radius: 12px; background: linear-gradient(135deg, #172554, #052e16); color: #93c5fd; padding: 14px 18px; }
-.markdown-section .fs-callout::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; border-radius: 12px 0 0 12px; background: linear-gradient(180deg, #3b82f6, #10b981); }
-.markdown-section .fs-callout p { color: #93c5fd; font-weight: 400; }
+.markdown-section .fs-callout { position: relative; border: none; border-radius: 12px; background: linear-gradient(135deg, #172554, #052e16); color: var(--lc-blue-300); padding: 14px 18px; }
+.markdown-section .fs-callout::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; border-radius: 12px 0 0 12px; background: linear-gradient(180deg, var(--lc-blue), var(--lc-emerald)); }
+.markdown-section .fs-callout p { color: var(--lc-blue-300); font-weight: 400; }
 .markdown-section .fs-callout strong, .markdown-section .fs-callout b { color: #bfdbfe; }
 .markdown-section blockquote.fs-quote-soft { background: transparent; border-left: 4px solid var(--lc-border2); color: var(--lc-text2); font-style: italic; }
 .markdown-section blockquote.fs-quote-soft p { color: var(--lc-text2); font-weight: 400; }
@@ -86,16 +88,16 @@ body.close .sidebar-toggle { width: auto; }
 /* dark.css 残留校准: 先清掉 #ddd 四边框与 #ccc 行线, 再落 zinc 边框（顺序敏感, 不可与下行对调） */
 .markdown-section td, .markdown-section th { border: none; }
 .markdown-section tr { border: none; }
-.markdown-section th { background: rgba(39,39,42,.5); color: var(--lc-text); border-bottom: 1px solid var(--lc-border); }
+.markdown-section th { background: var(--lc-surface-hover); color: var(--lc-text); border-bottom: 1px solid var(--lc-border); }
 .markdown-section td { border-bottom: 1px solid var(--lc-border); color: var(--lc-text-body); transition: background-color .15s ease; }
 .markdown-section tr:last-child td { border-bottom: none; }
-.markdown-section td code, .markdown-section th code { background: var(--lc-code-inline-bg) !important; color: #f9a8d4 !important; border-radius: 4px; font-variant-numeric: tabular-nums; }
+.markdown-section td code, .markdown-section th code { background: var(--lc-code-inline-bg) !important; color: var(--lc-pink-300) !important; border-radius: 4px; font-variant-numeric: tabular-nums; }
 
 /* 代码块（T4: 代码区 #0f172a slate-900, 全页最深表面; T3: 容器圆角 12px） */
 .markdown-section pre { background: var(--lc-code-bg) !important; border: 1px solid var(--lc-border); border-radius: 12px; }
-.markdown-section pre > code { color: #e4e4e7 !important; background: transparent !important; }
+.markdown-section pre > code { color: var(--lc-text-h3) !important; background: transparent !important; }
 /* T2: inline code 是全站唯一 pink 强调色, 与链接（blue 系）划清界限 */
-.markdown-section p code, .markdown-section li code { background: var(--lc-code-inline-bg) !important; color: #f9a8d4 !important; }
+.markdown-section p code, .markdown-section li code { background: var(--lc-code-inline-bg) !important; color: var(--lc-pink-300) !important; }
 
 /* T14: 代码卡 chrome —— 三点头 + 文件名 + 语言徽标（DOM 由 index.html codechrome 注入） */
 .fs-codecard { border: 1px solid var(--lc-border); border-radius: 12px; overflow: hidden; margin: 1.2em 0; }
@@ -114,7 +116,7 @@ body.close .sidebar-toggle { width: auto; }
 /* 提示/警告 —— dark.css 的 p.tip 是亮底 #f8f8f8 + #f66 红条, 特异性 (0,2,1) 需同形覆盖 */
 .markdown-section p.tip { background: var(--lc-card); border-left-color: var(--lc-blue); }
 .markdown-section p.tip:before { background: var(--lc-blue); color: var(--lc-bg1); }
-.markdown-section p.tip code { background: var(--lc-code-inline-bg); color: #f9a8d4; }
+.markdown-section p.tip code { background: var(--lc-code-inline-bg); color: var(--lc-pink-300); }
 .markdown-section p.tip em { color: var(--lc-text2); }
 .markdown-section p.warn { background: rgba(245,158,11,.08); }
 
@@ -124,8 +126,8 @@ body.close .sidebar-toggle { width: auto; }
 .cover .cover-main blockquote { color: var(--lc-text2); border: none; background: transparent; }
 .cover .cover-main a { color: var(--lc-text); border: 1px solid var(--lc-border2); background: rgba(255,255,255,.04); border-radius: 8px; }
 .cover .cover-main a:hover { border-color: var(--lc-blue); color: var(--lc-blue-300); }
-.cover .cover-main a.fs-cta { background: #fafafa; border-color: #fafafa; color: #09090b; font-weight: 600; }
-.cover .cover-main a.fs-cta:hover { background: #e4e4e7; color: #09090b; }
+.cover .cover-main a.fs-cta { background: var(--lc-text); border-color: var(--lc-text); color: var(--lc-bg0); font-weight: 600; }
+.cover .cover-main a.fs-cta:hover { background: var(--lc-text-h3); color: var(--lc-bg0); }
 
 /* GitHub 角标弱化 */
 .gh-corner, .github-corner { opacity: .5; }
@@ -143,7 +145,7 @@ body.close .sidebar-toggle { width: auto; }
 .markdown-section a:hover { color: var(--lc-blue-300); text-decoration-color: var(--lc-blue-300); }
 
 /* T12: 分割线两端消隐 */
-.markdown-section hr { border: none; height: 1px; background: linear-gradient(to right, transparent, #3f3f46, transparent); }
+.markdown-section hr { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--lc-border2), transparent); }
 
 /* 标题锚点 # 符号: dark.css #c8c8c8 → text3 */
 .anchor span { color: var(--lc-text3); }
