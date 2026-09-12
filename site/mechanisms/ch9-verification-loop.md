@@ -119,6 +119,12 @@ direction: higher 或 lower（根据指标语义推断）
 
 顺带一提，迭代运行中你随时可以插话纠正（「vendor 目录别动」「上次这类改动会导致 flaky」）——纠正写入 `.plan/loop-memory.md`，不打断当前轮，从下一轮开始生效。这条 on-the-loop 异步通道区别于全站其他阻断式确认点: in-the-loop 改变当前轮（停下等你），on-the-loop 改变未来轮（异步生效）; 且 durable-vs-oneoff 判别同样适用——只对本次任务有效的纠正不写 loop-memory（`stage55-iteration.md:64-74`）。
 
+这条纪律画成一条曲线最好懂——轨道赌注: 每次迭代是一枚有界尝试——冲多高由你, 落在哪由机械验证说了算:
+
+<div class="fs-replay" data-script="assets/scripts/ch9-track.json"></div>
+
+绿线只进不退: revert 的意义不是失败, 是失败不付费。
+
 ### Stage 5.7: 不让你停（Ralph Loop）
 
 如果 Stage 5.5 迭代用尽、且判定是「收敛中」或用户明确要强制继续，Stage 5.7 登场（`skills/flow-deep/SKILL.md:630-652`）。机制是 **Stop Hook 拦截会话退出**——每当模型想停下来，Hook 拦住，注入一份 prompt 强制继续。

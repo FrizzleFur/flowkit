@@ -4,6 +4,12 @@
 
 <div class="fs-budget"></div>
 
+把数字变成液位——同一套预算规则的另一种读法，看液面从 1 爬到安全顶格 3、在红旗处碰 4 临界、429 落地骤降回 2、再退避恢复稳 3 的全过程（点击播放，9 步自动演示）:
+
+<div class="fs-replay" data-script="assets/scripts/ch7-budget.json"></div>
+
+点破: 液面碰 4 的瞬间就是限流的瞬间。
+
 ## 怎么用（30 秒上手）
 
 - 说一句话就能触发: 「fan out subagents」「派团队深挖」「每个都深挖、别漏掉任何东西」——只读任务走 Fast Path 直接分发（`skills/multi-agent/SKILL.md:40-50`）

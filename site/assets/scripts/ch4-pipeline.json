@@ -28,7 +28,11 @@
       { "from": "s37", "to": "s4" },
       { "from": "s4", "to": "s5" },
       { "from": "s5", "to": "s58" }
-    ]
+    ],
+    "cruise": {
+      "intervalMs": 900,
+      "path": ["s-1", "s0", "s05", "s1", "s2", "s3", "s35", "s36", "s37", "s4", "s5", "s58"]
+    }
   },
   "messagesPanels": [
     { "id": "main", "title": "主会话" }

@@ -2,6 +2,14 @@
 
 > **一句话机制**: 上下文工程在 flow-deep 里是一套五层操作闭环——锚定（STATE.md 活记忆）、检测（脚本实测容量）、决策（四选项弹窗）、处置（压缩续命或交接换窗）、恢复（新会话直达断点）; 整套体系的出发点是一个物理事实: **模型感知不到自己的上下文占了多少**。
 
+**三条曲线, 同一个任务——**
+
+<div class="fs-replay" data-script="assets/scripts/ch8-threelines.json"></div>
+
+**三线分岔的那一刻, 就是 flowkit 存在的理由。**
+
+**接力细节: 一次 Auto Handoff 的完整链路——**
+
 <div class="fs-replay" data-script="assets/scripts/ch8-autohandoff.json"></div>
 
 **情景剧: 一次真实的断点与接手——**
@@ -22,7 +30,7 @@
 - `--no-auto-handoff` → 退出自动交接状态（会话中口头关闭等效）
 - 1M 窗口模型 → 检测命令加 `--window 1000000`（默认按 200K 窗口算百分比）
 
-顶部回放器演了一条完整链路: 边界告警 → 选「交接并记住自动」→ 五件套保存 → HANDOFF 交接 → 新会话从 Next Action 恢复（10 步），下文逐层拆解每步为什么。
+「接力细节」回放器演了一条完整链路: 边界告警 → 选「交接并记住自动」→ 五件套保存 → HANDOFF 交接 → 新会话从 Next Action 恢复（10 步），下文逐层拆解每步为什么。
 
 ## 为什么：五层操作体系逐层拆解
 
@@ -188,7 +196,7 @@ agent_hints:
 
 两个收尾细节: HANDOFF.md 是一次性文件，恢复完成后可删除（STATE.md 才是持久锚点）; STATE.md 里的 `Auto Handoff: enabled` 随恢复带入续接会话——偏好跨代继承，防每代重复弹窗，用户随时可口头关闭。多会话串扰的最后一道防线: spawn 后旧会话不再做 Guard 检测，check_context.py 的 mtime 竞争由 first_msg 核对 + `--session` 纠偏兜底。
 
-### 回放对照: 10 步 ↔ 协议
+### 回放对照: 10 步（接力细节） ↔ 协议
 
 顶部回放器 10 步与本章各层的对应: 步 1-2 检测层（边界实测 + first_msg 核对）/ 步 3-4 决策层（四选项 + 选 d 的 opt-in 语义）/ 步 5 锚定层（五件套保存，Next Action 写法）/ 步 6-8 交接（HANDOFF 薄指引 + spawn + 移交报告）/ 步 9-10 恢复协议（按序读三件套 + 从 Next Action 直达断点 + 偏好继承）。剧本里的百分比、代数、命令均可对照上文协议逐项核对。
 
