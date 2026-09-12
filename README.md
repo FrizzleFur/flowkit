@@ -4,7 +4,7 @@
 
 > AI 原生工作流编排工具集 —— 从任务分析到验证交付的结构化管道，75% 上下文自动交接让长任务跨会话不断线。
 
-**[English](README_EN.md)** | 中文
+**[English](README_EN.md)** | 中文 | **[交互教程站](http://michaelMaoMao.github.io/flowkit/)**——机制原理 11 章 + 可交互演示（线上版）; 仓内 [site/](site/) 为源码（本地预览 `cd site && python3 -m http.server`）
 
 ![FlowKit multi-agent tmux 实录](docs/images/multi-agent-tmux.jpg)
 

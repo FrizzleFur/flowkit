@@ -1,0 +1,22 @@
+/* fs-replay 剧本回放器样式 */
+.fs-replay { border: 1px solid #dfe3ea; border-radius: 10px; margin: 1.2em 0; background: #fff; overflow: hidden; }
+.fs-replay-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 14px; border-bottom: 1px solid #dfe3ea; background: #f5f7fa; }
+.fs-replay-title { font-weight: 600; color: #0f62be; font-size: 14px; }
+.fs-replay-ctrl { display: flex; gap: 6px; align-items: center; }
+.fs-replay-speed { border: 1px solid #dfe3ea; border-radius: 6px; padding: 3px 6px; font-size: 13px; background: #fff; }
+.fs-replay-stage { max-height: 420px; overflow-y: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.fs-msg { display: flex; gap: 10px; align-items: flex-start; }
+.fs-msg-role { flex: 0 0 64px; font-size: 12px; text-align: center; padding: 3px 0; border-radius: 5px; background: #e8ecf2; color: #4a5261; }
+.fs-user .fs-msg-role { background: #eaf2fc; color: #0f62be; }
+.fs-assistant .fs-msg-role { background: #e9f6ee; color: #198038; }
+.fs-tool_call .fs-msg-role, .fs-tool_result .fs-msg-role { background: #fff4e8; color: #9a5b00; }
+.fs-system .fs-msg-role { background: #fdecea; color: #da1e28; }
+.fs-msg-body { flex: 1; min-width: 0; }
+.fs-msg-pre { margin: 0; background: #f8fafc; border: 1px solid #eceff4; border-radius: 8px; padding: 8px 10px; font-size: 12.5px; white-space: pre-wrap; word-break: break-word; }
+.fs-msg-note { font-size: 12.5px; color: #9a5b00; background: #fff8ee; border-left: 3px solid #ff832b; border-radius: 0 6px 6px 0; padding: 6px 10px; margin-left: 74px; }
+.fs-replay-err { color: #da1e28; font-size: 13px; padding: 12px 14px; }
+.fs-btn { border: 1px solid #dfe3ea; background: #fff; border-radius: 6px; padding: 4px 12px; font-size: 13px; cursor: pointer; color: #1a1f27; }
+.fs-btn:hover:not(:disabled) { border-color: #0f62be; color: #0f62be; }
+.fs-btn:disabled { opacity: .55; cursor: default; }
+.fs-btn-primary { background: #0f62be; border-color: #0f62be; color: #fff; }
+.fs-btn-primary:hover:not(:disabled) { color: #fff; opacity: .9; }

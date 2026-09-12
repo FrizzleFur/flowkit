@@ -1,0 +1,55 @@
+{
+  "title": "一次 Auto Handoff 全链路：告警、checkpoint、交接与恢复（支付网关重构）",
+  "steps": [
+    {
+      "role": "tool_call",
+      "content": "[Stage 4 · Phase 2 完成边界] python3 ~/.claude/skills/flow-deep/scripts/check_context.py --threshold 70",
+      "annotation": "检测发生在每个 Stage/Phase 完成点，不在任务中途——边界处存档最完整，打断成本最低。模型无法自感 context 占用，百分比必须外置给脚本实测。"
+    },
+    {
+      "role": "tool_result",
+      "content": "context_pct=71.8 tokens_used=143600 window=200000 threshold=70 exceeded=true session=9f2c...e1.jsonl mtime=16:42:07 first_msg=重构支付网关：统一幂等与超时",
+      "annotation": "真值原理：取本会话 transcript 最后一条 usage（input+cache_read+cache_creation+output 四项之和）除以窗口。first_msg 摘要用于并行多会话时核对没读错文件——发现不符可用 --session 纠偏。exit code=1 表示超阈值，进入弹窗。"
+    },
+    {
+      "role": "assistant",
+      "content": "容量实测 71.8%（> 70% 阈值）。请选择：\na) 保存并继续——更新 STATE/progress 后按压缩矩阵续命\nb) 保存并交接——五件套 + HANDOFF.md，开新会话\nc) 跳过——本阶段收尾很快，不存档\nd) 交接并记住自动——执行 b，且后续边界达 75% 免弹窗直接交接",
+      "annotation": "弹窗决策先于压缩：先问「要不要换窗」，选不换才按矩阵压缩。同一 Stage 边界最多弹一次（节流），不打扰正在收尾的会话。"
+    },
+    {
+      "role": "user",
+      "content": "d",
+      "annotation": "自动交接必须显式 opt-in 进入，不做全局默认——这是设计宪法第 4 条 2026-08-28 的修订决议（原为只询问不自动）。控制权语义：自动化的入口 = 用户做选择的时刻。"
+    },
+    {
+      "role": "assistant",
+      "content": "执行五件套保存：\n1. STATE.md——Stage: 4 / Phase: 3 / Next Action: 「运行 Phase 3 gateway.py 测试套件，修复 tests/test_gateway.py:47 的超时断言」\n2. progress.md——Phase 2 完成项 + 测试证据路径\n3. task_plan.md——Phase 2 标 completed\n4. findings.md——幂等键设计决策（新会话单读文件可还原脉络）\n5. spec.md——Success Criteria 3/5 达成，对账同步\n并写入：Auto Handoff: enabled（Handoff Count: 1/3）",
+      "annotation": "Next Action 的写法是关键约束：具体、可立即执行、不依赖读其他文件——接手的新会话第一眼看到的就是能直接动手的动作。第 5 步核对契约是交接时最有价值的对账：新会话由此知道验收标准是什么。"
+    },
+    {
+      "role": "system",
+      "content": "HANDOFF.md 已写入 .plan-feat-pay/HANDOFF.md 并在终端展示全文。骨架：任务一句话（详见 spec.md Goal Contract）/ 当前进度（已完成 Phase 1-2，进行中 Phase 3）/ 必读文件按序（STATE.md → task_plan.md → findings.md）/ 建议（TDD；blocker：幂等键长度上限待定）",
+      "annotation": "HANDOFF.md 刻意做薄：不复制五件套内容，只引导新 agent 按序去读——重复内容会随进度过期，路径引用不会。尾行警告：敏感信息勿写入，本文件会成为新会话的 prompt。"
+    },
+    {
+      "role": "tool_call",
+      "content": "tmux new-window -n \"handoff-pay-gateway-g1\" -c \"$PWD\" \"CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1 claude \\\"$(cat .plan-feat-pay/HANDOFF.md)\\\"\"",
+      "annotation": "三个关键点：PERSISTENCE 变量让嵌套启动的续接会话可被 --resume 追溯（v2.1.172+）；-c \"$PWD\" 显式锚定项目目录（tmux 新窗口默认目录未必对）；交互式窗口里权限提示可正常确认——这是选 tmux 而非 headless 的原因。无 tmux 时静默降级为打印这条命令，文件落盘即交付。"
+    },
+    {
+      "role": "system",
+      "content": "[旧会话] 移交报告：HANDOFF.md 位于 .plan-feat-pay/HANDOFF.md；新窗口 handoff-pay-gateway-g1；接力第 1/3 代。本会话停止接收新任务——旧窗口请手动关闭。",
+      "annotation": "会话不自杀：Claude Code 无安全自终止机制，旧会话的动作边界是「停止接收新任务 + 输出报告」。Handoff Count 上限默认 3 代（--handoff-max 调整），防无限接力环——上限的存在本身说明交接有损耗。75% 阈值留出了写文件与 spawn 的余量，始终跑在 auto-compact 之前。"
+    },
+    {
+      "role": "user",
+      "content": "[新窗口 handoff-pay-gateway-g1] 初始 prompt 即 HANDOFF.md 全文——你是接续上一个会话的 agent，按必读清单开始。",
+      "annotation": "HANDOFF.md 即新会话的初始 prompt，其「必读文件」清单自动触发恢复协议。新会话起始占用约 14%——换窗的意义：任务还在长跑，历史已经没用了。"
+    },
+    {
+      "role": "assistant",
+      "content": "按序读取：STATE.md（Stage 4 Phase 3，Next Action 如上）→ task_plan.md（Phase 3 完成标准）→ findings.md（幂等键决策）。\n「上次停在 Stage 4 Phase 2 完成。恢复还是重新开始？」\n[用户：恢复] → Stage 4 中断从 Phase Progress 继续（执行结果已 git commit，文件有账），直接执行 Next Action：运行 gateway.py 测试套件。Auto Handoff: enabled 已随 STATE.md 继承——下一个边界若实测 ≥ 75% 将免弹窗直接交接（接力 2/3）。HANDOFF.md 为一次性文件，恢复完成，可删除。",
+      "annotation": "恢复按中断 Stage 分路径：0-2 重做、3 重新规划、4 从 Phase Progress 继续、5 直接重新验证——笔记存得住结果，存不住思考过程，所以按「哪里还剩上下文」分流。偏好跨代继承防每代重复弹窗；STATE.md 才是持久锚点，HANDOFF.md 只是入口。"
+    }
+  ]
+}
