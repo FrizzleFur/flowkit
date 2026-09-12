@@ -40,6 +40,12 @@
 
 注意半自动定位: Agent 只出报告，**暂停展示、等用户确认**——裁决权不在 Agent 手里。
 
+对比实验: 同一份 plan 的两种审法——
+
+<div class="fs-replay" data-script="assets/scripts/ch6-sunkcost.json"></div>
+
+右侧新会话没有「我写的」包袱——这就是强制独立审查的全部理由。
+
 ### 第二层: Stage 3.6 —— Design Review Board
 
 3.5 消的是「自我偏袒」，但一个 Staff Engineer 再资深也只有一副眼镜。Stage 3.6 引入 Design Review Board 心智: 8 个专家角色目录（R01 架构 / R02 安全 / R03 性能 / R04 领域 / R05 运维 / R06 测试 / R07 前端 / R08 数据），各带五条专业审查维度（`skills/flow-deep/references/panel-review.md:42-53`）。

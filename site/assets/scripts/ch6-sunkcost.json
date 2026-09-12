@@ -1,0 +1,69 @@
+{
+  "title": "沉没成本 vs 独立审查——同一份 plan 的两种审法",
+  "version": 2,
+  "messagesPanels": [
+    { "id": "main", "title": "同一会话继续（沉没成本）" },
+    { "id": "child", "title": "全新会话审查（plan-reviewer）" }
+  ],
+  "steps": [
+    {
+      "title": "同一会话写下 400 行 plan",
+      "desc": "规划全烧在一个会话里: 任务书、逐模块阅读、每一步取舍——最终落盘 400 行 task_plan.md。看左侧 len: 6 条。上下文里现在全是「自己写的东西」, 这就是沉没成本在物理上的样子。",
+      "append": {
+        "main": [
+          { "role": "user", "label": "任务书: 设计多 Agent 编排管道" },
+          { "role": "assistant", "label": "规划: 拆 6 个 Phase, 覆盖 3+ 模块" },
+          { "role": "tool_call", "label": "Read: 现有架构 5 个模块" },
+          { "role": "tool_result", "label": "模块依赖图与约束清单" },
+          { "role": "assistant", "label": "取舍: 先并发后收敛——当时是这么权衡的" },
+          { "role": "final", "label": "task_plan.md 落盘: 400 行 / 6 Phase" }
+        ]
+      }
+    },
+    {
+      "title": "交给谁审查?",
+      "desc": "plan 写完了, 下一个问题: 谁来审? 最省事的答案是让同一个会话再读一遍——毕竟它最熟。但「最熟」恰恰是要警惕的: 自己查自己, 审查者与作者共享同一份上下文、同一个立场。"
+    },
+    {
+      "title": "路径 A: 同会话自查",
+      "desc": "路径 A 开始: 让原会话自己检查自己。看它追加的输出——每一条都在为自己的决策辩护:「划分合理」「取舍有理由」。这不是模型偷懒, 是思维惯性: 上下文里的每个字都在替这个方案作证, 它跳不出自己。",
+      "append": {
+        "main": [
+          { "role": "assistant", "label": "我再检查一遍: Phase 划分合理, 顺序没问题" },
+          { "role": "assistant", "label": "取舍也有理由——当初就是这么权衡的" }
+        ]
+      }
+    },
+    {
+      "title": "路径 B: 新会话冷读",
+      "desc": "路径 B 完全不同: 开一个全新会话, 只传一句 Staff Engineer 审查任务书。右侧 len 只有 1——没有那 400 行的写作过程, 没有任何「我写的」包袱, 零沉没成本起步。",
+      "append": {
+        "child": [
+          { "role": "user", "label": "你是陌生 Staff Engineer, 审查这份 plan" }
+        ]
+      }
+    },
+    {
+      "title": "B 发现两个未验证假设",
+      "desc": "陌生读者一眼盯上「Plan 假设验证」维度: 两个技术假设从未被验证过。惯性外视角抓住的, 恰恰是作者上下文里看不见的——写作越投入, 这些缝隙越隐形。",
+      "append": {
+        "child": [
+          { "role": "assistant", "label": "发现 2 个未验证假设: API 版本 / 并发上限" }
+        ]
+      }
+    },
+    {
+      "title": "A 的结局: 确认没问题",
+      "desc": "对照左侧: 同一会话的自查几乎总是走向「确认没问题」——不是能力不足, 是结构注定的: 被告兼任合议庭, 沉没成本替方案背书。同一份 plan, 两种审法, 结论分岔。"
+    },
+    {
+      "title": "制度化: Stage 3.5 强制独立审查",
+      "desc": "所以 Stage 3.5 把「换个脑子」写进管道: 强制启动 plan-reviewer 独立审查, 报告三态返回——NEEDS_REVISION 退回修改不是失败, 是资产: 每一个被抓出的未验证假设, 都是执行前拆掉的雷。",
+      "append": {
+        "child": [
+          { "role": "final", "label": "审查报告: NEEDS_REVISION → 退回 Stage 3" }
+        ]
+      }
+    }
+  ]
+}

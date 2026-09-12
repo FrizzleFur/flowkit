@@ -4,6 +4,12 @@
 
 <div class="fs-replay" data-script="assets/scripts/ch8-autohandoff.json"></div>
 
+**情景剧: 一次真实的断点与接手——**
+
+<div class="fs-replay" data-script="assets/scripts/ch8-recovery.json"></div>
+
+**看两面板 len: 新会话从 0 开始却无损继续——交接的是『状态』不是『历史』。**
+
 [原理篇第 2 章](../principles/ch2-context-three-axes.md)已经给了这套机制理论名分——Compaction、结构化笔记、子代理的「三板斧」坐标系，讲清了「为什么是这三个」。本章进入工程细节: 检测脚本怎么拿到真值、压缩矩阵何时压什么、交接的五件套逐项怎么落盘、新会话怎么从断点直达。主源是 `skills/flow-deep/references/context-management.md`（flow-deep 的「Stage X: 上下文管理详细指令」），本章每个操作都能在其中逐条对到。
 
 ## 怎么用（30 秒上手）

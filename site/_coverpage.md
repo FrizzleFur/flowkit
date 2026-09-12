@@ -8,3 +8,7 @@
 
 <a href="#/principles/ch1-agent-loop-and-pipeline">开始阅读</a>
 <a href="#/mechanisms/ch4-pipeline-overview">30 秒导览</a>
+
+<div class="fs-hero"></div>
+
+<p class="fs-hero-hint">pipeline in action——滚动至第 4 章查看完整 twelve-gate 演示</p>

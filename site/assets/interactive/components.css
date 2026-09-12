@@ -1,48 +1,48 @@
-/* FlowSite 通用交互组件样式（autodecide / switch / budget / johari 共用体系） */
-.fs-autodecide, .fs-switch, .fs-budget, .fs-johari { border: 1px solid #dfe3ea; border-radius: 10px; margin: 1.2em 0; background: #fff; padding: 14px 16px; }
-.fs-ad-intro, .fs-sw-intro, .fs-bd-intro, .fs-jh-intro { font-size: 13.5px; color: #4a5261; margin-bottom: 12px; }
+/* FlowSite 轻交互组件 — learncc zinc 深色主题对齐（2026-09-12 重制） */
+.fs-autodecide, .fs-switch, .fs-budget, .fs-johari { border: 1px solid #27272a; border-radius: 12px; margin: 1.2em 0; background: #131316; padding: 14px 16px; }
+.fs-ad-intro, .fs-sw-intro, .fs-bd-intro, .fs-jh-intro { font-size: 13.5px; color: #a1a1aa; margin-bottom: 12px; }
 
-/* autodecide */
-.fs-ad-bar { display: flex; justify-content: space-between; font-size: 13px; color: #0f62be; margin-bottom: 10px; }
-.fs-ad-finding { background: #f5f7fa; border: 1px solid #e3e8ef; border-radius: 8px; padding: 12px 14px; font-size: 14px; margin-bottom: 10px; }
+/* autodecide 判定游戏 */
+.fs-ad-bar { display: flex; justify-content: space-between; font-size: 13px; color: #93c5fd; margin-bottom: 10px; }
+.fs-ad-finding { background: #18181b; border: 1px solid #2c2c34; border-radius: 8px; padding: 12px 14px; font-size: 14px; color: #e4e4e7; margin-bottom: 10px; }
 .fs-ad-opts { display: flex; gap: 8px; flex-wrap: wrap; }
-.fs-opt-right { border-color: #198038 !important; color: #198038 !important; background: #e9f6ee !important; }
-.fs-opt-wrong { border-color: #da1e28 !important; color: #da1e28 !important; background: #fdecea !important; }
+.fs-opt-right { border-color: #10b981 !important; color: #6ee7b7 !important; background: rgba(16,185,129,.12) !important; }
+.fs-opt-wrong { border-color: #ef4444 !important; color: #fca5a5 !important; background: rgba(239,68,68,.12) !important; }
 .fs-ad-feedback { margin-top: 10px; border-radius: 8px; padding: 10px 12px; font-size: 13px; }
-.fs-fb-right { background: #e9f6ee; border: 1px solid #bfe3cc; }
-.fs-fb-wrong { background: #fff4e8; border: 1px solid #f3cf9f; }
+.fs-fb-right { background: rgba(16,185,129,.08); border: 1px solid #065f46; color: #6ee7b7; }
+.fs-fb-wrong { background: rgba(245,158,11,.08); border: 1px solid #92400e; color: #fcd34d; }
 .fs-fb-verdict { font-weight: 600; margin-bottom: 4px; }
-.fs-fb-why { color: #4a5261; }
-.fs-ad-done { font-size: 14px; font-weight: 600; margin: 8px 0; }
+.fs-fb-why { color: #a1a1aa; }
+.fs-ad-done { font-size: 14px; font-weight: 600; margin: 8px 0; color: #fafafa; }
 
-/* switch panel */
+/* switch 管道开关 */
 .fs-sw-ctrl { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 12px; }
-.fs-sw-param { font-size: 13px; font-family: ui-monospace, Menlo, monospace; cursor: pointer; }
-.fs-sw-pipe { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 12px; background: #f8fafc; border-radius: 8px; min-height: 52px; }
-.fs-sw-chip { background: #fff; border: 1px solid #0f62be; color: #0f62be; border-radius: 14px; padding: 3px 11px; font-size: 12.5px; }
-.fs-chip-must { border-style: dashed; border-color: #198038; color: #198038; }
-.fs-sw-arrow { color: #9aa4b2; font-size: 12px; }
-.fs-sw-empty { font-size: 13px; color: #da1e28; }
-.fs-sw-note { margin-top: 10px; font-size: 12.5px; font-family: ui-monospace, Menlo, monospace; color: #4a5261; background: #f5f7fa; padding: 8px 10px; border-radius: 6px; word-break: break-all; }
+.fs-sw-param { font-size: 13px; font-family: ui-monospace, Menlo, monospace; cursor: pointer; color: #e4e4e7; }
+.fs-sw-pipe { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 12px; background: #101014; border-radius: 8px; min-height: 52px; }
+.fs-sw-chip { background: transparent; border: 1px solid #3b82f6; color: #93c5fd; border-radius: 14px; padding: 3px 11px; font-size: 12.5px; }
+.fs-chip-must { border-style: dashed; border-color: #10b981; color: #6ee7b7; }
+.fs-sw-arrow { color: #52525b; font-size: 12px; }
+.fs-sw-empty { font-size: 13px; color: #fca5a5; }
+.fs-sw-note { margin-top: 10px; font-size: 12.5px; font-family: ui-monospace, Menlo, monospace; color: #a1a1aa; background: #18181b; padding: 8px 10px; border-radius: 6px; word-break: break-all; border: 1px solid #27272a; }
 
-/* budget 429 */
+/* budget 429 计算器 */
 .fs-bd-box { display: flex; flex-direction: column; gap: 10px; }
 .fs-bd-step { display: flex; align-items: center; gap: 10px; }
-.fs-bd-lab { flex: 0 0 150px; font-size: 13.5px; }
+.fs-bd-lab { flex: 0 0 150px; font-size: 13.5px; color: #e4e4e7; }
 .fs-bd-btn { width: 34px; padding: 4px 0; text-align: center; }
-.fs-bd-num { min-width: 28px; text-align: center; font-weight: 600; font-size: 15px; }
+.fs-bd-num { min-width: 28px; text-align: center; font-weight: 600; font-size: 15px; color: #fafafa; }
 .fs-bd-out { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-top: 6px; }
-.fs-bd-cap { font-size: 13px; color: #4a5261; }
-.fs-bd-total { font-size: 34px; font-weight: 700; }
-.fs-bd-eq { font-size: 13px; color: #4a5261; font-family: ui-monospace, Menlo, monospace; }
+.fs-bd-cap { font-size: 13px; color: #a1a1aa; }
+.fs-bd-total { font-size: 34px; font-weight: 700; color: #fafafa; }
+.fs-bd-eq { font-size: 13px; color: #a1a1aa; font-family: ui-monospace, Menlo, monospace; }
 .fs-bd-verdict { font-size: 13.5px; font-weight: 600; }
-.fs-bd-ok { color: #198038; } .fs-bd-warn { color: #ff832b; } .fs-bd-bad { color: #da1e28; }
-.fs-bd-note { margin-top: 10px; font-size: 12.5px; color: #9a5b00; }
+.fs-bd-ok { color: #34d399; } .fs-bd-warn { color: #fbbf24; } .fs-bd-bad { color: #f87171; }
+.fs-bd-note { margin-top: 10px; font-size: 12.5px; color: #a1a1aa; }
 
-/* johari */
-.fs-jh-card { border: 1px solid #e3e8ef; border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; }
-.fs-jh-text { font-size: 14px; margin-bottom: 8px; }
+/* johari 象限演示 */
+.fs-jh-card { border: 1px solid #2c2c34; border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; background: #18181b; }
+.fs-jh-text { font-size: 14px; color: #e4e4e7; margin-bottom: 8px; }
 .fs-jh-opts { display: flex; gap: 8px; flex-wrap: wrap; }
 .fs-jh-fb { margin-top: 8px; font-size: 13px; border-radius: 6px; padding: 8px 10px; }
-.fs-jh-why { color: #4a5261; }
-.fs-jh-note { font-size: 12.5px; color: #9a5b00; }
+.fs-jh-why { color: #a1a1aa; }
+.fs-jh-note { font-size: 12.5px; color: #a1a1aa; }

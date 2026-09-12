@@ -1,0 +1,65 @@
+/* theme-learncc.css — 全站 zinc 深色主题对齐层（实测 learn.shareai.run 色板 2026-09-12）
+ * 色板: bg0 #09090b · bg1 #18181b · card #131316 · border #27272a/#3f3f46
+ *       text #fafafa · text2 #a1a1aa · text3 #71717a · accent #3b82f6
+ * 作用: 叠在 docsify dark.css 之上，把基调从「docsify 暗」校准到「learncc 锌」
+ */
+:root {
+  --lc-bg0: #09090b; --lc-bg1: #18181b; --lc-card: #131316;
+  --lc-border: #27272a; --lc-border2: #3f3f46;
+  --lc-text: #fafafa; --lc-text2: #a1a1aa; --lc-text3: #71717a;
+  --lc-blue: #3b82f6; --lc-emerald: #10b981; --lc-amber: #f59e0b; --lc-red: #ef4444; --lc-purple: #a855f7;
+}
+body { background: var(--lc-bg0); color: var(--lc-text2); }
+h1, h2, h3, h4 { color: var(--lc-text); font-weight: 700; }
+h1 code, h2 code, h3 code { background: transparent !important; color: inherit !important; }
+a { color: var(--lc-blue); }
+a:hover { color: #93c5fd; }
+p, li, td, th { color: var(--lc-text2); }
+strong, b { color: var(--lc-text); }
+
+/* 侧栏 */
+.sidebar { background: var(--lc-bg1) !important; border-right: 1px solid var(--lc-border) !important; }
+.sidebar ul li a { color: var(--lc-text2) !important; font-size: 14px; }
+.sidebar ul li.active > a, .sidebar ul li a:hover { color: var(--lc-text) !important; border-right-color: var(--lc-blue) !important; }
+.sidebar > h1 { color: var(--lc-text) !important; }
+.search input { background: var(--lc-bg0) !important; border: 1px solid var(--lc-border) !important; color: var(--lc-text) !important; }
+.search .results-panel { background: var(--lc-bg1) !important; border-color: var(--lc-border) !important; }
+
+/* 正文容器 */
+.content { background: var(--lc-bg0); }
+.markdown-section { max-width: 900px; }
+.markdown-section h1, .markdown-section h2 { border-bottom: 1px solid var(--lc-border); padding-bottom: .4em; }
+.markdown-section blockquote { border-left: 3px solid var(--lc-blue); background: #0f1a33; color: #93b4ff; border-radius: 0 8px 8px 0; }
+.markdown-section blockquote p { color: #93b4ff; }
+
+/* 表格（SC5 锚点表等）——learncc 卡片语法 */
+.markdown-section table { border-collapse: separate; border-spacing: 0; background: var(--lc-card); border: 1px solid var(--lc-border); border-radius: 10px; overflow: hidden; }
+.markdown-section th { background: #1a1a1e; color: var(--lc-text); border-bottom: 1px solid var(--lc-border); }
+.markdown-section td { border-bottom: 1px solid #1e1e22; color: var(--lc-text2); }
+.markdown-section tr:last-child td { border-bottom: none; }
+.markdown-section td code, .markdown-section th code { background: #26262c !important; color: #93c5fd !important; border-radius: 4px; }
+
+/* 代码块 */
+.markdown-section pre { background: #101014 !important; border: 1px solid var(--lc-border); border-radius: 10px; }
+.markdown-section pre > code { color: #e4e4e7 !important; background: transparent !important; }
+.markdown-section p code, .markdown-section li code { background: #26262c !important; color: #93c5fd !important; }
+
+/* 提示/警告 */
+.markdown-section .tip, .markdown-section .warn { background: var(--lc-card); }
+
+/* 封面 */
+.cover { background: linear-gradient(160deg, #09090b 0%, #10101a 55%, #172554 100%) !important; color: var(--lc-text); }
+.cover .cover-main h1 { color: var(--lc-text); }
+.cover .cover-main blockquote { color: var(--lc-text2); border: none; background: transparent; }
+.cover .cover-main a { color: var(--lc-text); border: 1px solid var(--lc-border2); background: rgba(255,255,255,.04); border-radius: 8px; }
+.cover .cover-main a:hover { border-color: var(--lc-blue); color: #93c5fd; }
+.cover .cover-main p:last-child a:last-child { background: var(--lc-blue); border-color: var(--lc-blue); color: #fff; }
+.cover .cover-main p:last-child a:last-child:hover { background: #2563eb; color: #fff; }
+
+/* GitHub 角标弱化 */
+.gh-corner, .github-corner { opacity: .5; }
+
+/* 滚动条 */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--lc-border2); border-radius: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
