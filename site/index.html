@@ -32,6 +32,39 @@
           hook.doneEach(function () {
             if (window.FlowSite && window.FlowSite.initAll) window.FlowSite.initAll();
           });
+        },
+        function (hook) {
+          // T14 代码卡 chrome: 为每个 prose pre 包 .fs-codecard（macOS 三点头 + 可选文件名 + 语言徽标;
+          // sh/bash 系自动绿标 terminal; 文件名由 md 侧 data-filename 提供, learncc「文件感」语法）
+          hook.doneEach(function () {
+            document.querySelectorAll('.markdown-section pre').forEach(function (pre) {
+              if (pre.getAttribute('data-fs-chrome')) return;
+              pre.setAttribute('data-fs-chrome', '1');
+              var code = pre.querySelector('code');
+              var m = code ? /lang-([\w-]+)/.exec(code.className) : null;
+              var lang = m ? m[1] : '';
+              var sh = lang === 'sh' || lang === 'bash' || lang === 'shell' || lang === 'console';
+              var card = document.createElement('div');
+              card.className = 'fs-codecard';
+              var head = document.createElement('div');
+              head.className = 'fs-codehead';
+              head.innerHTML = '<span class="fs-codedots"><i></i><i></i><i></i></span>';
+              var fname = pre.getAttribute('data-filename');
+              if (fname) {
+                var f = document.createElement('span');
+                f.className = 'fs-codefile';
+                f.textContent = fname;
+                head.appendChild(f);
+              }
+              var badge = document.createElement('span');
+              badge.className = 'fs-codelang' + (sh ? ' fs-lang-sh' : '');
+              badge.textContent = sh ? 'terminal' : (lang || 'text');
+              head.appendChild(badge);
+              pre.parentNode.insertBefore(card, pre);
+              card.appendChild(head);
+              card.appendChild(pre);
+            });
+          });
         }
       ]
     };

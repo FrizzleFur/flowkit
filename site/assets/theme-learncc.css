@@ -1,56 +1,120 @@
 /* theme-learncc.css — 全站 zinc 深色主题对齐层（实测 learn.shareai.run 色板 2026-09-12）
- * 色板: bg0 #09090b · bg1 #18181b · card #131316 · border #27272a/#3f3f46
- *       text #fafafa · text2 #a1a1aa · text3 #71717a · accent #3b82f6
+ * 色板: bg0 #09090b · bg1 #18181b · border #27272a/#3f3f46
+ *       text #fafafa · text-body #d4d4d8(zinc-300 正文) · text2 #a1a1aa(zinc-400 meta) · text3 #71717a
+ *       代码区 #0f172a(slate-900) · inline code 底 #27272a
  * 作用: 叠在 docsify dark.css 之上，把基调从「docsify 暗」校准到「learncc 锌」
+ * 五态语义系（G1）: 每色 5 个衍生态 —— 实色 / -300 亮字 / -900-30 暗 badge 底 / -border-30 / -border-60
+ *   九域（pathview A-I）: blue yellow violet pink green cyan red teal orange
+ *   芯片补充（replay 消息）: emerald amber —— 共 11 色 × 5 token
  */
 :root {
-  --lc-bg0: #09090b; --lc-bg1: #18181b; --lc-card: #131316;
+  --lc-bg0: #09090b; --lc-bg1: #18181b; --lc-card: #18181b;
   --lc-border: #27272a; --lc-border2: #3f3f46;
-  --lc-text: #fafafa; --lc-text2: #a1a1aa; --lc-text3: #71717a;
-  --lc-blue: #3b82f6; --lc-emerald: #10b981; --lc-amber: #f59e0b; --lc-red: #ef4444; --lc-purple: #a855f7;
+  --lc-text: #fafafa; --lc-text-body: #d4d4d8; --lc-text2: #a1a1aa; --lc-text3: #71717a;
+  --lc-link: #60a5fa; --lc-link-deco: rgba(96,165,250,.4);
+  --lc-code-bg: #0f172a; --lc-code-inline-bg: #27272a;
+  --lc-blue: #3b82f6;    --lc-blue-300: #93c5fd;    --lc-blue-900-30: rgba(30,58,138,.3);    --lc-blue-border-30: rgba(59,130,246,.3);    --lc-blue-border-60: rgba(59,130,246,.6);
+  --lc-emerald: #10b981; --lc-emerald-300: #6ee7b7; --lc-emerald-900-30: rgba(6,78,59,.3);   --lc-emerald-border-30: rgba(16,185,129,.3); --lc-emerald-border-60: rgba(16,185,129,.6);
+  --lc-amber: #f59e0b;   --lc-amber-300: #fcd34d;   --lc-amber-900-30: rgba(120,53,15,.3);   --lc-amber-border-30: rgba(245,158,11,.3);   --lc-amber-border-60: rgba(245,158,11,.6);
+  --lc-red: #ef4444;     --lc-red-300: #fca5a5;     --lc-red-900-30: rgba(127,29,29,.3);     --lc-red-border-30: rgba(239,68,68,.3);      --lc-red-border-60: rgba(239,68,68,.6);
+  --lc-purple: #8b5cf6;  --lc-purple-300: #c4b5fd;  --lc-purple-900-30: rgba(76,29,149,.3);  --lc-purple-border-30: rgba(139,92,246,.3);  --lc-purple-border-60: rgba(139,92,246,.6);
+  --lc-yellow: #eab308;  --lc-yellow-300: #fde047;  --lc-yellow-900-30: rgba(113,63,18,.3);  --lc-yellow-border-30: rgba(234,179,8,.3);   --lc-yellow-border-60: rgba(234,179,8,.6);
+  --lc-pink: #ec4899;    --lc-pink-300: #f9a8d4;    --lc-pink-900-30: rgba(131,24,67,.3);    --lc-pink-border-30: rgba(236,72,153,.3);    --lc-pink-border-60: rgba(236,72,153,.6);
+  --lc-green: #22c55e;   --lc-green-300: #86efac;   --lc-green-900-30: rgba(20,83,45,.3);    --lc-green-border-30: rgba(34,197,94,.3);    --lc-green-border-60: rgba(34,197,94,.6);
+  --lc-cyan: #06b6d4;    --lc-cyan-300: #67e8f9;    --lc-cyan-900-30: rgba(22,78,99,.3);     --lc-cyan-border-30: rgba(6,182,212,.3);     --lc-cyan-border-60: rgba(6,182,212,.6);
+  --lc-teal: #14b8a6;    --lc-teal-300: #5eead4;    --lc-teal-900-30: rgba(19,78,74,.3);     --lc-teal-border-30: rgba(20,184,166,.3);    --lc-teal-border-60: rgba(20,184,166,.6);
+  --lc-orange: #f97316;  --lc-orange-300: #fdba74;  --lc-orange-900-30: rgba(124,45,18,.3);  --lc-orange-border-30: rgba(249,115,22,.3);  --lc-orange-border-60: rgba(249,115,22,.6);
 }
-body { background: var(--lc-bg0); color: var(--lc-text2); }
+body { background: var(--lc-bg0); color: var(--lc-text-body); }
 h1, h2, h3, h4, h5, h6 { color: var(--lc-text); font-weight: 700; }
 h1 code, h2 code, h3 code { background: transparent !important; color: inherit !important; }
-a { color: var(--lc-blue); }
-a:hover { color: #93c5fd; }
-p, li, td, th { color: var(--lc-text2); }
+a { color: var(--lc-link); transition: color .15s ease, background-color .15s ease, border-color .15s ease; }
+a:hover { color: var(--lc-blue-300); }
+p, li, td, th { color: var(--lc-text-body); }
 strong, b { color: var(--lc-text); }
 
-/* 侧栏 */
-.sidebar { background: var(--lc-bg1) !important; border-right: 1px solid var(--lc-border) !important; }
-.sidebar ul li a { color: var(--lc-text2) !important; font-size: 14px; }
-.sidebar ul li.active > a, .sidebar ul li a:hover { color: var(--lc-text) !important; border-right-color: var(--lc-blue) !important; }
+/* 侧栏（T13: 224px = learncc w-56; T9: active 底块 + hover 表面微亮 + 150ms 过渡）
+ * dark.css 侧栏几何是 300px 一族（sidebar/content/toggle/close transform 四处联动）, 须成组覆盖 */
+.sidebar { background: var(--lc-bg1) !important; border-right: 1px solid var(--lc-border) !important; width: 224px !important; }
+.content { left: 224px; background: var(--lc-bg0); }
+.sidebar-toggle { background-color: transparent; width: 224px; }
+.sidebar-toggle span { background-color: var(--lc-text3); }
+body.close .sidebar { transform: translateX(-224px); }
+body.close .sidebar-toggle { width: auto; }
+.sidebar ul li a { color: var(--lc-text2) !important; font-size: 14px; padding: 2px 10px; border-radius: 6px; text-decoration: none; transition: color .15s ease, background-color .15s ease; }
+.sidebar ul li a:hover { color: var(--lc-text) !important; background: rgba(39,39,42,.5); text-decoration: none; }
+.sidebar ul li.active > a { color: var(--lc-text) !important; background: #27272a; font-weight: 500; }
 .sidebar > h1 { color: var(--lc-text) !important; font-weight: 600; }
 .search input { background: var(--lc-bg0) !important; border: 1px solid var(--lc-border) !important; color: var(--lc-text) !important; }
 .search .results-panel { background: var(--lc-bg1) !important; border-color: var(--lc-border) !important; }
+@media screen and (max-width: 768px) {
+  .sidebar { left: -224px; }
+  body.close .sidebar { transform: translateX(224px); }
+  body.close .content { transform: translateX(224px); }
+  body.close .sidebar-toggle { width: auto; }
+}
 
-/* 正文容器 */
-.content { background: var(--lc-bg0); }
-.markdown-section { max-width: 900px; }
-.markdown-section h1, .markdown-section h2 { border-bottom: 1px solid var(--lc-border); padding-bottom: .4em; }
-.markdown-section blockquote { border-left: 3px solid var(--lc-blue); background: #0f1a33; color: #93b4ff; border-radius: 0 8px 8px 0; }
-.markdown-section blockquote p { color: #93b4ff; }
+/* 正文容器（T5: 阅读列 768px = learncc max-w-3xl） */
+.markdown-section { max-width: 768px; animation: fs-pagein .35s ease; }
+@keyframes fs-pagein { from { opacity: 0; transform: translateY(8px); } }
+/* T6: 仅 h2 带分隔线, 章题 h1 靠 header 组合建立身份 */
+.markdown-section h2 { border-bottom: 1px solid var(--lc-border); padding-bottom: .4em; }
+/* T7: 标题内部半档降 —— h3 zinc-200 / h4 zinc-300·15px */
+.markdown-section h3 { color: #e4e4e7; }
+.markdown-section h4 { color: #d4d4d8; font-size: 15px; font-weight: 600; }
+/* T10: 普通引用回归 indigo 系（blue 渐变位让给 hero-callout） */
+.markdown-section blockquote { border-left: 3px solid #6366f1; background: rgba(99,102,241,.1); color: #c7d2fe; border-radius: 0 8px 8px 0; padding: 10px 16px 10px 20px; }
+.markdown-section blockquote p { color: #c7d2fe; }
+/* S6/G3: 引用三档之二 —— hero-callout 金句卡（渐变底 + 左 4px blue→emerald 竖条）
+ * 与 fs-quote-soft（说明引用, 弱档）分工; md 侧按 class 挂载 */
+.markdown-section .fs-callout { position: relative; border: none; border-radius: 12px; background: linear-gradient(135deg, #172554, #052e16); color: #93c5fd; padding: 14px 18px; }
+.markdown-section .fs-callout::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; border-radius: 12px 0 0 12px; background: linear-gradient(180deg, #3b82f6, #10b981); }
+.markdown-section .fs-callout p { color: #93c5fd; font-weight: 400; }
+.markdown-section .fs-callout strong, .markdown-section .fs-callout b { color: #bfdbfe; }
+.markdown-section blockquote.fs-quote-soft { background: transparent; border-left: 4px solid var(--lc-border2); color: var(--lc-text2); font-style: italic; }
+.markdown-section blockquote.fs-quote-soft p { color: var(--lc-text2); font-weight: 400; }
+/* S6/S15: 上下章导航行（border-t + 两端对齐）; md 侧箭头包 <span class="fs-arrow"> 获得位移微动效 */
+.fs-prevnext { border-top: 1px solid var(--lc-border); margin-top: 2.4em; padding-top: 24px; display: flex; justify-content: space-between; gap: 12px; }
+.fs-prevnext a { color: var(--lc-text2) !important; text-decoration: none; }
+.fs-prevnext a:hover { color: var(--lc-text) !important; }
+.fs-prevnext .fs-arrow { display: inline-block; transition: transform .15s ease; }
+.fs-prevnext a.fs-nav-next:hover .fs-arrow { transform: translateX(4px); }
+.fs-prevnext a.fs-nav-prev:hover .fs-arrow { transform: translateX(-4px); }
 
-/* 表格（SC5 锚点表等）——learncc 卡片语法 */
-.markdown-section table { border-collapse: separate; border-spacing: 0; background: var(--lc-card); border: 1px solid var(--lc-border); border-radius: 10px; overflow: hidden; }
+/* 表格（SC5 锚点表等）——learncc 卡片语法（T3: 容器圆角 12px; T4: 表面收敛 zinc 阶） */
+.markdown-section table { border-collapse: separate; border-spacing: 0; background: var(--lc-card); border: 1px solid var(--lc-border); border-radius: 12px; overflow: hidden; }
 /* dark.css 残留校准: 先清掉 #ddd 四边框与 #ccc 行线, 再落 zinc 边框（顺序敏感, 不可与下行对调） */
 .markdown-section td, .markdown-section th { border: none; }
 .markdown-section tr { border: none; }
-.markdown-section th { background: #1a1a1e; color: var(--lc-text); border-bottom: 1px solid var(--lc-border); }
-.markdown-section td { border-bottom: 1px solid #1e1e22; color: var(--lc-text2); }
+.markdown-section th { background: rgba(39,39,42,.5); color: var(--lc-text); border-bottom: 1px solid var(--lc-border); }
+.markdown-section td { border-bottom: 1px solid var(--lc-border); color: var(--lc-text-body); transition: background-color .15s ease; }
 .markdown-section tr:last-child td { border-bottom: none; }
-.markdown-section td code, .markdown-section th code { background: #26262c !important; color: #93c5fd !important; border-radius: 4px; }
+.markdown-section td code, .markdown-section th code { background: var(--lc-code-inline-bg) !important; color: #f9a8d4 !important; border-radius: 4px; font-variant-numeric: tabular-nums; }
 
-/* 代码块 */
-.markdown-section pre { background: #101014 !important; border: 1px solid var(--lc-border); border-radius: 10px; }
+/* 代码块（T4: 代码区 #0f172a slate-900, 全页最深表面; T3: 容器圆角 12px） */
+.markdown-section pre { background: var(--lc-code-bg) !important; border: 1px solid var(--lc-border); border-radius: 12px; }
 .markdown-section pre > code { color: #e4e4e7 !important; background: transparent !important; }
-.markdown-section p code, .markdown-section li code { background: #26262c !important; color: #93c5fd !important; }
+/* T2: inline code 是全站唯一 pink 强调色, 与链接（blue 系）划清界限 */
+.markdown-section p code, .markdown-section li code { background: var(--lc-code-inline-bg) !important; color: #f9a8d4 !important; }
+
+/* T14: 代码卡 chrome —— 三点头 + 文件名 + 语言徽标（DOM 由 index.html codechrome 注入） */
+.fs-codecard { border: 1px solid var(--lc-border); border-radius: 12px; overflow: hidden; margin: 1.2em 0; }
+.fs-codehead { display: flex; align-items: center; gap: 10px; padding: 7px 12px; background: var(--lc-bg1); border-bottom: 1px solid var(--lc-border); }
+.fs-codedots { display: inline-flex; gap: 6px; flex: 0 0 auto; }
+.fs-codedots i { width: 10px; height: 10px; border-radius: 50%; opacity: .7; }
+.fs-codedots i:nth-child(1) { background: var(--lc-red); }
+.fs-codedots i:nth-child(2) { background: var(--lc-yellow); }
+.fs-codedots i:nth-child(3) { background: var(--lc-green); }
+.fs-codefile { font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: var(--lc-text2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fs-codelang { margin-left: auto; flex: 0 0 auto; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; line-height: 1; padding: 3px 7px; border-radius: 4px; background: var(--lc-blue); color: #fff; }
+.fs-codelang.fs-lang-sh { background: var(--lc-emerald); }
+.fs-codecard > pre { margin: 0 !important; border: none !important; border-radius: 0 !important; }
+.fs-codecard pre:after { display: none; } /* dark.css 自带 data-lang 角标, 与徽标二选一 */
 
 /* 提示/警告 —— dark.css 的 p.tip 是亮底 #f8f8f8 + #f66 红条, 特异性 (0,2,1) 需同形覆盖 */
 .markdown-section p.tip { background: var(--lc-card); border-left-color: var(--lc-blue); }
 .markdown-section p.tip:before { background: var(--lc-blue); color: var(--lc-bg1); }
-.markdown-section p.tip code { background: #26262c; color: #93c5fd; }
+.markdown-section p.tip code { background: var(--lc-code-inline-bg); color: #f9a8d4; }
 .markdown-section p.tip em { color: var(--lc-text2); }
 .markdown-section p.warn { background: rgba(245,158,11,.08); }
 
@@ -59,7 +123,7 @@ strong, b { color: var(--lc-text); }
 .cover .cover-main h1 { color: var(--lc-text); font-weight: 700; }
 .cover .cover-main blockquote { color: var(--lc-text2); border: none; background: transparent; }
 .cover .cover-main a { color: var(--lc-text); border: 1px solid var(--lc-border2); background: rgba(255,255,255,.04); border-radius: 8px; }
-.cover .cover-main a:hover { border-color: var(--lc-blue); color: #93c5fd; }
+.cover .cover-main a:hover { border-color: var(--lc-blue); color: var(--lc-blue-300); }
 .cover .cover-main a.fs-cta { background: #fafafa; border-color: #fafafa; color: #09090b; font-weight: 600; }
 .cover .cover-main a.fs-cta:hover { background: #e4e4e7; color: #09090b; }
 
@@ -73,26 +137,29 @@ strong, b { color: var(--lc-text); }
 
 /* ===== dark.css 基底残留校准（2026-09-12 审计 F3） =====
  * dark.css 用 .markdown-section a (0,1,1) 定义链接色, 裸 a (0,0,1) 压不过 → 正文链接实为 docsify 橙红 #ea6f5a
+ * T11: 链接 blue-400 + 淡一档下划线装饰 + 2px offset, hover 下划线变实
  */
-.markdown-section a { color: var(--lc-blue); font-weight: 500; }
-.markdown-section a:hover { color: #93c5fd; }
+.markdown-section a { color: var(--lc-link); font-weight: 500; text-decoration: underline; text-decoration-color: var(--lc-link-deco); text-underline-offset: 2px; }
+.markdown-section a:hover { color: var(--lc-blue-300); text-decoration-color: var(--lc-blue-300); }
 
-/* 分割线: dark.css hr 是 #eee 亮线 */
-.markdown-section hr { border: none; border-bottom: 1px solid var(--lc-border); }
+/* T12: 分割线两端消隐 */
+.markdown-section hr { border: none; height: 1px; background: linear-gradient(to right, transparent, #3f3f46, transparent); }
 
 /* 标题锚点 # 符号: dark.css #c8c8c8 → text3 */
 .anchor span { color: var(--lc-text3); }
 
-/* 侧栏收起按钮: dark.css 三横线为橙红 var(--theme-color) + 灰底块 */
-.sidebar-toggle { background-color: transparent; }
-.sidebar-toggle span { background-color: var(--lc-text3); }
-
 /* 搜索残留: dark.css .search .search-keyword / .search a:hover 为 #ea6f5a;
  * .matching-post 分隔线 #eee 由 search 插件运行时注入（晚于本文件, 需更高特异性压过） */
-.search .search-keyword { color: #93c5fd; font-style: normal; font-weight: 700; }
-.search a:hover { color: #93c5fd; }
+.search .search-keyword { color: var(--lc-blue-300); font-style: normal; font-weight: 700; }
+.search a:hover { color: var(--lc-blue-300); }
 .search .results-panel .matching-post { border-bottom-color: var(--lc-border); }
 .search .clear-button svg { fill: var(--lc-text3); }
+
+/* T15: reduce-motion 用户关闭页面入场动画 */
+@media (prefers-reduced-motion: reduce) {
+  .markdown-section { animation: none; }
+  a, .sidebar ul li a, .markdown-section td { transition: none; }
+}
 
 /* 打印: 深底白字直接打印不可读, 反转为纸面配色（dark.css 仅隐藏侧栏, 未反转正文） */
 @media print {
@@ -102,10 +169,14 @@ strong, b { color: var(--lc-text); }
   a { color: #0366d6 !important; }
   .markdown-section pre { background: #f6f8fa !important; border-color: #ddd; }
   .markdown-section pre > code { color: #24292f !important; }
-  .markdown-section p code, .markdown-section li code, .markdown-section td code, .markdown-section th code { background: #eff1f3 !important; color: #0366d6 !important; }
+  .markdown-section p code, .markdown-section li code, .markdown-section td code, .markdown-section th code { background: #eff1f3 !important; color: #be185d !important; }
   .markdown-section table { background: #fff; border-color: #ddd; }
   .markdown-section td { border-bottom-color: #e2e2e6 !important; }
   .markdown-section blockquote { background: transparent; border-left-color: #0366d6; }
   .markdown-section blockquote p { color: #333; }
+  .markdown-section .fs-callout { background: #eff6ff !important; }
+  .markdown-section .fs-callout p { color: #1e40af; }
+  .fs-codecard { border-color: #ddd; }
+  .fs-codehead { background: #f1f3f5; border-bottom-color: #ddd; }
   .cover, .sidebar, .sidebar-toggle, .gh-corner, .github-corner { display: none !important; }
 }

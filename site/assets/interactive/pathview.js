@@ -10,17 +10,18 @@
 (function () {
   window.FlowSite = window.FlowSite || { fns: [] };
 
-  /* 九域配色表（R3 机制地图域 A-I; Tailwind 500 系, 与 zinc 深色主题同族） */
+  /* 九域配色表（R3 机制地图域 A-I; Tailwind 500 系, 与 zinc 深色主题同族）
+   * t = theme-learncc.css :root 五态 token 域名（--lc-{t} 实色 / -300 / -900-30 / -border-30 / -border-60） */
   var DOMAINS = {
-    A: { name: '编排与治理', color: '#3b82f6' },
-    B: { name: '目标与输入质量', color: '#eab308' },
-    C: { name: '思考与规划', color: '#8b5cf6' },
-    D: { name: '评审与决策', color: '#ec4899' },
-    E: { name: '执行与并发', color: '#22c55e' },
-    F: { name: '上下文工程', color: '#06b6d4' },
-    G: { name: '验证与迭代', color: '#ef4444' },
-    H: { name: '跨会话记忆', color: '#14b8a6' },
-    I: { name: '质量自举', color: '#f97316' }
+    A: { name: '编排与治理', color: '#3b82f6', t: 'blue' },
+    B: { name: '目标与输入质量', color: '#eab308', t: 'yellow' },
+    C: { name: '思考与规划', color: '#8b5cf6', t: 'violet' },
+    D: { name: '评审与决策', color: '#ec4899', t: 'pink' },
+    E: { name: '执行与并发', color: '#22c55e', t: 'green' },
+    F: { name: '上下文工程', color: '#06b6d4', t: 'cyan' },
+    G: { name: '验证与迭代', color: '#ef4444', t: 'red' },
+    H: { name: '跨会话记忆', color: '#14b8a6', t: 'teal' },
+    I: { name: '质量自举', color: '#f97316', t: 'orange' }
   };
 
   function el(tag, cls, text) {
@@ -42,7 +43,7 @@
     Object.keys(DOMAINS).forEach(function (k) {
       var item = el('span', 'fs-pv-legend-item');
       var dot = el('i', 'fs-pv-legend-dot');
-      dot.style.background = DOMAINS[k].color;
+      dot.style.background = DOMAINS[k].t ? 'var(--lc-' + DOMAINS[k].t + ')' : DOMAINS[k].color;
       item.appendChild(dot);
       item.appendChild(document.createTextNode(k + ' · ' + DOMAINS[k].name));
       legend.appendChild(item);
@@ -56,22 +57,32 @@
 
       var row = el('div', 'fs-pv-row');
       row.style.transitionDelay = Math.min(i, 4) * 80 + 'ms'; // 同屏多卡依次淡入（封顶防滚读延迟）
+      // 域色五态以变量注入（着色映射在 theme-learncc.css/pathview.css, 此处只给引用）:
+      // 实色 → 节点圆/金句边框/进度条; -300 → 徽章与计数文字; -900-30 → 徽章暗底
+      if (dom.t) {
+        row.style.setProperty('--fs-pv-dom', 'var(--lc-' + dom.t + ')');
+        row.style.setProperty('--fs-pv-dom-300', 'var(--lc-' + dom.t + '-300)');
+        row.style.setProperty('--fs-pv-dom-badge', 'var(--lc-' + dom.t + '-900-30)');
+      } else {
+        row.style.setProperty('--fs-pv-dom', dom.color);
+      }
 
-      /* 左列: 编号圆点 + 连接线 */
+      /* 左列: 编号圆点（域色实底 + 页底色 ring, 见 pathview.css G2）+ 连接线（下一章域色 /30） */
       var node = el('div', 'fs-pv-node');
       var dot = el('span', 'fs-pv-dot', pad(c.num));
-      dot.style.borderColor = dom.color;
       node.appendChild(dot);
-      if (i < chapters.length - 1) node.appendChild(el('span', 'fs-pv-line'));
+      if (i < chapters.length - 1) {
+        var nextDom = DOMAINS[chapters[i + 1].domain] || dom;
+        var line = el('span', 'fs-pv-line');
+        if (nextDom.t) line.style.setProperty('--fs-pv-line-dom', 'var(--lc-' + nextDom.t + ')');
+        node.appendChild(line);
+      }
       row.appendChild(node);
 
       /* 章卡片 */
       var card = el('div', 'fs-pv-card');
-      card.style.setProperty('--fs-pv-dom', dom.color);
 
       var badge = el('span', 'fs-pv-badge', 's' + pad(c.num) + ' · ' + dom.name);
-      badge.style.borderColor = dom.color;
-      badge.style.color = dom.color;
       card.appendChild(badge);
 
       card.appendChild(el('h3', 'fs-pv-title', c.title));

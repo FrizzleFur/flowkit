@@ -1,49 +1,57 @@
 /* fs-pathview — Learning Path 学习路径时间线（zinc 深色主题对齐）
- * 色板: bg #131316 容器 / #18181b 卡 / #27272a 边 / #3b82f6 进度条 / 域色点见 pathview.js DOMAINS
+ * 色板: 容器 #18181b / 卡 = 页底色 #09090b + 1px 边框（learncc timeline 卡形态, G2）
+ *       进度条轨 #27272a · 代码/金句底 #0f172a
+ * 域色五态（G1）: pathview.js 按章域注入 --fs-pv-dom{,-300,-badge} / --fs-pv-line-dom（指向
+ *       theme-learncc.css :root 九域 token）, 本文件只消费变量 —— 节点圆=实色、徽章=暗 badge
+ *       （900/30 底 + 300 字）、连接线=下一章域色 /30、金句边框/进度条=域色, 四处同色贯穿
  */
-.fs-pathview { border: 1px solid #27272a; border-radius: 12px; margin: 1.2em 0; background: #131316; padding: 18px 20px; }
+.fs-pathview { border: 1px solid var(--lc-border); border-radius: 12px; margin: 1.2em 0; background: var(--lc-bg1); padding: 18px 20px; }
 
 /* 顶部域色图例 */
-.fs-pv-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; padding-bottom: 13px; margin-bottom: 2px; border-bottom: 1px dashed #27272a; font-size: 12.5px; color: #a1a1aa; }
+.fs-pv-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; padding-bottom: 13px; margin-bottom: 2px; border-bottom: 1px dashed var(--lc-border); font-size: 12.5px; color: var(--lc-text2); }
 .fs-pv-legend-item { display: inline-flex; align-items: center; gap: 6px; }
 .fs-pv-legend-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: 0 0 auto; }
 
-/* 垂直轨道: 编号圆点 + 连接线 */
+/* 垂直轨道: 编号圆点 + 连接线
+ * G2: 节点 = 域色实底圆 + 白字, 外缘 4px 页底色 ring 切断背景（learncc ring-4 分层）,
+ *     连接线压到节点 z 层之下 */
 .fs-pv-track { position: relative; }
 .fs-pv-row { display: flex; gap: 16px; opacity: 0; transform: translateY(14px); transition: opacity .5s ease, transform .5s ease; }
 .fs-pv-row.fs-pv-in { opacity: 1; transform: none; }
 .fs-pv-node { display: flex; flex-direction: column; align-items: center; flex: 0 0 44px; }
-.fs-pv-dot { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #3b82f6; background: #18181b; color: #fafafa; font-size: 12.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: ui-monospace, Menlo, monospace; flex: 0 0 auto; }
-.fs-pv-line { flex: 1; width: 2px; min-height: 18px; background: #27272a; margin: 4px 0; }
+.fs-pv-dot { width: 40px; height: 40px; border-radius: 50%; border: none; background: var(--fs-pv-dom, #71717a); color: #fff; font-size: 12.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: ui-monospace, Menlo, monospace; flex: 0 0 auto; box-shadow: 0 0 0 4px var(--lc-bg0); position: relative; z-index: 10; }
+.fs-pv-line { flex: 1; width: 2px; min-height: 18px; background: color-mix(in srgb, var(--fs-pv-line-dom, #3f3f46) 30%, transparent); margin: 4px 0; position: relative; z-index: 0; }
 
-/* 章卡片 */
-.fs-pv-card { flex: 1; min-width: 0; background: #18181b; border: 1px solid #27272a; border-radius: 10px; padding: 13px 16px; margin: 10px 0; }
-.fs-pv-badge { display: inline-block; font-size: 11px; font-family: ui-monospace, Menlo, monospace; border: 1px solid #3f3f46; border-radius: 12px; padding: 2px 10px; margin-bottom: 8px; }
+/* 章卡片（G2: 卡 = 页底色 + border 1px + 4px 页底色 ring, 与节点同构分层） */
+.fs-pv-card { flex: 1; min-width: 0; background: var(--lc-bg0); border: 1px solid var(--lc-border); border-radius: 12px; padding: 13px 16px; margin: 10px 0; box-shadow: 0 0 0 4px var(--lc-bg0); }
+/* G1: 域徽章改暗态实底（域色 900/30 底 + 域色 300 字）, 替换原描边式 */
+.fs-pv-badge { display: inline-block; font-size: 11px; font-family: ui-monospace, Menlo, monospace; border: none; border-radius: 9999px; padding: 2px 10px; margin-bottom: 8px; background: var(--fs-pv-dom-badge, rgba(39,39,42,.6)); color: var(--fs-pv-dom-300, var(--lc-text2)); }
 .fs-pv-title { font-size: 16.5px; font-weight: 700; color: #fafafa; margin: 0 0 4px; border: none; padding: 0; }
-.fs-pv-sub { font-size: 13.5px; color: #a1a1aa; margin: 0 0 10px; line-height: 1.6; }
+.fs-pv-sub { font-size: 13.5px; color: var(--lc-text2); margin: 0 0 10px; line-height: 1.6; }
 
-/* 锚点数进度条 */
+/* 锚点数进度条: 宽度 = 该章锚点数 / 全站最大锚点数; 条色随章域色（层语义贯穿） */
 .fs-pv-meter { margin-bottom: 4px; }
-.fs-pv-meter-head { display: flex; justify-content: space-between; font-size: 12px; color: #71717a; margin-bottom: 5px; }
-.fs-pv-meter-num { font-family: ui-monospace, Menlo, monospace; color: #93c5fd; }
-.fs-pv-bar { height: 6px; background: #101014; border: 1px solid #27272a; border-radius: 4px; overflow: hidden; }
-.fs-pv-fill { display: block; height: 100%; background: #3b82f6; border-radius: 4px; }
+.fs-pv-meter-head { display: flex; justify-content: space-between; font-size: 12px; color: var(--lc-text3); margin-bottom: 5px; }
+.fs-pv-meter-num { font-family: ui-monospace, Menlo, monospace; color: var(--fs-pv-dom-300, var(--lc-blue-300)); font-variant-numeric: tabular-nums; }
+.fs-pv-bar { height: 6px; background: var(--lc-border); border: none; border-radius: 9999px; overflow: hidden; }
+.fs-pv-fill { display: block; height: 100%; background: var(--fs-pv-dom, var(--lc-blue)); border-radius: 9999px; }
 
-/* 金句与阅读链接（金句左边框取域色, 由组件内联 --fs-pv-dom 提供） */
-.fs-pv-quote { border-left: 3px solid var(--fs-pv-dom, #3f3f46); background: #101014; color: #a1a1aa; font-size: 13px; margin: 10px 0; padding: 8px 12px; border-radius: 0 8px 8px 0; }
+/* 金句与阅读链接（金句左边框取域色, 由 pathview.js 注入 --fs-pv-dom 提供） */
+.fs-pv-quote { border-left: 3px solid var(--fs-pv-dom, var(--lc-border2)); background: var(--lc-code-bg); color: var(--lc-text2); font-size: 13px; margin: 10px 0; padding: 8px 12px; border-radius: 0 8px 8px 0; }
 .fs-pv-quote p { margin: 0; }
-.fs-pv-link { font-size: 13px; color: #3b82f6; text-decoration: none; }
-.fs-pv-link:hover { color: #93c5fd; text-decoration: underline; }
+.fs-pv-link { font-size: 13px; color: var(--lc-link); text-decoration: none; }
+.fs-pv-link:hover { color: var(--lc-blue-300); text-decoration: underline; }
 
 /* reduce-motion: 关闭入场动画（卡片直接显示, 无过渡） */
 @media (prefers-reduced-motion: reduce) {
   .fs-pv-row { opacity: 1; transform: none; transition: none; }
 }
 
-/* 窄屏: 圆点列收窄, 卡片贴轨 */
+/* 窄屏: 圆点列收窄, 卡片贴轨; ring 同步收窄至 3px（G2） */
 @media (max-width: 480px) {
   .fs-pathview { padding: 14px 12px; }
   .fs-pv-row { gap: 10px; }
   .fs-pv-node { flex-basis: 34px; }
-  .fs-pv-dot { width: 30px; height: 30px; font-size: 11px; }
+  .fs-pv-dot { width: 30px; height: 30px; font-size: 11px; box-shadow: 0 0 0 3px var(--lc-bg0); }
+  .fs-pv-card { box-shadow: 0 0 0 3px var(--lc-bg0); }
 }
