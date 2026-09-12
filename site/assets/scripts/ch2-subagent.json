@@ -1,0 +1,65 @@
+{
+  "title": "上下文防火墙——子代理隔离",
+  "version": 2,
+  "messagesPanels": [
+    { "id": "main", "title": "父代理 messages[]" },
+    { "id": "child", "title": "子代理 messages[]" }
+  ],
+  "steps": [
+    {
+      "title": "父上下文积累",
+      "desc": "multi-agent 主会话先干活: 收下用户的调研任务书, 拆出分片规划, 拿回结构化清单。这几步全烧在父窗口里——上下文开始变长, 而真正的大头还没来。",
+      "append": {
+        "main": [
+          { "role": "user", "label": "任务书: 摸清 11 章交互素材" },
+          { "role": "assistant", "label": "规划: 拆 3 个分片, 派 3 个 named agent" },
+          { "role": "tool_result", "label": "分片清单: A/B/C 各带文件范围" }
+        ]
+      }
+    },
+    {
+      "title": "named agent 派发",
+      "desc": "分发只传任务书, 不传历史——Agent prompt 里只有目标、上下文、验收三样。父会话刚攒下的三条消息不会跟着过去: 子代理从一张白纸起步。",
+      "append": {
+        "main": [
+          { "role": "task", "label": "子代理任务书: 目标 + 上下文 + 验收" }
+        ],
+        "child": [
+          { "role": "task", "label": "调研分片 D: 只读任务走 Fast Path" }
+        ]
+      }
+    },
+    {
+      "title": "子代理独立工作",
+      "desc": "子代理大量读、大量试错, 全烧在自己的窗口里——父面板 len 纹丝不动。这条边界就是上下文防火墙: 子代理看不到父历史, 父上下文也嗅不到子代理的中间步骤。",
+      "append": {
+        "child": [
+          { "role": "tool_call", "label": "Read: 逐个摸读源文件" },
+          { "role": "tool_call", "label": "Grep: 跨文件检索锚点" }
+        ]
+      }
+    },
+    {
+      "title": "子代理收口",
+      "desc": "子代理只写一份最终结果——中间读了什么、试错了几次, 全部留在子上下文里, 一件都不出现在回传物中。",
+      "append": {
+        "child": [
+          { "role": "final", "label": "调研结论 ≤350 token: 模式 + 证据行号" }
+        ]
+      }
+    },
+    {
+      "title": "结果回传",
+      "desc": "final 文本成为父会话的一条 tool_result——注意回流的只有这一条凝练摘要, 子代理的中间消息一条都不回流。摘要是账单, 不是承诺。",
+      "append": {
+        "main": [
+          { "role": "tool_result", "label": "凝练摘要: 分片结论(≤350 token)" }
+        ]
+      }
+    },
+    {
+      "title": "父继续——干净如初",
+      "desc": "父代理带着摘要继续推进。对比两侧 len: 父 5 条; 子代理那 4 条中间消息永远停在子面板——隔离的价值, 就是父上下文不被中间步骤污染。"
+    }
+  ]
+}

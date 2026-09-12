@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>learn-claude-code 交互模式全解剖 · iviz 研究报告</title>
+<style>
+:root{--primary:#0f62be;--success:#198038;--warning:#ff832b;--danger:#da1e28;--ink:#1a1f27;--ink2:#4a5261;--line:#dfe3ea;--bg:#f5f7fa;--card:#fff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.65;font-size:15px}
+.wrap{max-width:1020px;margin:0 auto;padding:0 20px 60px}
+header.hero{background:linear-gradient(135deg,#0b3d7a,var(--primary));color:#fff;padding:36px 20px 28px}
+.hero h1{font-size:24px}.hero .sub{margin-top:6px;font-size:13.5px;opacity:.92}.hero .meta{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+.hero .meta span{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:3px 12px;font-size:12.5px}
+nav.toc{position:sticky;top:0;z-index:9;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 1px 6px rgba(15,40,80,.06)}
+nav.toc .wrap{display:flex;gap:2px;overflow-x:auto;padding:8px 20px}
+nav.toc a{white-space:nowrap;color:var(--ink2);text-decoration:none;font-size:13.5px;padding:5px 13px;border-radius:16px}
+nav.toc a:hover{background:#eaf2fc;color:var(--primary)}
+section{margin-top:34px}
+h2.sec{font-size:20px;border-left:5px solid var(--primary);padding-left:12px;margin-bottom:4px}
+p.secnote{color:var(--ink2);font-size:13px;margin-bottom:14px}
+h3{font-size:16px;margin:20px 0 8px;color:var(--primary)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-top:12px}
+.callout{background:#fff8ee;border:1px solid #f3cf9f;border-radius:10px;padding:14px 16px;margin:14px 0;font-size:14px}
+.callout b{color:#9a5b00}
+table{width:100%;border-collapse:collapse;font-size:13px;background:#fff;border-radius:8px;overflow:hidden}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:#eef2f7;font-weight:600}
+td code,.card code{background:#eef2f7;border-radius:4px;padding:1px 6px;font-family:ui-monospace,Menlo,monospace;font-size:12px}
+/* ===== learncc 深色复刻舞台 ===== */
+.lc{background:#101014;border:1px solid #26262c;border-radius:12px;padding:18px;margin:12px 0;color:#e4e4e7}
+.lc .cap{font-size:12px;color:#8b8b94;margin-bottom:10px}
+.lc .cap b{color:#c8c8d0}
+/* 增长动画复刻 */
+.lc-msgbox{border:1px solid #2c2c34;border-radius:10px;background:#17171c;padding:10px 12px}
+.lc-msgbar{display:flex;justify-content:space-between;align-items:center;font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#a1a1ab;margin-bottom:8px}
+.lc-len{background:#2c2c34;border-radius:5px;padding:1px 8px;font-size:11px}
+.lc-chips{display:flex;flex-wrap:wrap;gap:6px}
+.lc-chip{font-family:ui-monospace,Menlo,monospace;font-size:10px;border-radius:5px;padding:3px 9px;color:#fff}
+.lc-user{background:#3b82f6}.lc-asst{background:#52525b}.lc-tool{background:#10b981}.lc-end{background:#a855f7}
+.lc-arrow{display:inline-block;margin:0 2px;color:#52525b}
+/* Learning Path 复刻 */
+.lc-path{display:flex;gap:14px}
+.lp-rail{display:flex;flex-direction:column;align-items:center}
+.lp-num{width:34px;height:34px;border-radius:50%;background:#3b82f6;color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+.lp-line{width:2px;flex:1;background:#3b82f6;min-height:40px}
+.lp-card{flex:1;border:1px solid #2c2c34;border-radius:10px;background:#17171c;padding:12px 14px;margin-bottom:14px}
+.lp-head{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.lp-badge{font-family:ui-monospace,Menlo,monospace;font-size:11px;background:#2c2c34;border-radius:5px;padding:2px 7px;color:#a1a1ab}
+.lp-title{font-weight:700;font-size:14.5px}
+.lp-sub{color:#8b8b94;font-size:12.5px}
+.lp-meta{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:#a1a1ab;margin:6px 0 4px}
+.lp-bar{height:4px;background:#2c2c34;border-radius:3px;overflow:hidden;margin-bottom:8px}
+.lp-bar i{display:block;height:100%;background:#3b82f6}
+.lp-quote{font-size:12px;color:#8b8b94;font-style:italic}
+.lc-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:#a1a1ab;margin-bottom:10px}
+.lc-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+/* Permission Desk 复刻 */
+.lc-desk{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.lc-col{border:1px solid #2c2c34;border-radius:10px;padding:10px;min-height:150px}
+.lc-colh{font-size:12.5px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.lc-icol{width:20px;height:20px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:11px}
+.lc-req{border:1px solid;border-radius:8px;padding:8px 9px;margin-bottom:8px;font-size:11.5px}
+.lc-req .cmd{font-family:ui-monospace,Menlo,monospace;background:#101014;border-radius:5px;padding:3px 7px;margin:4px 0;display:block;font-size:10.5px}
+.lc-tag{float:right;font-family:ui-monospace,Menlo,monospace;font-size:10px;border-radius:4px;padding:1px 6px}
+.lc-allow{border-color:#065f46;background:#022c22;color:#6ee7b7}.lc-allow .lc-tag{background:#065f46;color:#a7f3d0}
+.lc-ask{border-color:#92400e;background:#291a05;color:#fcd34d}.lc-ask .lc-tag{background:#92400e;color:#fde68a}
+.lc-deny{border-color:#7f1d1d;background:#2a0a0a;color:#fca5a5}.lc-deny .lc-tag{background:#7f1d1d;color:#fecaca}
+.lc-outcome{border:1px dashed #3f3f46;border-radius:8px;display:flex;align-items:center;justify-content:center;min-height:110px;color:#52525b;font-size:11.5px}
+/* While-Loop 复刻 */
+.lc-loop{border:1px solid #2c2c34;border-radius:10px;background:#17171c;padding:12px}
+.lc-loopgrid{display:grid;grid-template-columns:1.2fr 1fr;gap:10px}
+.lc-flow svg{width:100%;height:auto;display:block}
+.lc-msgs{border:1px solid #2c2c34;border-radius:8px;background:#101014;padding:8px;min-height:150px}
+.lc-msgs .t{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:#a1a1ab;text-align:right;margin-bottom:6px}
+.lc-note{margin-top:10px;border:1px solid #1e3a8a;background:#0f1a33;color:#93b4ff;border-radius:8px;padding:8px 11px;font-size:12px}
+.lc-note b{display:block;font-size:12.5px}
+.lc-ctrl{display:flex;justify-content:space-between;align-items:center;margin-top:8px;color:#a1a1ab;font-size:13px}
+.lc-dots{font-size:11px;letter-spacing:2px}
+.lc-dots b{color:#3b82f6}
+/* 状态高亮 */
+.node{fill:#26262c;stroke:#3f3f46}
+.node.on{fill:#1e3a8a;stroke:#3b82f6}
+.ndlabel{fill:#d4d4d8;font-size:9px;font-family:ui-monospace,Menlo,monospace;text-anchor:middle}
+.edge{stroke:#3f3f46;fill:none}
+.edge.on{stroke:#3b82f6}
+.tagtxt{fill:#8b8b94;font-size:7.5px;font-family:ui-monospace,Menlo,monospace}
+/* 通用 */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:760px){.grid2,.lc-desk,.lc-loopgrid{grid-template-columns:1fr}}
+footer{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;color:var(--ink2);font-size:12.5px}
+.badge{display:inline-block;font-size:11.5px;border-radius:12px;padding:2px 10px;margin-right:6px}
+.b-src{background:#eaf2fc;color:var(--primary)}.b-ours{background:#e9f6ee;color:var(--success)}
+</style>
+</head>
+<body>
+
+<header class="hero"><div class="wrap">
+  <h1>learn-claude-code 交互模式全解剖</h1>
+  <div class="sub">iviz 研究报告 · 面向 FlowKit 教程站的布局讨论底稿</div>
+  <div class="meta"><span>2026-09-12</span><span>方法: CDP 运行时实测 + GitHub 源码直读</span><span>来源: learn.shareai.run + web/src/components/</span><span>深色块 = learncc 风格复刻（静态定格）</span></div>
+</div></header>
+
+<nav class="toc"><div class="wrap">
+  <a href="#s0">站点架构</a><a href="#s1">P11 增长动画</a><a href="#s2">Learning Path</a><a href="#s3">P12 路由台</a><a href="#s4">P13 多面板联动</a><a href="#s5">全模式目录</a><a href="#s6">概念映射</a><a href="#s7">零依赖替换</a>
+</div></nav>
+
+<div class="wrap">
+
+<section id="s0">
+  <h2 class="sec">〇、站点架构总览</h2>
+  <p class="secnote">learncc 是「应用中心」站（Next.js）; 我们是「文档中心」站（docsify）。布局讨论的第一性问题: 借它的什么，放进我们的壳。</p>
+  <div class="card">
+    <b>站点三层结构:</b><br>
+    ① <b>首页</b>——大标题 + Start Learning 按钮 + 「The Core Pattern」代码卡 + <b>Message Growth 循环动画</b>（滚动进视口才播）<br>
+    ② <b>三个站级视图</b>——Timeline（Learning Path 时间线）/ Compare（版本对比）/ Layers（五层组织）<br>
+    ③ <b>章节页 ×20</b>——每章四标签: Learn（图文+可视化演示）/ Simulate（剧本回放模拟器）/ Code（源码）/ Deep Dive（深读）; 左侧 sticky 章节导航（五域色点分组）
+    <div class="callout" style="margin-top:12px"><b>关键观察:</b> 它的每个演示都是「步进引擎 + 声明式数据」——不为一章写一次动画逻辑。这是我们最该搬的架构决策，比任何单个动画都重要。</div>
+  </div>
+</section>
+
+<section id="s1">
+  <h2 class="sec">一、P11 增长动画（首页 Message Growth）</h2>
+  <p class="secnote">行为实测: 角色芯片逐个 append，len 徽章同步递增（采样捕获 7→8→1 重置循环）; 滚动进视口才开演。源码: architecture/message-flow.tsx（useState/useEffect + interval + framer-motion）。</p>
+  <div class="lc"><div class="cap">静态定格复刻 · <b>运行时为循环动画</b></div>
+    <div style="text-align:center;font-size:17px;font-weight:700;margin-bottom:2px">Message Growth</div>
+    <div style="text-align:center;font-size:11.5px;color:#8b8b94;margin-bottom:10px">Watch the messages array grow as the agent loop executes</div>
+    <div class="lc-msgbox">
+      <div class="lc-msgbar"><span>messages[]</span><span class="lc-len">len=6</span></div>
+      <div class="lc-chips"><span class="lc-chip lc-user">user</span><span class="lc-arrow">→</span><span class="lc-chip lc-asst">assistant</span><span class="lc-arrow">→</span><span class="lc-chip lc-tool">tool_result</span><span class="lc-arrow">→</span><span class="lc-chip lc-asst">assistant</span><span class="lc-arrow">→</span><span class="lc-chip lc-tool">tool_result</span><span class="lc-arrow">→</span><span class="lc-chip lc-end">assistant:Done</span></div>
+    </div>
+  </div>
+  <div class="card"><b>aha 本质:</b> 「数组在增长」这个抽象概念变成看得见的堆积。<b>flowkit 对应:</b> S3 首页 hero（五 Stage 块逐个点亮循环——「pipeline in action」）; C12 记忆复利闭环（召回→沉淀条目滚雪球）与之同构。</div>
+</section>
+
+<section id="s2">
+  <h2 class="sec">二、Learning Path 时间线（/timeline）</h2>
+  <p class="secnote">结构实测: 左 sticky 导航（五域色点分组）+ 右编号节点垂直轨道; 每章卡片 = s0X 徽章 + 一句话机制 + LOC 进度条 + 金句 + Learn More。源码: timeline/timeline.tsx。</p>
+  <div class="lc"><div class="cap">静态定格复刻 · <b>Learning Path</b>（s01→s20: Progressive Agent Harness Design）</div>
+    <div class="lc-legend"><span><i style="background:#3b82f6"></i>Tools & Execution</span><span><i style="background:#10b981"></i>Planning & Control</span><span><i style="background:#a855f7"></i>Memory Management</span><span><i style="background:#f59e0b"></i>Concurrency</span><span><i style="background:#ef4444"></i>Multi-Agent</span></div>
+    <div class="lc-path">
+      <div class="lp-rail"><div class="lp-num">01</div><div class="lp-line"></div></div>
+      <div class="lp-card"><div class="lp-head"><span class="lp-badge">s01</span><span class="lp-title">The Agent Loop</span><span class="lp-sub">One Loop Is All You Need</span></div>
+        <div class="lp-meta">102 lines of code · 1 tools</div>
+        <div class="lp-bar"><i style="width:12%"></i></div>
+        <div class="lp-quote">"The smallest useful agent is a loop that calls the model, runs tools, and feeds results back."</div></div>
+    </div>
+    <div class="lc-path">
+      <div class="lp-rail"><div class="lp-num">02</div><div class="lp-line"></div></div>
+      <div class="lp-card"><div class="lp-head"><span class="lp-badge">s02</span><span class="lp-title">Tool Use</span><span class="lp-sub">Add a Tool, Add Just One Line</span></div>
+        <div class="lp-meta">135 lines of code · 5 tools</div>
+        <div class="lp-bar"><i style="width:16%"></i></div>
+        <div class="lp-quote">"The loop stays stable while capabilities register into a dispatch table."</div></div>
+    </div>
+  </div>
+  <div class="card"><b>aha 本质:</b> 「渐进式构建」的量感——LOC 进度条让增长可感知，域色点让归属一眼可读。<b>flowkit 对应:</b> <b>S2 新子项目</b>——站级 Learning Path 视图: 11 章编号轨道 + 九域色点 + <b>锚点数进度条</b>（LOC 的等价物: 每章锚定多少处源码，同样传达「每章只讲一点、但桩桩有据」）。</div>
+</section>
+
+<section id="s3">
+  <h2 class="sec">三、P12 交互路由台（s03 Permission Desk）</h2>
+  <p class="secnote">实现: STEPS[] 声明步进脚本（mode: overview/allow/ask/ask-approved/deny/summary）+ REQUESTS[] 声明三请求卡（tone 三色）; 步进按 mode 高亮路由路径。源码: visualizations/s03-permission.tsx。</p>
+  <div class="lc"><div class="cap">静态定格复刻 · <b>Permission Desk</b>（步进至 deny 路由的中间态）</div>
+    <div class="lc-desk">
+      <div class="lc-col"><div class="lc-colh"><span class="lc-icol" style="background:#7f1d1d;color:#fecaca">!</span>Tool requests</div>
+        <div class="lc-req lc-allow">tool request <span class="lc-tag">read_file</span><span class="cmd">README.md</span>read-only workspace file <span class="lc-tag">allow</span></div>
+        <div class="lc-req lc-ask">tool request <span class="lc-tag">bash</span><span class="cmd">rm -rf ./tmp/build-cache</span>local destructive <span class="lc-tag">ask</span></div>
+        <div class="lc-req lc-deny">tool request <span class="lc-tag">bash</span><span class="cmd">sudo rm -rf /</span>forbidden root delete <span class="lc-tag">deny</span></div>
+      </div>
+      <div class="lc-col"><div class="lc-colh"><span class="lc-icol" style="background:#3f3f46;color:#d4d4d8">✓</span>Permission desk</div>
+        <div class="lc-req lc-allow">✓ Safe read <span class="lc-tag">allow</span><br><span style="font-size:10.5px;opacity:.75">No write, no shell, no approval needed.</span></div>
+        <div class="lc-req lc-ask">⚠ Risky local change <span class="lc-tag">ask</span><br><span style="font-size:10.5px;opacity:.75">May be useful, but requires a human yes.</span></div>
+        <div class="lc-req lc-deny">⛔ Forbidden pattern <span class="lc-tag">deny</span><br><span style="font-size:10.5px;opacity:.75">Root delete never reaches handlers.</span></div>
+      </div>
+      <div class="lc-col"><div class="lc-colh"><span class="lc-icol" style="background:#3f3f46;color:#d4d4d8">▶</span>Outcome</div>
+        <div class="lc-outcome">select a request route</div>
+      </div>
+    </div>
+  </div>
+  <div class="card"><b>aha 本质:</b> 「路由」不是文字——三张请求卡走不同的道，allow 直通 / ask 停下等人 / deny 拦截，分岔画面一眼懂。<b>flowkit 对应:</b> C9 Fast/Full 风险路由分流（ch7 首节——任务卡滑入 flow vs flow-deep 岔路口）; C15 复杂度闸门（备选池，与 ch1 开关面板联动）。</div>
+</section>
+
+<section id="s4">
+  <h2 class="sec">四、P13 多面板联动步进（s01 While-Loop）★ 全站核心架构</h2>
+  <p class="secnote">源码实证: NODES/EDGES 手排 SVG + 四张声明表（ACTIVE_NODES_PER_STEP / ACTIVE_EDGES_PER_STEP / MESSAGES_PER_STEP / STEP_INFO）+ 共享 hook useSteppedVisualization——一份步进状态，流程图/消息面板/旁白三处同频。</p>
+  <div class="lc"><div class="cap">静态定格复刻 · <b>The Agent While-Loop</b>（步进至 step 3: Execute Tool）</div>
+    <div class="lc-loop">
+      <div class="lc-loopgrid">
+        <div class="lc-flow">
+          <svg viewBox="0 0 320 330" xmlns="http://www.w3.org/2000/svg">
+            <rect class="node" x="100" y="8" width="120" height="30" rx="6"/><text class="ndlabel" x="160" y="27">Start</text>
+            <path class="edge on" d="M160 38 L160 66"/>
+            <rect class="node on" x="100" y="66" width="120" height="30" rx="6"/><text class="ndlabel" x="160" y="85">API Call</text>
+            <path class="edge on" d="M160 96 L160 124"/>
+            <polygon class="node on" points="160,124 230,160 160,196 90,160"/><text class="ndlabel" x="160" y="164">stop_reason?</text>
+            <path class="edge" d="M230 160 L268 160"/><text class="tagtxt" x="234" y="152">end_turn</text>
+            <rect class="node" x="268" y="145" width="48" height="30" rx="6"/><text class="ndlabel" x="292" y="164">Break</text>
+            <path class="edge on" d="M160 196 L160 224"/><text class="tagtxt" x="166" y="214">tool_use</text>
+            <rect class="node on" x="100" y="224" width="120" height="30" rx="6"/><text class="ndlabel" x="160" y="243">Execute Tool</text>
+            <path class="edge" d="M160 254 L160 282"/>
+            <rect class="node" x="100" y="282" width="120" height="30" rx="6"/><text class="ndlabel" x="160" y="301">Append Result</text>
+            <path class="edge" d="M100 297 L58 297 L58 81 L100 81"/>
+          </svg>
+        </div>
+        <div class="lc-msgs"><div class="t">messages[]</div>
+          <span class="lc-chip lc-user">user</span> <span style="font-size:10px;color:#8b8b94">Fix the login bug</span><br><br>
+          <span class="lc-chip lc-asst">assistant</span> <span style="font-size:10px;color:#8b8b94">tool_use: read_file</span><br><br>
+          <span class="lc-chip lc-tool">tool_result</span> <span style="font-size:10px;color:#8b8b94">auth.ts contents…</span>
+        </div>
+      </div>
+      <div class="lc-note"><b>The While Loop</b>Every agent is a while loop that keeps calling the model until it says 'stop'.</div>
+      <div class="lc-ctrl"><span>⟲ ◁ ▷ ▷|</span><span class="lc-dots">● ○ ○ ○ ○ ○ ○ <b>1/7</b></span></div>
+    </div>
+  </div>
+  <div class="card"><b>aha 本质:</b> 左眼看流程走到哪、右眼看数据怎么变、下方读旁白——三通道同频; 圆点进度给完成感。<b>flowkit 对应:</b> 这就是 R0 引擎的终态形态——replay.js 从「单消息面板」升级为「多面板订阅引擎」（声明式 step 表协议），ch4 管道全景/C2 曲线/C3 轨道/C9 路由全部站其上。</div>
+</section>
+
+<section id="s5">
+  <h2 class="sec">五、全模式目录（P1-P13）</h2>
+  <p class="secnote">P1-P10 见 B-patterns.md（10 形态）; 本次新增三种, 源头均为用户指定参考页面。</p>
+  <table>
+    <tr><th>形态</th><th>learncc 来源</th><th>匹配判据</th><th>我们状态</th></tr>
+    <tr><td>P1 剧本回放</td><td>Simulate 标签</td><td>时序叙事型机制</td><td><span class="badge b-ours">已实装</span>升级中</td></tr>
+    <tr><td>P13 多面板联动 ★</td><td>每章 Learn 标签 hero</td><td>流程+数据双轴机制</td><td><span class="badge b-src">R0 目标形态</span></td></tr>
+    <tr><td>P11 增长动画</td><td>首页 Message Growth</td><td>累积/复利型机制</td><td><span class="badge b-src">新增 S3/C12</span></td></tr>
+    <tr><td>P12 交互路由台</td><td>s03 Permission Desk</td><td>分流/闸门型机制</td><td><span class="badge b-src">新增 C9</span></td></tr>
+    <tr><td>Learning Path 时间线</td><td>/timeline 视图</td><td>站级导航/渐进量感</td><td><span class="badge b-src">新增 S2</span></td></tr>
+    <tr><td>P2 状态机步进 / P3 描线 / P4 开关 / P5 计算器 / P6 判定游戏 / P7 曲线仪表 / P8 分屏 / P9 泳道 / P10 时间线</td><td>混合（2 learncc + 4 首创等）</td><td>见 B-patterns.md 速查表</td><td><span class="badge b-ours">部分已实装</span></td></tr>
+  </table>
+</section>
+
+<section id="s6">
+  <h2 class="sec">六、概念映射总表（16 子项目）</h2>
+  <div class="card">
+    <b>批 1:</b> C2 三策略曲线（5/3.5）· C3 keep-revert 轨道（5/3）· <b>R0 多面板引擎（—/4.5, 范围升级）</b><br><br>
+    <b>批 2:</b> C1 吞噬漏斗（5/2.5）· C4 预算生命周期（4.5/3）· C11 喂模式分屏+johari 2x2（4/2.5）· <b>S2 Learning Path 视图（4.5/2.5, 新增）</b><br><br>
+    <b>批 3:</b> C5 红旗拦截（4.5/2.5）· C6 断点恢复情景剧（4.5/2.5）· C7 分片勾销（4.5/2.5）· <b>S3 首页增长 hero（4/2, 新增）</b><br><br>
+    <b>批 4:</b> C8 沉没成本双面板（4/3）· C9 路由分流（4/2.5）· C10 pane 治理（4/3）<br><br>
+    <b>批 5:</b> C12 记忆复利（4/3.5）· S1 switch 微升级（—/1.5）<br><br>
+    <b>否决区:</b> 面板汇流 / evals 三层 / 冲突矩阵 / Run ID / Plan Mode 反转——无 aha 时序增量，防为动画而动画。
+  </div>
+</section>
+
+<section id="s7">
+  <h2 class="sec">七、零依赖替换清单（framer-motion → 原生）</h2>
+  <table>
+    <tr><th>learncc 用法</th><th>我们的等价物</th></tr>
+    <tr><td><code>motion</code> 出场动画（chip/卡片滑入）</td><td>CSS <code>@keyframes</code> + class 挂载（components.css 已有基础）</td></tr>
+    <tr><td><code>AnimatePresence</code> 退出动画</td><td>class 切换 + transitionend, 或教学场景直接瞬时移除</td></tr>
+    <tr><td><code>useSteppedVisualization</code></td><td>扩展 replay.js: 步进状态抽为可订阅引擎, 面板注册 <code>onStep(idx)</code> 回调</td></tr>
+    <tr><td><code>lucide-react</code> 图标</td><td>内联 SVG path（3-4 个常用图标手嵌）</td></tr>
+    <tr><td>IntersectionObserver 触发</td><td>原生 <code>IntersectionObserver</code>（本就原生, 直接用）</td></tr>
+  </table>
+  <div class="callout"><b>结论:</b> learncc 的生动度不来自框架，来自「声明式数据 + 步进引擎 + 多面板」的架构与旁白纪律——零依赖路线完全可以追平。</div>
+</section>
+
+<footer>
+  FlowKit iviz 研究报告 · D 线（learncc 四模式源码级解剖）可视化版 · 2026-09-12<br>
+  证据: CDP 运行时采样（增长动画 7→8→1 循环实测）+ web/src/components/ 源码直读（s01/s03/message-flow/timeline）· 配套: subprojects/D-learncc-patterns.md · 本报告 0 外部依赖 0 script
+</footer>
+
+</div>
+</body>
+</html>

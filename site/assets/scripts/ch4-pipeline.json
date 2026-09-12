@@ -1,65 +1,170 @@
 {
   "title": "一次 /flow-deep 的典型流转（认证模块重构）",
+  "version": 2,
+  "flow": {
+    "nodes": [
+      { "id": "s-1", "label": "Stage -1 经验召回", "x": 20, "y": 10, "w": 150, "h": 34, "type": "rect" },
+      { "id": "s0", "label": "Stage 0 能力检查", "x": 20, "y": 66, "w": 150, "h": 34, "type": "rect" },
+      { "id": "s05", "label": "Stage 0.5 目标契约", "x": 20, "y": 122, "w": 150, "h": 34, "type": "rect" },
+      { "id": "s1", "label": "Stage 1 Prompt 优化", "x": 20, "y": 178, "w": 150, "h": 34, "type": "rect" },
+      { "id": "s2", "label": "Stage 2 深度思考", "x": 20, "y": 234, "w": 150, "h": 34, "type": "rect" },
+      { "id": "s3", "label": "Stage 3 确定性规划", "x": 20, "y": 290, "w": 150, "h": 34, "type": "rect" },
+      { "id": "s35", "label": "Stage 3.5 独立审查", "x": 260, "y": 290, "w": 150, "h": 34, "type": "rect" },
+      { "id": "s36", "label": "Stage 3.6 面板评审", "x": 260, "y": 234, "w": 150, "h": 34, "type": "rect" },
+      { "id": "s37", "label": "Stage 3.7 代码细化", "x": 260, "y": 178, "w": 150, "h": 34, "type": "rect" },
+      { "id": "s4", "label": "Stage 4 执行路由", "x": 260, "y": 122, "w": 150, "h": 34, "type": "rect" },
+      { "id": "s5", "label": "Stage 5 目标验证", "x": 260, "y": 66, "w": 150, "h": 34, "type": "rect" },
+      { "id": "s58", "label": "Stage 5.8 经验沉淀", "x": 260, "y": 10, "w": 150, "h": 34, "type": "rect" }
+    ],
+    "edges": [
+      { "from": "s-1", "to": "s0" },
+      { "from": "s0", "to": "s05" },
+      { "from": "s05", "to": "s1" },
+      { "from": "s1", "to": "s2" },
+      { "from": "s2", "to": "s3" },
+      { "from": "s3", "to": "s35" },
+      { "from": "s35", "to": "s36" },
+      { "from": "s36", "to": "s37" },
+      { "from": "s37", "to": "s4" },
+      { "from": "s4", "to": "s5" },
+      { "from": "s5", "to": "s58" }
+    ]
+  },
+  "messagesPanels": [
+    { "id": "main", "title": "主会话" }
+  ],
   "steps": [
     {
-      "role": "user",
-      "content": "/flow-deep 重构认证模块的错误处理：统一重试与降级策略，超时不超过 2 秒",
-      "annotation": "入口。任务跨模块、含不可逆风险，过 Complexity Gate 判定为复杂任务，进入完整十二关（单文件小改会被劝退去 /flow——重型引擎自己也防杀鸡用牛刀）。"
+      "title": "入口：Complexity Gate 放行",
+      "desc": "入口先过 Complexity Gate：任务跨模块、含不可逆风险，判为复杂任务、十二关全开——单文件小改会被劝退去 /flow，重型引擎自己也防杀鸡用牛刀。放行后管道从 Stage -1 开始。",
+      "on": ["s-1"],
+      "edgesOn": [],
+      "append": {
+        "main": [
+          { "role": "user", "label": "/flow-deep 重构认证模块的错误处理：统一重试与降级策略，超时不超过 2 秒" }
+        ]
+      }
     },
     {
-      "role": "system",
-      "content": "[Stage -1] 召回命中 2 条：experience/flow-deep-plan-dir.md、knowledge-base/重试退避参数.md，已全文加载\n[Stage 0] 能力矩阵：必需依赖 7/7 通过；iterate_available=true；ralph_loop_available=false；发现未注册 skill retry-lint（标记为未知能力，可供 Stage 2 考虑）",
-      "annotation": "读端强制召回：auto-skill 的话题切换判断可能漏载，管道层重新做一次针对性匹配，不赌它的记忆。能力检测用确定性命令而非目录猜测——实测不同检测方法曾得出相反结论；矩阵里 ralph=false 直接预定了 Stage 5.7 只能降级。"
+      "title": "Stage -1 召回 + Stage 0 摸牌",
+      "desc": "读端强制召回：auto-skill 的话题切换判断可能漏载，管道层重新做一次针对性匹配，不赌它的记忆——防的是「上次踩过的坑这次再踩」。能力检测用确定性命令而非目录猜测（不同检测方法曾得出相反结论）；ralph=false 在入口就预定了 Stage 5.7 只能降级。",
+      "on": ["s0"],
+      "edgesOn": ["s-1>s0"],
+      "append": {
+        "main": [
+          { "role": "system", "label": "[Stage -1] 召回命中 2 条：退避参数模板、plan 目录规范，全文加载；[Stage 0] 能力矩阵：必需依赖 7/7 通过，iterate_available=true，ralph_loop_available=false（预定 5.7 走降级）" }
+        ]
+      }
     },
     {
-      "role": "assistant",
-      "content": "Stage 0.5 Goal Contract：\nObjective: 统一认证模块错误处理\nSuccess Criteria: ①重试策略统一 ②超时≤2s ③存量用例不新增失败\nConstraints: 不改公共 API 签名\nNon-goals: 不动登录 UI\nVerification Plan: 测试全绿 + grep 确认无散落重试逻辑\nRelevant History: 命中「退避参数模板」1 条",
-      "annotation": "开工前先立约。六字段写死目标，Verification Plan 把验收标准前置到开工前——Stage 5 验证的就是这份清单。Non-goals 划掉相邻任务防范围蔓延。召回的经验以 Relevant History 字段进入契约。"
+      "title": "Stage 0.5 立约",
+      "desc": "开工前先立约。六字段写死目标，Verification Plan 把验收标准前置到开工前——Stage 5 验证的就是这份清单；Non-goals 划掉相邻任务防范围蔓延；召回经验以 Relevant History 进入契约。防的是最贵的漂移：高效执行但偏离用户真正目标。",
+      "on": ["s05"],
+      "edgesOn": ["s0>s05"],
+      "append": {
+        "main": [
+          { "role": "assistant", "label": "[Stage 0.5] Goal Contract 六字段：Objective 统一认证错误处理 / Criteria ①重试统一 ②超时≤2s ③存量用例不新增失败 / Constraints 不改公共 API / Non-goals 不动登录 UI / Verification Plan 测试全绿 + grep 无散落重试" }
+        ]
+      }
     },
     {
-      "role": "user",
-      "content": "Success Criteria 第 3 条改成「新增用例全绿，存量用例不新增失败」——口径要精确",
-      "annotation": "用户在契约层修正成功标准。目标变化的处理协议：回到 0.5 更新契约再继续，成本只是一次确认；若拖到 Stage 5 才发现口径分歧，返本重来的代价大得多。"
+      "title": "用户改约",
+      "desc": "目标变化的处理协议：回到 0.5 更新契约再继续，成本只是一次确认；若拖到 Stage 5 才发现口径分歧，返本重来的代价大得多——改约通道是明门，不是潜规则。",
+      "on": ["s05"],
+      "edgesOn": [],
+      "append": {
+        "main": [
+          { "role": "user", "label": "Success Criteria 第 3 条改成「新增用例全绿，存量用例不新增失败」——口径要精确" }
+        ]
+      }
     },
     {
-      "role": "assistant",
-      "content": "Stage 2 深度思考完成：\nST 六维：3 个 Phase，Phase 2/3 无依赖可并行；风险 2 项（会话失效边界、缓存雪崩）\n能力规划：匹配 TDD + code-review；覆盖审计无遗漏\nMermaid 依赖图 + ASCII 双输出已展示",
-      "annotation": "第 6 维能力规划是特色：拿 Stage 0 矩阵做覆盖审计，缺技能在思考期暴露而不是执行到一半。图表必须 mermaid+ASCII 双输出——终端渲染不了图形，这是 CLI 的工程现实。匹配到 2+ 技能时还会 AskUserQuestion 让用户确认。"
+      "title": "Stage 1 优化 + Stage 2 六维思考",
+      "desc": "垃圾进垃圾出的防线设在入口：Stage 1 优化表述，评分 ≥8 会提示「原始表述已够好」——不为优化而优化。Stage 2 第 6 维能力规划拿 Stage 0 矩阵做覆盖审计，缺技能在思考期暴露而不是执行到一半。（1.5 需求探索是条件关，不画节点：主干明确走 Grilling、模糊想法走选项式，本例边界清晰未触发。）",
+      "on": ["s1", "s2"],
+      "edgesOn": ["s05>s1", "s1>s2"],
+      "append": {
+        "main": [
+          { "role": "assistant", "label": "[Stage 1] Prompt 评分 7.2/10，优化表述已作为后续输入；[Stage 2] 六维思考完成：3 个 Phase、2 个无依赖可并行，风险 2 项（会话失效边界、缓存雪崩），能力规划匹配 TDD + code-review，覆盖审计无遗漏，Mermaid + ASCII 双输出已展示" }
+        ]
+      }
     },
     {
-      "role": "assistant",
-      "content": "Stage 3 plan 已落盘 .plan/（task_plan + findings + progress + STATE.md），plan-quality 自检 8.5/10。\n确认点：批准 / 修改 / 重新规划？",
-      "annotation": "产出是 plan 文件不是代码，探索全程只读。2026-09-09 反转默认后不进 Plan Mode——审批由「落盘+自检+确认点+3.5/3.6 双审查」多道关承担，无 harness 弹窗，批准权仍在用户。（此处用户选「批准」，进入 3.5）"
+      "title": "Stage 3 落盘 + 确认点",
+      "desc": "产出是 plan 文件不是代码，探索全程只读。2026-09-09 反转默认后不进 Plan Mode——审批由「落盘+自检+确认点+3.5/3.6 双审查」多道关承担，无 harness 弹窗，批准权仍在用户。（此处用户选「批准」。）",
+      "on": ["s3"],
+      "edgesOn": ["s2>s3"],
+      "append": {
+        "main": [
+          { "role": "assistant", "label": "[Stage 3] plan 已落盘 .plan/（task_plan + findings + progress + STATE.md），plan-quality 自检 8.5/10；确认点：批准 / 修改 / 重新规划？（用户选：批准）" }
+        ]
+      }
     },
     {
-      "role": "tool_call",
-      "content": "Agent(name: plan-reviewer) — 以 Staff Engineer 角色审查 task_plan.md（6+3 维，全新上下文）",
-      "annotation": "独立 Agent 审查消除沉没成本偏差：第一个 Claude 花时间想的方案不愿推翻，全新上下文的审查 Agent 没有这包袱。强制启用——flow 里这是可选项。"
+      "title": "Stage 3.5 独立审查发起",
+      "desc": "强制启用的独立 Agent 审查消除沉没成本偏差：第一个 Claude 花时间想的方案不愿推翻，全新上下文的审查者没有这包袱——flow 里这是可选项，flow-deep 钉死为强制。",
+      "on": ["s35"],
+      "edgesOn": ["s3>s35"],
+      "append": {
+        "main": [
+          { "role": "tool_call", "label": "Agent(name: plan-reviewer) — 以 Staff Engineer 角色审查 task_plan.md（6+3 维，全新上下文）" }
+        ]
+      }
     },
     {
-      "role": "tool_result",
-      "content": "APPROVED_WITH_NOTES：Phase 2 缺幂等性假设说明，建议补充后继续",
-      "annotation": "三态裁决之一。NOTES 级处理：选择性采纳、更新 plan、继续前进；只有 NEEDS_REVISION 才退回 Stage 3 重做。半自动——报告呈用户，裁决权不在 Agent。"
+      "title": "Stage 3.5 三态裁决",
+      "desc": "三态裁决之一。NOTES 级处理：选择性采纳、更新 plan、继续前进；只有 NEEDS_REVISION 才退回 Stage 3 重做。半自动——报告呈用户，裁决权不在 Agent。",
+      "on": ["s35"],
+      "edgesOn": [],
+      "append": {
+        "main": [
+          { "role": "tool_result", "label": "APPROVED_WITH_NOTES：Phase 2 缺幂等性假设说明，建议补充后继续" }
+        ]
+      }
     },
     {
-      "role": "system",
-      "content": "[Stage 3.6] 面板评审（basic 档 3 角色并行只读）：14 项发现\nAuto-Decide 处理 12 项（行业标准 7 / 已批一致性 5），静默入 findings\n上浮 2 条 Taste Decisions：[CLOSE_APPROACH] 退避算法二选一；[YAGNI] 是否引入熔断",
-      "annotation": "Decision Review Board + 决策疲劳治理：约 80% 常规发现按 P1-P6 原则自动裁决（可追溯），用户界面只剩必须由人拍板的品味决策——2 条而不是 14 条。角色分歧会标 DISAGREEMENT 强制上浮。"
+      "title": "Stage 3.6 面板评审",
+      "desc": "Decision Review Board + 决策疲劳治理：约 80% 常规发现按 P1-P6 原则自动裁决（可追溯），用户界面只剩必须由人拍板的品味决策——2 条而不是 14 条。角色分歧标 DISAGREEMENT 强制上浮。",
+      "on": ["s36"],
+      "edgesOn": ["s35>s36"],
+      "append": {
+        "main": [
+          { "role": "system", "label": "[Stage 3.6] 面板评审（basic 档 3 角色并行只读）14 项发现：Auto-Decide 自动裁决 12 项、静默入 findings；上浮 2 条 Taste Decisions——[CLOSE_APPROACH] 退避算法二选一、[YAGNI] 是否引入熔断" }
+        ]
+      }
     },
     {
-      "role": "user",
-      "content": "SELECTIVE_ADOPT：[CLOSE_APPROACH] 用指数退避；[YAGNI] 熔断不加——当前调用量用不上",
-      "annotation": "Final Approval Gate 三选（全采 / 选择性采纳 / 退回重规划）。用户做的是品味决策，每项有背景、来源、选项、推荐——不是审 20 条流水账。"
+      "title": "Stage 3.6 Approval Gate",
+      "desc": "Final Approval Gate 三选：全采 / 选择性采纳 / 退回重规划。用户做的是品味决策，每项有背景、来源、选项、推荐——不是审 20 条流水账。",
+      "on": ["s36"],
+      "edgesOn": [],
+      "append": {
+        "main": [
+          { "role": "user", "label": "SELECTIVE_ADOPT：[CLOSE_APPROACH] 用指数退避；[YAGNI] 熔断不加——当前调用量用不上" }
+        ]
+      }
     },
     {
-      "role": "tool_call",
-      "content": "Stage 4 执行路由判定行：模式=multi-agent（2 独立 Phase 可并行）；并发 2 ≤ 3 通过\n分发：auth-core[TDD] + session-mgr[TDD]（Agent name 命名，IN_TMUX 自动分屏）",
-      "annotation": "先选后端再执行：Stage 4 不等于固定 multi-agent，单点改动会走串行，多维审查走 Workflow（须过 Fit Gate）。并发预算=主会话恒 1 路+运行中 subagent+其他活跃会话，同消息默认 ≤3 防 429——2026-09-11 从 2 上调至 3。"
+      "title": "Stage 3.7 细化 + Stage 4 路由分发",
+      "desc": "3.7 是 plan 到 Agent 指令之间的「编译层」（非代码任务自然跳过）。Stage 4 ≠ 固定 multi-agent：先选后端再执行，单点改动走串行、多维审查走 Workflow（须过 Fit Gate）；有效并发含主会话恒 1 路，同消息并发 ≤3 防 429——2026-09-11 从 2 上调至 3。",
+      "on": ["s37", "s4"],
+      "edgesOn": ["s36>s37", "s37>s4"],
+      "append": {
+        "main": [
+          { "role": "tool_call", "label": "[Stage 3.7] agent_hint 已编译：auth-core / session-mgr，bite-sized、无 placeholder；[Stage 4] 路由判定：模式=multi-agent（2 独立 Phase 可并行），并发 2 ≤ 3 通过，Agent name 命名、IN_TMUX 自动分屏" }
+        ]
+      }
     },
     {
-      "role": "system",
-      "content": "[Stage 4] Phase 1/2 完成：Spot-check 通过（文件存在 / git log 2 commits / 测试通过）；agent 已 TaskStop 收本体\n[Stage 5] Goal Verification：3/3 Pass（测试输出 + grep 验证 + 人工检查点）→ DONE\n[Stage 5.8] 沉淀提示：「认证重试退避参数模板」写入 knowledge-base？",
-      "annotation": "收口三件事：Spot-check 逐项勾销防分片遗漏；完成即总结即收防 pane 泄漏（mailbox 型 agent 不自动退出是实测教训）；验证只认新鲜证据，完成态只有 DONE/PARTIAL/BLOCKED 三种。沉淀只在 DONE 后触发——失败方案不进知识库，它和 Stage -1 构成跨会话读写闭环。"
+      "title": "Stage 5 验证 + Stage 5.8 沉淀",
+      "desc": "收口三件事：Spot-check 逐项勾销防分片遗漏；完成即总结即收防 pane 泄漏；验证只认新鲜证据，完成态只有 DONE/PARTIAL/BLOCKED 三种，失败按病因回退（偏差→S4 / plan 错→S3 / 目标不清→S0.5）。沉淀只在 DONE 后触发——失败方案不进知识库，它和 Stage -1 构成跨会话读写闭环。（未达标才进条件关 5.5 迭代 / 5.7 Ralph 强制持续，本例一次达标直通 5.8。）",
+      "on": ["s5", "s58"],
+      "edgesOn": ["s4>s5", "s5>s58"],
+      "append": {
+        "main": [
+          { "role": "system", "label": "[Stage 4] Phase 1/2 完成：Spot-check 通过（文件存在 / git log 2 commits / 测试通过），agent 已 TaskStop 收本体；[Stage 5] Goal Verification 3/3 Pass（测试输出 + grep + 人工检查点）→ DONE；[Stage 5.8] 「认证重试退避参数模板」写入 knowledge-base？" }
+        ]
+      }
     }
   ]
 }
