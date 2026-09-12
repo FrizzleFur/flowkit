@@ -130,7 +130,7 @@ body.close .sidebar-toggle { width: auto; }
 .cover .cover-main a.fs-cta:hover { background: var(--lc-text-h3); color: var(--lc-bg0); }
 
 /* GitHub 角标弱化 */
-.gh-corner, .github-corner { opacity: .5; }
+.gh-corner, .github-corner { display: none; }
 
 /* 滚动条 */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
