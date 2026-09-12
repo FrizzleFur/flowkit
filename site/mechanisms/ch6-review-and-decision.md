@@ -1,6 +1,19 @@
 # 第 6 章 · 评审与决策：两个 Claude、八副眼镜与六条原则
 
-> **一句话机制**: 让一个没写过方案的 Claude 审方案（消沉没成本），让多副专业眼镜交叉看（消单视角盲区），再用六条原则的自动判定层滤掉 80% 常规裁决——用户只接住那几条真正值得「品味判断」的决策。
+> **机制篇 · 第 6 章** · 决策
+
+*Fresh Eyes, Fewer Blind Spots*
+`~16 anchors` · `236 行` · 组件 `autodecide` + `funnel` + `replay` · 约 25 分钟
+
+<div class="fs-callout">
+
+**一句话机制**: 让一个没写过方案的 Claude 审方案（消沉没成本），让多副专业眼镜交叉看（消单视角盲区），再用六条原则的自动判定层滤掉 80% 常规裁决——用户只接住那几条真正值得「品味判断」的决策。
+
+**机制定位**: 评审区三关展开的前两关（Stage 3.5 独立审查 / Stage 3.6 面板评审）+ Auto-Decide——回答「自己写的方案，凭什么自己检查自己可信」。
+
+</div>
+
+`16` 条源码锚点 · `fs-autodecide`（8 题判定）+ `fs-funnel` + 回放 `ch6-sunkcost`（7 步）· 约 `25` 分钟
 
 <div class="fs-autodecide"></div>
 
@@ -46,7 +59,7 @@
 
 注意半自动定位: Agent 只出报告，**暂停展示、等用户确认**——裁决权不在 Agent 手里。
 
-对比实验: 同一份 plan 的两种审法——
+对比实验: 同一份 plan 的两种审法（点击播放，7 步自动演示）——
 
 <div class="fs-replay" data-script="assets/scripts/ch6-sunkcost.json"></div>
 

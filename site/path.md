@@ -4,6 +4,8 @@
 
 <div class="fs-pathview"></div>
 
-> **域色说明**: 轨道圆点与卡片徽章的颜色对应机制九域——A 编排与治理 / B 目标与输入质量 / C 思考与规划 / D 评审与决策 / E 执行与并发 / F 上下文工程 / G 验证与迭代 / H 跨会话记忆 / I 质量自举。进度条长度 = 该章「源码锚点表」断言数 ÷ 全站最大值（第 9 章, 29 条）——锚得越深, 章的工程含量越密。
->
-> **数据源**: [`assets/scripts/path-data.json`](assets/scripts/path-data.json)（11 章手工维护; 章节增删或锚点表更新后需同步）。
+<blockquote class="fs-callout">
+<p><strong>锚得越深，章的工程含量越密</strong> —— 轨道圆点与卡片徽章的颜色对应机制九域，进度条长度 = 该章「源码锚点表」断言数 ÷ 全站最大值（第 9 章, 29 条）。</p>
+<p>域色九域: A 编排与治理 · B 目标与输入质量 · C 思考与规划 · D 评审与决策 · E 执行与并发 · F 上下文工程 · G 验证与迭代 · H 跨会话记忆 · I 质量自举</p>
+<p><strong>数据源</strong>: <a href="assets/scripts/path-data.json">assets/scripts/path-data.json</a>（11 章手工维护; 章节增删或锚点表更新后需同步）。</p>
+</blockquote>

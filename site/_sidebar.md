@@ -1,4 +1,8 @@
 - [首页](/)
+<div class="fs-legend" style="padding:6px 15px;font-size:10.5px;color:#71717a;line-height:1.9">
+域色: <span style="color:#3b82f6">●</span>编排 <span style="color:#eab308">●</span>输入 <span style="color:#8b5cf6">●</span>规划 <span style="color:#ec4899">●</span>评审 <span style="color:#22c55e">●</span>并发 <span style="color:#06b6d4">●</span>上下文 <span style="color:#ef4444">●</span>验证 <span style="color:#14b8a6">●</span>记忆 <span style="color:#f97316">●</span>自举
+</div>
+
 - [关于本站](about.md)
 
 - **原理篇**

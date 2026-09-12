@@ -143,3 +143,16 @@
   to { opacity: 1; box-shadow: 0 0 9px rgba(59, 130, 246, .5); filter: drop-shadow(0 0 4px rgba(59, 130, 246, .6)); }
 }
 @media (prefers-reduced-motion: reduce) { .fs-breath { animation: none; } }
+
+/* ===== 批 2 章节结构点亮（fs-chheader/fs-grid3/fs-cta-ghost/fs-tokenbadge） ===== */
+.fs-chheader { display: flex; align-items: center; gap: 8px; font-family: ui-monospace, Menlo, monospace; font-size: 11.5px; color: #a1a1aa; margin-bottom: 6px; }
+.fs-chheader .dom { color: #3b82f6; }
+.fs-grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 1em 0; }
+.fs-grid3-card { display: block; background: #131316; border: 1px solid #27272a; border-radius: 10px; padding: 12px 14px; text-decoration: none; }
+.fs-grid3-card b { color: #fafafa; display: block; margin-bottom: 3px; }
+.fs-grid3-card span { font-size: 12.5px; color: #a1a1aa; }
+.fs-grid3-card:hover { border-color: #3b82f6; }
+.fs-cta-ghost { opacity: .75; }
+.fs-cta-ghost:hover { opacity: 1; }
+.fs-tokenbadge { display: inline-block; background: rgba(139,92,246,.16); color: #c4b5fd; border: 1px solid rgba(139,92,246,.35); border-radius: 5px; padding: 1px 7px; font-family: ui-monospace, Menlo, monospace; font-size: 11px; }
+h2 .fs-tokenbadge { vertical-align: 3px; }

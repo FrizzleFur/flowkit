@@ -1,18 +1,31 @@
 # 第 8 章 · 上下文工程：从容量检测到断点恢复的操作闭环
 
-> **一句话机制**: 上下文工程在 flow-deep 里是一套五层操作闭环——锚定（STATE.md 活记忆）、检测（脚本实测容量）、决策（四选项弹窗）、处置（压缩续命或交接换窗）、恢复（新会话直达断点）; 整套体系的出发点是一个物理事实: **模型感知不到自己的上下文占了多少**。
+> **机制篇 · 第 8 章** · 上下文
 
-**三条曲线, 同一个任务——**
+*Hand Off Before You Rot*
+`~20 anchors` · `248 行` · 组件 `replay`×3 · 约 30 分钟
+
+<div class="fs-callout">
+
+**一句话机制**: 上下文工程在 flow-deep 里是一套五层操作闭环——锚定（STATE.md 活记忆）、检测（脚本实测容量）、决策（四选项弹窗）、处置（压缩续命或交接换窗）、恢复（新会话直达断点）; 整套体系的出发点是一个物理事实: **模型感知不到自己的上下文占了多少**。
+
+**机制定位**: 上下文工程的工程细节层——理论坐标系见[原理篇第 2 章](../principles/ch2-context-three-axes.md)，本章每个操作都能对回主源 context-management.md。
+
+</div>
+
+`20` 条源码锚点 · 回放 ×3（`ch8-threelines` 9 步 / `ch8-autohandoff` 10 步 / `ch8-recovery` 7 步）· 约 `30` 分钟
+
+### 三线分岔: 三条曲线同一个任务
 
 <div class="fs-replay" data-script="assets/scripts/ch8-threelines.json"></div>
 
 **三线分岔的那一刻, 就是 flowkit 存在的理由。**
 
-**接力细节: 一次 Auto Handoff 的完整链路——**
+### 接力细节: 一次 Auto Handoff 的完整链路
 
 <div class="fs-replay" data-script="assets/scripts/ch8-autohandoff.json"></div>
 
-**情景剧: 一次真实的断点与接手——**
+### 情景剧: 一次真实的断点与接手
 
 <div class="fs-replay" data-script="assets/scripts/ch8-recovery.json"></div>
 

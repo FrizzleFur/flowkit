@@ -1,6 +1,15 @@
 # 第 3 章 · 记忆与召回闭环
 
-> **一句话机制**: 会话天然失忆——任务结束，这次踩的坑与想通的方案就随上下文蒸发; auto-skill 用「召回-沉淀」闭环把教训变成资产: **任务开始强制召回（Stage -1），验证通过才准沉淀（Stage 5.8）**，一读一写之间，经验跨会话复利。
+> **原理篇 · 第 3 章** · H · 跨会话记忆
+
+*Forced Recall, Gated Distillation*
+
+`~24 anchors` · `200 行` · 组件 — · 约 20 分钟
+
+<blockquote class="fs-callout">
+<p><strong>一句话机制</strong>: 会话天然失忆——任务结束，这次踩的坑与想通的方案就随上下文蒸发; auto-skill 用「召回-沉淀」闭环把教训变成资产: <strong>任务开始强制召回（Stage -1），验证通过才准沉淀（Stage 5.8）</strong>，一读一写之间，经验跨会话复利。</p>
+<p>Memory Layer · 跨会话记忆（H 域）· Stage -1 强制召回 / Stage 5.8 验证后沉淀的双库闭环</p>
+</blockquote>
 
 ## 30 秒看懂（闭环全景）
 
@@ -197,4 +206,7 @@ hello-agents 教程（[HelloAgents](https://github.com/jjyaoao/helloagents) 第 
 | integrity-check 四类检查（REC-2，仓外部署） | `~/.claude/skills/integrity-check/SKILL.md`（用户全局技能目录） |
 | rag-lab 双臂数据与「混合而非替换」结论 | `AIPrj/rag-lab/report.md`（[实测] 仓外个人项目） |
 
-> 下一章: [管道全景](../mechanisms/ch4-pipeline-overview.md)——单章看关卡，全图看流转: 十二关 Stage 如何串成一条流水线，本章的召回与沉淀正是它的首尾两端。
+<nav class="fs-prevnext">
+<a class="fs-nav-prev" href="#/principles/ch2-context-three-axes"><span class="fs-arrow">←</span> 上一章 · 长时程三板斧</a>
+<a class="fs-nav-next" href="#/mechanisms/ch4-pipeline-overview">下一章 · 管道全景 <span class="fs-arrow">→</span><br><small>单章看关卡，全图看流转: 十二关 Stage 如何串成一条流水线，本章的召回与沉淀正是它的首尾两端。</small></a>
+</nav>

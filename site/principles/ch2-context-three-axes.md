@@ -1,6 +1,15 @@
 # 第 2 章 · 长时程三板斧——概念与工程的三对映
 
-> **一句话机制**: 长任务会撞上 context rot——上下文越满质量越差; hello-agents 把解法归纳为「三板斧」（Compaction / 结构化笔记 / 子代理），而 flowkit 仓里早有三个机制在跑同样的活——本章给工程穿上概念的鞋，也用工程细节反过来检验概念。
+> **原理篇 · 第 2 章** · F · 上下文工程
+
+*Three Pairings, One Enemy: Context Rot*
+
+`~25 anchors` · `199 行` · 组件 `replay` · 约 25 分钟
+
+<blockquote class="fs-callout">
+<p><strong>一句话机制</strong>: 长任务会撞上 context rot——上下文越满质量越差; hello-agents 把解法归纳为「三板斧」（Compaction / 结构化笔记 / 子代理），而 flowkit 仓里早有三个机制在跑同样的活——本章给工程穿上概念的鞋，也用工程细节反过来检验概念。</p>
+<p>Context Layer · 上下文工程（F 域）· 对映 hello-agents 长时程三板斧 · 机制操作细节见第 8 章</p>
+</blockquote>
 
 ## 怎么用（30 秒上手）
 
@@ -204,4 +213,7 @@ Auto Handoff: [enabled / disabled]  # 交接偏好，跨代继承
 | tmux 分屏 named-only 与静默降级 | `skills/multi-agent/SKILL.md:258-284`; frontmatter（:5） |
 | Auto Handoff 通俗图解与四设计点 | `README.md`「Auto Handoff」节（:142-163） |
 
-> 下一章: [记忆与召回闭环](ch3-memory-loop.md)——三板斧管的是单次长任务; 跨会话的经验怎么存、怎么召回，是 auto-skill 的闭环故事。
+<nav class="fs-prevnext">
+<a class="fs-nav-prev" href="#/principles/ch1-agent-loop-and-pipeline"><span class="fs-arrow">←</span> 上一章 · Agent Loop 与管道形态</a>
+<a class="fs-nav-next" href="#/principles/ch3-memory-loop">下一章 · 记忆与召回闭环 <span class="fs-arrow">→</span><br><small>三板斧管的是单次长任务; 跨会话的经验怎么存、怎么召回，是 auto-skill 的闭环故事。</small></a>
+</nav>

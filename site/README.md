@@ -1,12 +1,17 @@
 # FlowKit 机制原理教程站
 
-> FlowKit 把「感觉驱动的编码」变成可重复的工程流程。本站讲清它的每个机制**为什么存在、怎么运转、在源码哪里**。
+<blockquote class="fs-callout">
+<p><strong>讲的就是代码里发生的</strong> —— FlowKit 把「感觉驱动的编码」变成可重复的工程流程，本站讲清它的每个机制<strong>为什么存在、怎么运转、在源码哪里</strong>。</p>
+<p>docsify 零构建 · SC5 源码锚定 · 11 章 · 原理篇 3 + 机制篇 8</p>
+</blockquote>
 
 ## 30 秒导览
 
-- **你想学会用 FlowKit** → 直接进[机制篇第 4 章管道全景](/principles/../mechanisms/ch4-pipeline-overview.md)，每章开头有「怎么用」侧栏
-- **你想理解 Agent 工程原理** → 从[原理篇第 1 章](principles/ch1-agent-loop-and-pipeline.md)顺序读，flowkit 机制是贯穿全书的活例子
-- **你只想要某个答案** → 左侧搜索（支持中文），例如搜「429」「上下文交接」「Goal Verification」
+<div class="fs-grid3">
+<a class="fs-grid3-card" href="#/mechanisms/ch4-pipeline-overview"><strong>学会用</strong><span>直接进机制篇第 4 章管道全景，每章开头有「怎么用」侧栏</span></a>
+<a class="fs-grid3-card" href="#/principles/ch1-agent-loop-and-pipeline"><strong>懂原理</strong><span>从原理篇第 1 章顺序读，flowkit 机制是贯穿全书的活例子</span></a>
+<div class="fs-grid3-card"><strong>查答案</strong><span>左侧搜索（支持中文），例如搜「429」「上下文交接」「Goal Verification」</span></div>
+</div>
 
 ## 两类读者，一条主干
 

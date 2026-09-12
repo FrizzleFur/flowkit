@@ -1,6 +1,19 @@
 # 第 4 章 · 管道全景：从 Stage -1 到 5.8 的一条龙
 
-> **一句话机制**: flow-deep 是十二道关串成的一条流水线——每道关存在的原因，都是一种被实测踩过的漂移; 过了关你拿到的不是「感觉做完了」，是证据表上的 `DONE`。
+> **机制篇 · 第 4 章** · 管道
+
+*Twelve Gates, One Journey*
+`~25 anchors` · `217 行` · 组件 `replay` · 约 30 分钟
+
+<div class="fs-callout">
+
+**一句话机制**: flow-deep 是十二道关串成的一条流水线——每道关存在的原因，都是一种被实测踩过的漂移; 过了关你拿到的不是「感觉做完了」，是证据表上的 `DONE`。
+
+**机制定位**: flow-deep 全量管道的主干地图——十二道关「为什么存在、防什么漂移、过了会怎样」; 后续各章按支线展开，本章只讲主干。
+
+</div>
+
+`25` 条源码锚点 · 回放 `ch4-pipeline`（12 步）· 约 `30` 分钟
 
 <div class="fs-replay" data-script="assets/scripts/ch4-pipeline.json"></div>
 
