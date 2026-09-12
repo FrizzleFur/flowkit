@@ -72,3 +72,72 @@
 .fs-li-done { border-color: #065f46; background: #022c22; color: #6ee7b7; }
 .fs-li-failed { border-color: #7f1d1d; background: #2a0a0a; color: #fca5a5; }
 @media (prefers-reduced-motion: reduce) { .fs-laneitem { animation: none; } }
+
+/* ===== fs-funnel 吞噬漏斗（批量评审第二幕, zinc 深色） ===== */
+.fs-funnel { border: 1px solid #27272a; border-radius: 12px; margin: 1.2em 0; background: #131316; overflow: hidden; }
+.fs-funnel-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 14px; border-bottom: 1px solid #27272a; background: #18181b; }
+.fs-funnel-title { font-weight: 600; color: #fafafa; font-size: 13.5px; }
+.fs-fn-counts { display: flex; gap: 12px; }
+.fs-fn-count { font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: #71717a; }
+.fs-fn-count b { display: inline-block; font-size: 14px; color: #e4e4e7; margin-left: 3px; min-width: 18px; text-align: right; }
+.fs-fn-count b.fs-fn-bump { animation: fs-fn-bump .25s ease; }
+@keyframes fs-fn-bump { from { transform: scale(1.45); color: #fff; } }
+.fs-funnel-ctrl { display: flex; gap: 6px; align-items: center; padding: 8px 14px 0; }
+.fs-funnel-stage { position: relative; margin: 10px 14px 0; padding: 10px; border: 1px solid #27272a; border-radius: 10px; background: #101014; overflow: hidden; }
+.fs-fn-stream { border: 1px dashed #3f3f46; border-radius: 8px; padding: 5px 10px; font-size: 12px; color: #a1a1aa; background: #131316; margin-bottom: 10px; min-height: 20px; }
+.fs-fn-slabel { font-family: ui-monospace, Menlo, monospace; font-size: 10px; color: #71717a; margin-right: 8px; }
+.fs-fn-walls { display: flex; flex-direction: column; gap: 16px; padding: 2px 0 6px; }
+.fs-fn-wall { display: flex; gap: 8px; align-items: center; justify-content: center; border: 1px solid #3f3f46; border-radius: 8px; background: linear-gradient(180deg, #1b1b20, #17171c); padding: 5px 10px; }
+.fs-fn-wall:nth-child(1) { margin: 0 4px; } .fs-fn-wall:nth-child(2) { margin: 0 24px; } .fs-fn-wall:nth-child(3) { margin: 0 44px; }
+.fs-fn-wallname { font-family: ui-monospace, Menlo, monospace; font-size: 10px; color: #71717a; letter-spacing: .4px; }
+.fs-fn-ptag { font-family: ui-monospace, Menlo, monospace; font-size: 10px; background: #1e3a8a; color: #93c5fd; border-radius: 5px; padding: 1px 7px; visibility: hidden; animation: fs-fn-tagup 1s ease; }
+@keyframes fs-fn-tagup { 0% { opacity: 0; transform: translateY(7px); } 25% { opacity: 1; transform: none; } 100% { opacity: .9; } }
+.fs-fn-air { position: absolute; inset: 0; pointer-events: none; }
+.fs-fn-card { position: absolute; width: 132px; border: 1px solid #3f3f46; border-radius: 7px; background: #18181b; color: #d4d4d8; font-size: 10.5px; padding: 4px 8px; transition: transform .42s cubic-bezier(.55, 0, .75, .45), opacity .45s ease; will-change: transform; }
+.fs-fn-cardin { animation: fs-fn-in .3s ease both; }
+.fs-fn-card.fs-fn-dim { border-color: #27272a; background: #131316; color: #52525b; }
+.fs-fn-card.fs-fn-red { border-color: #ef4444; background: #2a0a0a; color: #fca5a5; }
+.fs-fn-shake .fs-fn-cardin { animation: fs-fn-shake .42s ease; }
+@keyframes fs-fn-shake { 20% { transform: translateX(-4px); } 40% { transform: translateX(4px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
+.fs-fn-exits { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.fs-funnel.fs-fn-static .fs-fn-exits { grid-template-columns: repeat(3, 1fr); }
+.fs-funnel:not(.fs-fn-static) .fs-fn-eatbox { display: none; }
+.fs-fn-exit { border: 1px solid #27272a; border-radius: 10px; background: #17171c; padding: 6px 9px; min-height: 84px; }
+.fs-fn-exit-title { font-family: ui-monospace, Menlo, monospace; font-size: 10.5px; color: #71717a; padding-bottom: 5px; border-bottom: 1px dashed #27272a; margin-bottom: 6px; }
+.fs-fn-tray .fs-fn-exit-title { color: #fbbf24; } .fs-fn-gate .fs-fn-exit-title { color: #fca5a5; }
+.fs-fn-tlist { display: flex; flex-direction: column; gap: 4px; }
+.fs-fn-trow { display: flex; gap: 6px; align-items: baseline; font-size: 11px; color: #d4d4d8; animation: fs-fn-drop .5s cubic-bezier(.3, .7, .4, 1.25); }
+@keyframes fs-fn-drop { 0% { opacity: 0; transform: translateY(-12px); } 55% { transform: translateY(3px); } 100% { opacity: 1; transform: none; } }
+.fs-fn-ttag { flex: 0 0 auto; font-family: ui-monospace, Menlo, monospace; font-size: 9px; border-radius: 4px; padding: 0 5px; background: #3f2d0e; color: #fcd34d; }
+.fs-fn-trow-red .fs-fn-ttag { background: #450a0a; color: #fca5a5; }
+.fs-fn-trow-dim { color: #52525b; } .fs-fn-trow-dim .fs-fn-ttag { background: #1c1c21; color: #71717a; }
+.fs-fn-note { margin: 8px 14px 0; font-size: 12px; color: #a1a1aa; min-height: 18px; }
+.fs-fn-done { display: none; margin: 8px 14px 12px; border: 1px solid #92400e; background: #231a05; border-radius: 8px; padding: 8px 12px; font-size: 12.5px; color: #fcd34d; font-weight: 600; }
+.fs-fn-done.fs-fn-done-on { display: block; animation: fs-fn-in .35s ease; }
+.fs-funnel.fs-fn-static .fs-funnel-ctrl, .fs-funnel.fs-fn-static .fs-fn-stream, .fs-funnel.fs-fn-static .fs-fn-air, .fs-funnel.fs-fn-static .fs-fn-note { display: none; }
+@media (max-width: 640px) { .fs-fn-exits, .fs-funnel.fs-fn-static .fs-fn-exits { grid-template-columns: 1fr; } .fs-fn-wall:nth-child(2) { margin: 0 14px; } .fs-fn-wall:nth-child(3) { margin: 0 26px; } }
+@media (prefers-reduced-motion: reduce) { .fs-fn-cardin, .fs-fn-trow, .fs-fn-ptag, .fs-fn-count b, .fs-fn-done { animation: none; } .fs-fn-card { transition: none; } }
+
+/* ===== curve 曲线面板（reveal 逐段生长） ===== */
+.fs-curvehost { flex: 1.2 1 320px; min-width: 260px; border: 1px solid #27272a; border-radius: 10px; background: #101014; padding: 8px; }
+.fs-curvehost svg { width: auto; max-width: 100%; height: auto; margin: 0 auto; display: block; }
+.fs-curve-axis { stroke: #3f3f46; stroke-width: 1; }
+.fs-curve-grid { stroke: #27272a; stroke-width: 1; stroke-dasharray: 2 4; }
+.fs-curve-label { fill: #a1a1aa; font-size: 9px; font-family: ui-monospace, Menlo, monospace; }
+.fs-curve-flag { stroke-width: 1.2; stroke-dasharray: 3 3; opacity: .85; }
+.fs-curve-flaglabel { font-size: 8.5px; font-family: ui-monospace, Menlo, monospace; }
+.fs-curveline { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.fs-crvetip { stroke: #09090b; stroke-width: 1; }
+.fs-curve-legend { display: flex; gap: 12px; flex-wrap: wrap; padding: 6px 4px 0; font-size: 10.5px; color: #a1a1aa; font-family: ui-monospace, Menlo, monospace; }
+.fs-legend-swatch { display: inline-block; width: 14px; height: 3px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+
+/* ===== flow.cruise 巡游 token ===== */
+.fs-token { filter: drop-shadow(0 0 5px #3b82f6) drop-shadow(0 0 10px rgba(59, 130, 246, .55)); }
+
+/* ===== 呼吸动词（引擎自动挂: 活跃节点/曲线端点） ===== */
+.fs-breath { animation: fs-breath 2.5s ease-in-out infinite alternate; }
+@keyframes fs-breath {
+  from { opacity: .82; box-shadow: 0 0 0 rgba(59, 130, 246, 0); filter: drop-shadow(0 0 0 rgba(59, 130, 246, 0)); }
+  to { opacity: 1; box-shadow: 0 0 9px rgba(59, 130, 246, .5); filter: drop-shadow(0 0 4px rgba(59, 130, 246, .6)); }
+}
+@media (prefers-reduced-motion: reduce) { .fs-breath { animation: none; } }

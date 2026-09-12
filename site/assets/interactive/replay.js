@@ -2,8 +2,9 @@
  *
  * 兼容两种剧本 schema:
  *  v1（旧）: { title, steps:[{role, content, annotation}] }              → 单消息面板回放
- *  v2（新）: { title, version:2, layout, flow:{nodes,edges},             → 流程图 + 多消息面板 + 旁白
- *             messagesPanels:[{id,title}], steps:[{title,desc,on,edgesOn,append,clear}] }
+ *  v2（新）: { title, version:2, layout, flow:{nodes,edges,cruise},       → 流程图(+巡游) + 多消息面板 + 旁白
+ *             curve:{curves,flags}, messagesPanels:[{id,title}],
+ *             steps:[{title,desc,on,edgesOn,append,clear,reveal}] }
  *
  * 协议文档: assets/scripts/PROTOCOL.md
  * 用法: <div class="fs-replay" data-script="assets/scripts/xxx.json"></div>
@@ -26,6 +27,7 @@
   }
 
   function clearTimer(st) { if (st.timer) { clearTimeout(st.timer); st.timer = null; } }
+  function reducedMotion() { return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
 
   /* ---------- v1 → v2 归一化 ---------- */
   function normalize(script) {
@@ -93,7 +95,155 @@
       nodeEls[n.id] = g;
     });
     host.appendChild(svg);
-    return { els: nodeEls, edges: edgeEls };
+    return { els: nodeEls, edges: edgeEls, svg: svg }; // svg 供巡游 token 挂载
+  }
+
+  /* ---------- 面板: 曲线（reveal 逐段生长; 坐标系左下原点） ---------- */
+  function buildCurve(host, conf) {
+    var NS = 'http://www.w3.org/2000/svg';
+    var PW = 320, PH = 190, ML = 36, MR = 14, MT = 14, MB = 26;
+    var xMax = conf.xMax || 100, yMax = conf.yMax || 100;
+    function X(v) { return ML + (v / xMax) * PW; }
+    function Y(v) { return MT + PH - (v / yMax) * PH; }
+    var svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 ' + (PW + ML + MR) + ' ' + (PH + MT + MB));
+    [0.25, 0.5, 0.75].forEach(function (f) {
+      var l = document.createElementNS(NS, 'line');
+      l.setAttribute('x1', ML); l.setAttribute('x2', ML + PW);
+      l.setAttribute('y1', MT + PH * (1 - f)); l.setAttribute('y2', MT + PH * (1 - f));
+      l.setAttribute('class', 'fs-curve-grid');
+      svg.appendChild(l);
+    });
+    var axis = document.createElementNS(NS, 'path');
+    axis.setAttribute('d', 'M' + ML + ',' + MT + ' L' + ML + ',' + (MT + PH) + ' L' + (ML + PW) + ',' + (MT + PH));
+    axis.setAttribute('class', 'fs-curve-axis'); axis.setAttribute('fill', 'none');
+    svg.appendChild(axis);
+    // 轴刻度（0 与量程）
+    [['0', ML, MT + PH + 13, 'middle'], [String(xMax), ML + PW, MT + PH + 13, 'middle'],
+     ['0', ML - 5, MT + PH + 3, 'end'], [String(yMax), ML - 5, MT + 4, 'end']].forEach(function (t) {
+      var e = document.createElementNS(NS, 'text');
+      e.setAttribute('x', t[1]); e.setAttribute('y', t[2]); e.setAttribute('text-anchor', t[3]);
+      e.setAttribute('class', 'fs-curve-label'); e.textContent = t[0];
+      svg.appendChild(e);
+    });
+    // 参考线: x = yThreshold 处贯穿竖直虚线（协议约定）
+    if (conf.yThreshold != null) {
+      var th = document.createElementNS(NS, 'line');
+      th.setAttribute('x1', X(conf.yThreshold)); th.setAttribute('x2', X(conf.yThreshold));
+      th.setAttribute('y1', MT); th.setAttribute('y2', MT + PH);
+      th.setAttribute('class', 'fs-curve-flag'); th.setAttribute('stroke', '#71717a');
+      svg.appendChild(th);
+      var tht = document.createElementNS(NS, 'text');
+      tht.setAttribute('x', X(conf.yThreshold) + 4); tht.setAttribute('y', MT + 9);
+      tht.setAttribute('class', 'fs-curve-flaglabel'); tht.setAttribute('fill', '#a1a1aa');
+      tht.textContent = String(conf.yThreshold);
+      svg.appendChild(tht);
+    }
+    // 里程碑旗标
+    (conf.flags || []).forEach(function (f) {
+      var fl = document.createElementNS(NS, 'line');
+      fl.setAttribute('x1', X(f.x)); fl.setAttribute('x2', X(f.x));
+      fl.setAttribute('y1', MT); fl.setAttribute('y2', MT + PH);
+      fl.setAttribute('class', 'fs-curve-flag'); fl.setAttribute('stroke', f.color || '#3b82f6');
+      svg.appendChild(fl);
+      var t = document.createElementNS(NS, 'text');
+      t.setAttribute('x', X(f.x)); t.setAttribute('y', MT + 9);
+      t.setAttribute('text-anchor', 'middle');
+      t.setAttribute('class', 'fs-curve-flaglabel'); t.setAttribute('fill', f.color || '#3b82f6');
+      t.textContent = '⚑ ' + (f.label || '');
+      svg.appendChild(t);
+    });
+    // 曲线本体: path + 手动累加段长（cum），reveal 值 = 画到第几个点
+    var state = {};
+    (conf.curves || []).forEach(function (c) {
+      var pts = c.points || [];
+      var d = pts.map(function (p, i) { return (i ? 'L' : 'M') + X(p[0]).toFixed(1) + ',' + Y(p[1]).toFixed(1); }).join(' ');
+      var path = document.createElementNS(NS, 'path');
+      path.setAttribute('d', d); path.setAttribute('class', 'fs-curveline');
+      path.setAttribute('stroke', c.color || '#3b82f6');
+      var cum = [0];
+      for (var i = 1; i < pts.length; i++) {
+        var dx = X(pts[i][0]) - X(pts[i - 1][0]), dy = Y(pts[i][1]) - Y(pts[i - 1][1]);
+        cum.push(cum[i - 1] + Math.sqrt(dx * dx + dy * dy));
+      }
+      var total = cum[cum.length - 1] || 0;
+      path.setAttribute('stroke-dasharray', total);
+      path.setAttribute('stroke-dashoffset', total); // 初始全隐藏
+      svg.appendChild(path);
+      var tip = document.createElementNS(NS, 'circle');
+      tip.setAttribute('r', '3.5'); tip.setAttribute('fill', c.color || '#3b82f6');
+      tip.setAttribute('class', 'fs-crvetip'); tip.style.display = 'none';
+      svg.appendChild(tip);
+      state[c.id] = { conf: c, pts: pts, path: path, tip: tip, total: total, cum: cum, cur: 0, raf: null };
+    });
+    var yl = document.createElementNS(NS, 'text');
+    yl.setAttribute('x', 11); yl.setAttribute('y', MT + PH / 2);
+    yl.setAttribute('transform', 'rotate(-90 11 ' + (MT + PH / 2) + ')');
+    yl.setAttribute('text-anchor', 'middle'); yl.setAttribute('class', 'fs-curve-label');
+    yl.textContent = conf.yLabel || '';
+    svg.appendChild(yl);
+    var xl = document.createElementNS(NS, 'text');
+    xl.setAttribute('x', ML + PW / 2); xl.setAttribute('y', MT + PH + 24);
+    xl.setAttribute('text-anchor', 'middle'); xl.setAttribute('class', 'fs-curve-label');
+    xl.textContent = conf.xLabel || '';
+    svg.appendChild(xl);
+    var legend = el('div', 'fs-curve-legend');
+    (conf.curves || []).forEach(function (c) {
+      var item = el('span', 'fs-curve-legitem');
+      var sw = el('i', 'fs-legend-swatch'); sw.style.background = c.color || '#3b82f6';
+      item.appendChild(sw); item.appendChild(document.createTextNode(c.label || c.id));
+      legend.appendChild(item);
+    });
+    host.appendChild(svg); host.appendChild(legend);
+
+    function pointAt(cs, len) { // 折线上取点（纯几何计算，不依赖 DOM 几何 API）
+      if (len <= 0) return { x: X(cs.pts[0][0]), y: Y(cs.pts[0][1]) };
+      for (var i = 1; i < cs.cum.length; i++) {
+        if (len <= cs.cum[i] || i === cs.cum.length - 1) {
+          var seg = (cs.cum[i] - cs.cum[i - 1]) || 1;
+          var f = Math.max(0, Math.min(1, (len - cs.cum[i - 1]) / seg));
+          return { x: X(cs.pts[i - 1][0]) + (X(cs.pts[i][0]) - X(cs.pts[i - 1][0])) * f,
+                   y: Y(cs.pts[i - 1][1]) + (Y(cs.pts[i][1]) - Y(cs.pts[i - 1][1])) * f };
+        }
+      }
+    }
+    function setDraw(cs, len) {
+      cs.cur = len;
+      cs.path.setAttribute('stroke-dashoffset', cs.total - len);
+      if (len > 0.5) {
+        var p = pointAt(cs, len);
+        cs.tip.setAttribute('cx', p.x); cs.tip.setAttribute('cy', p.y);
+        cs.tip.style.display = '';
+        cs.tip.classList.add('fs-breath'); // 呼吸动词: 活跃曲线端点
+      } else {
+        cs.tip.style.display = 'none';
+        cs.tip.classList.remove('fs-breath');
+      }
+    }
+    function reveal(id, k) {
+      var cs = state[id];
+      if (!cs || !cs.pts.length) return;
+      var kk = Math.max(0, Math.min(k | 0, cs.pts.length));
+      var target = kk > 0 ? cs.cum[kk - 1] : 0;
+      if (cs.raf) { cancelAnimationFrame(cs.raf); cs.raf = null; } // 中途改目标: 从当前值续补间
+      if (reducedMotion()) { setDraw(cs, target); return; }
+      var from = cs.cur, t0 = performance.now(), dur = 600;
+      function frame(now) {
+        var t = Math.min(1, (now - t0) / dur);
+        var e = 1 - (1 - t) * (1 - t); // ease-out 生长
+        setDraw(cs, from + (target - from) * e);
+        cs.raf = t < 1 ? requestAnimationFrame(frame) : null;
+      }
+      cs.raf = requestAnimationFrame(frame);
+    }
+    function reset() {
+      Object.keys(state).forEach(function (id) {
+        var cs = state[id];
+        if (cs.raf) { cancelAnimationFrame(cs.raf); cs.raf = null; }
+        setDraw(cs, 0);
+      });
+    }
+    return { reveal: reveal, reset: reset, state: state };
   }
 
   /* ---------- 面板: 泳道（多列并行 + 条目状态流动） ---------- */
@@ -164,7 +314,7 @@
   function build(root, script) {
     script = normalize(script);
     root.textContent = '';
-    var layout = script.layout || (script.flow ? 'flow+messages' : 'messages');
+    var layout = script.layout || (script.flow ? 'flow+messages' : (script.curve ? 'curve+messages' : 'messages'));
     var multi = script.messagesPanels && script.messagesPanels.length > 1;
 
     var head = el('div', 'fs-replay-head');
@@ -179,7 +329,7 @@
     head.appendChild(ctr);
     root.appendChild(head);
 
-    var stage = el('div', 'fs-stage' + (layout.indexOf('flow') === 0 ? ' fs-stage-flow' : ''));
+    var stage = el('div', 'fs-stage' + (layout.indexOf('flow') === 0 || layout.indexOf('curve') === 0 ? ' fs-stage-flow' : ''));
     root.appendChild(stage);
 
     var flowHost = null, flow = null;
@@ -189,6 +339,12 @@
       flowHost = el('div', 'fs-flowhost');
       stage.appendChild(flowHost);
       flow = buildFlow(flowHost, script.flow);
+    }
+    var curveObj = null;
+    if (script.curve) {
+      var curveHost = el('div', 'fs-curvehost');
+      stage.appendChild(curveHost);
+      curveObj = buildCurve(curveHost, script.curve);
     }
     if (script.lanes) {
       laneHost = el('div', 'fs-lanehost');
@@ -205,6 +361,86 @@
     var dots = el('div', 'fs-dots');
     root.appendChild(dots);
 
+    /* ---------- 巡游（flow.cruise）: 终态后发光 token 沿节点序列连续巡游 ---------- */
+    var cruiseConf = (script.flow && script.flow.cruise && flow) ? script.flow.cruise : null;
+    if (!(cruiseConf && cruiseConf.path && cruiseConf.path.length > 1)) cruiseConf = null;
+    var cruise = { timer: null, raf: null, active: false, idx: 0, pulses: {}, token: null, paths: {} };
+    var nodeCenter = {};
+    if (cruiseConf) {
+      var CNS = 'http://www.w3.org/2000/svg';
+      script.flow.nodes.forEach(function (n) { nodeCenter[n.id] = { x: n.x + n.w / 2 + 8, y: n.y + n.h / 2 + 8 }; });
+      var token = document.createElementNS(CNS, 'circle');
+      token.setAttribute('r', '5'); token.setAttribute('fill', '#3b82f6'); token.setAttribute('class', 'fs-token');
+      token.style.display = 'none';
+      flow.svg.appendChild(token);
+      cruise.token = token;
+    }
+    function segPath(aId, bId) { // 优先复用已画边; 未连通段用隐形直线补
+      var key = aId + '>' + bId;
+      if (flow.edges[key]) return flow.edges[key];
+      if (cruise.paths[key]) return cruise.paths[key];
+      var a = nodeCenter[aId], b = nodeCenter[bId];
+      if (!a || !b) return null;
+      var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      p.setAttribute('d', 'M' + a.x + ',' + a.y + ' L' + b.x + ',' + b.y);
+      p.setAttribute('fill', 'none'); p.setAttribute('stroke', 'none');
+      flow.svg.appendChild(p); flow.svg.appendChild(cruise.token); // token 保持最上层
+      cruise.paths[key] = p;
+      return p;
+    }
+    function restoreNode(id) { // 脉动结束后恢复该步的权威点亮状态
+      var g = flow.els[id];
+      if (!g) return;
+      var s = script.steps[st ? Math.max(0, st.idx) : 0];
+      var on = !!(s && s.on && s.on.indexOf(id) >= 0);
+      g.firstChild.setAttribute('class', 'fs-node' + (on ? ' on fs-breath' : ''));
+    }
+    function pulseNode(id) { // 路过节点: 点亮 0.6s（fill transition + breath 即脉动）
+      var g = flow.els[id];
+      if (!g) return;
+      if (cruise.pulses[id]) clearTimeout(cruise.pulses[id]);
+      g.firstChild.setAttribute('class', 'fs-node on fs-breath');
+      cruise.pulses[id] = setTimeout(function () { delete cruise.pulses[id]; restoreNode(id); }, 600);
+    }
+    function stopCruise() {
+      cruise.active = false;
+      if (cruise.timer) { clearTimeout(cruise.timer); cruise.timer = null; }
+      if (cruise.raf) { cancelAnimationFrame(cruise.raf); cruise.raf = null; }
+      if (cruise.token) cruise.token.style.display = 'none';
+      Object.keys(cruise.pulses).forEach(function (id) { clearTimeout(cruise.pulses[id]); delete cruise.pulses[id]; restoreNode(id); });
+    }
+    function startCruise() {
+      if (!cruiseConf || cruise.active || reducedMotion()) return;
+      var first = nodeCenter[cruiseConf.path[0]];
+      if (!first || !cruise.token) return;
+      cruise.active = true; cruise.idx = 0;
+      cruise.token.style.display = '';
+      cruise.token.setAttribute('cx', first.x); cruise.token.setAttribute('cy', first.y);
+      pulseNode(cruiseConf.path[0]);
+      cruise.timer = setTimeout(cruiseHop, Math.max(200, cruiseConf.intervalMs || 900));
+    }
+    function cruiseHop() { // 每段 getPointAtLength + rAF 按边长匀速
+      if (!cruise.active) return;
+      var path = cruiseConf.path;
+      var to = path[(cruise.idx + 1) % path.length];
+      var seg = segPath(path[cruise.idx], to);
+      if (!seg) { stopCruise(); return; }
+      var len = seg.getTotalLength();
+      var dur = Math.max(240, len / 0.16); // 0.16 viewBox-px/ms 匀速
+      var t0 = performance.now();
+      cruise.raf = requestAnimationFrame(function frame(now) {
+        if (!cruise.active) return;
+        var t = Math.min(1, (now - t0) / dur);
+        var pt = seg.getPointAtLength(len * t);
+        cruise.token.setAttribute('cx', pt.x); cruise.token.setAttribute('cy', pt.y);
+        if (t < 1) { cruise.raf = requestAnimationFrame(frame); return; }
+        cruise.raf = null;
+        cruise.idx = (cruise.idx + 1) % path.length; // 走完回绕起点
+        pulseNode(to);
+        cruise.timer = setTimeout(cruiseHop, Math.max(200, cruiseConf.intervalMs || 900));
+      });
+    }
+
     var st = { idx: -1, playing: false, timer: null, speed: 1, total: script.steps.length };
 
     function renderDots() {
@@ -216,11 +452,12 @@
       var s = script.steps[i];
       if (!s) return;
       if (flow) {
-        flow.els && Object.keys(flow.els).forEach(function (id) { flow.els[id].firstChild.setAttribute('class', 'fs-node' + (s.on && s.on.indexOf(id) >= 0 ? ' on' : '')); });
+        flow.els && Object.keys(flow.els).forEach(function (id) { flow.els[id].firstChild.setAttribute('class', 'fs-node' + (s.on && s.on.indexOf(id) >= 0 ? ' on fs-breath' : '')); });
         flow.edges && Object.keys(flow.edges).forEach(function (k) { flow.edges[k].setAttribute('class', 'fs-edge' + (s.edgesOn && s.edgesOn.indexOf(k) >= 0 ? ' on' : '')); });
       }
       if (s.clear) s.clear.forEach(function (pid) { if (msgPanels[pid]) { msgPanels[pid].body.textContent = ''; msgPanels[pid].count = 0; } });
       if (s.lanes && lanesObj) applyLaneSet(lanesObj, s.lanes.set);
+      if (s.reveal && curveObj) Object.keys(s.reveal).forEach(function (id) { curveObj.reveal(id, s.reveal[id]); });
       if (s.append) Object.keys(s.append).forEach(function (pid) {
         var p = msgPanels[pid]; if (!p) return;
         s.append[pid].forEach(function (b) { p.body.appendChild(chipFor(b)); p.count++; });
@@ -232,6 +469,7 @@
         if (s.desc) note.appendChild(el('span', null, s.desc));
       }
       renderDots();
+      if (st.total > 0 && i >= st.total - 1 && !st.playing && cruiseConf) startCruise(); // 手动步进到终态也巡游
       var act = root.querySelector('.fs-stage');
       if (act) act.scrollTop = act.scrollHeight;
     }
@@ -243,13 +481,14 @@
     function tick() {
       if (!st.playing) return;
       advance();
-      if (st.idx >= st.total - 1) { stop(); return; }
+      if (st.idx >= st.total - 1) { stop(); if (cruiseConf) startCruise(); return; } // 播完启动巡游
       st.timer = setTimeout(tick, BASE_MS / st.speed);
     }
     play.onclick = function () {
       if (st.playing) { stop(); return; }
       if (st.idx >= st.total - 1) {
         st.idx = -1;
+        stopCruise(); if (curveObj) curveObj.reset(); // 重播前归零巡游与曲线
         Object.keys(msgPanels).forEach(function (pid) { msgPanels[pid].body.textContent = ''; msgPanels[pid].count = 0; msgPanels[pid].len.textContent = 'len=0'; });
       }
       st.playing = true; play.textContent = '暂停'; tick();
@@ -257,6 +496,7 @@
     step.onclick = function () { stop(); advance(); };
     reset.onclick = function () {
       stop(); st.idx = -1;
+      stopCruise(); if (curveObj) curveObj.reset();
       Object.keys(msgPanels).forEach(function (pid) { msgPanels[pid].body.textContent = ''; msgPanels[pid].count = 0; msgPanels[pid].len.textContent = 'len=0'; });
       if (lanesObj) { Object.keys(lanesObj.items).forEach(function (id) { lanesObj.items[id].remove(); delete lanesObj.items[id]; }); }
       note.textContent = ''; renderDots();
@@ -265,13 +505,18 @@
 
     renderDots();
     applyStep(0); st.idx = 0; renderDots(); // 首步预渲染——打开即有画面（learncc 式）
+    if (cruiseConf && st.total === 0) cruise.timer = setTimeout(startCruise, 600); // 无 steps: 加载后即巡游
+
+    // 巡游计时器并入 root._fsClear 生命周期链（重初始化/离开页面必清）
+    var prevClear = root._fsClear;
+    root._fsClear = function () { if (prevClear) prevClear(); stopCruise(); };
 
     // 进视口自动播放一次（learncc 行为）；reduce-motion 用户与手动重置后不自动重播
     var played = false;
     if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       var io = new IntersectionObserver(function (entries) {
         entries.forEach(function (en) {
-          if (en.isIntersecting && !played) { played = true; io.disconnect(); setTimeout(function () { if (!st.playing) { st.idx = -1; Object.keys(msgPanels).forEach(function (pid) { msgPanels[pid].body.textContent = ''; msgPanels[pid].count = 0; msgPanels[pid].len.textContent = 'len=0'; }); st.playing = true; play.textContent = '暂停'; tick(); } }, 400); }
+          if (en.isIntersecting && !played) { played = true; io.disconnect(); setTimeout(function () { if (!st.playing) { stopCruise(); if (curveObj) curveObj.reset(); st.idx = -1; Object.keys(msgPanels).forEach(function (pid) { msgPanels[pid].body.textContent = ''; msgPanels[pid].count = 0; msgPanels[pid].len.textContent = 'len=0'; }); st.playing = true; play.textContent = '暂停'; tick(); } }, 400); }
         });
       }, { threshold: 0.35 });
       io.observe(root);
