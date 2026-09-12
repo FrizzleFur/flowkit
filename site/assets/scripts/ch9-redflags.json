@@ -16,7 +16,7 @@
     },
     {
       "title": "SC3 进闸待检",
-      "desc": "闸门不问「写得怎么样」，只问 IL-2 那一句：No completion claims without fresh verification evidence。检查动词全是「看到」——不是「知道」，不是「推断」。",
+      "desc": "闸门只问 IL-2: No completion claims without fresh verification evidence。检查动词全是「看到」——不是知道或推断。",
       "lanes": { "set": {
         "sc3": { "lane": "lane-gate", "state": "running", "label": "SC3: 已附 grep 实测输出", "note": "验三件事: 证据新鲜 / 输出可见 / 标准来自 Goal Contract" }
       } }
@@ -37,7 +37,7 @@
     },
     {
       "title": "流水线另一端冒出红旗话术",
-      "desc": "Agent 内部冒出第一句自我辩解：「看起来应该能工作」。iron-laws 的 Rationalization Table 逐句收录这类话术——出现在推理里即触发，立即停下回到铁律。",
+      "desc": "Agent 内部冒出第一句自我辩解:「看起来应该能工作」。Rationalization Table 逐句收录这类话术——出现在推理里即触发，立即停下回到铁律。",
       "lanes": { "set": {
         "rf1": { "lane": "lane-out", "state": "running", "label": "看起来应该能工作", "note": "话术卡: 没有任何输出可出示" }
       } }

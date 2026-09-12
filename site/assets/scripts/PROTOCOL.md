@@ -49,8 +49,8 @@
 
 | 文件 | schema | 面板 |
 |---|---|---|
-| ch4-pipeline.json | v1（兼容模式运行） | 单消息 |
-| ch8-autohandoff.json | v1（兼容模式运行） | 单消息 |
+| ch4-pipeline.json | v2 | 单消息 |
+| ch8-autohandoff.json | v1（annotation 已补 {title, desc} 结构，兼容模式运行） | 单消息 |
 
 ## lanes 泳道面板（v2.1 新增——多列并行/条目状态流动类机制）
 

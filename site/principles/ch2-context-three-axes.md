@@ -17,7 +17,7 @@
 
 <div class="fs-replay" data-script="assets/scripts/ch2-subagent.json"></div>
 
-注意 len 对比: 子代理的中间消息永远不进入父上下文。
+**注意 len 对比: 子代理的中间消息永远不进入父上下文。**
 
 
 本章是原理篇，无可跑命令——用一张速查表代替体验。任务出现下列症状时，对号入座:

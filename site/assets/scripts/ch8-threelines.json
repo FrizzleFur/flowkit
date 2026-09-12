@@ -59,7 +59,7 @@
     },
     {
       "title": "75% Context Guard 告警",
-      "desc": "蓝色 Auto Handoff 线与红线同走势抵达 75% 虚线, Context Guard 在此告警。注意: 前 75% 它和「不管」一模一样——主动交接的价值, 要到分岔点之后才显现。",
+      "desc": "蓝色 Auto Handoff 线与红线同走势抵达 75% 虚线, Context Guard 在此告警。注意: 前 75% 它和「不管」一模一样——交接的价值到分岔点后才显现。",
       "reveal": { "handoff": 9 }
     },
     {
@@ -74,7 +74,7 @@
     },
     {
       "title": "同一任务, 三种结局",
-      "desc": "终局对照: 不管 5 分 / 只靠 auto-compact 35 分 / Auto Handoff 88 分。同一个任务三种结局——三线分岔的那一刻, 就是 flowkit 存在的理由。",
+      "desc": "终局对照: 不管 5 分 / 只靠 auto-compact 35 分 / Auto Handoff 88 分。三种结局——三线分岔的那一刻, 就是 flowkit 存在的理由。",
       "reveal": { "handoff": 12 }
     }
   ]

@@ -8,7 +8,7 @@
   "steps": [
     {
       "title": "会话 A: 深度工作中",
-      "desc": "长任务跑到 Stage 4: 任务书收下, 前三个 Phase 已完成并 commit, 第四个正在改。每一步都在加长 messages[]——上下文是只涨不缩的账本, 而窗口有限, 这个矛盾注定在某个边界爆发。",
+      "desc": "跑到 Stage 4: 前三个 Phase 已完成并 commit, 第四个在改。每步都在加长 messages[]——上下文是只涨不缩的账本, 窗口有限, 矛盾必在某边界爆发。",
       "append": {
         "main": [
           { "role": "user", "label": "任务: 重构支付回调模块 (Run ID: flow-deep-0912-1030-pay)" },
@@ -22,7 +22,7 @@
     },
     {
       "title": "容量告警: 边界实测 75%",
-      "desc": "Context Guard 在 Stage/Phase 边界跑 check_context.py——读 transcript 最后一条 assistant usage（input+cache_read+cache_creation+output 四项之和）除以窗口大小。模型感知不到自己的占用, 百分比只能来自脚本实测, 不做人工估计; 75% 是 armed 状态的自动交接阈值, 留出写文件与 spawn 的余量, 保证动作链始终跑在 auto-compact 之前。",
+      "desc": "边界实测: 取 transcript 末条 usage 四项之和除以窗口, 75% armed 阈值留出 spawn 余量, 跑在 auto-compact 之前。",
       "append": {
         "main": [
           { "role": "system", "label": "Context Guard: 边界实测 75% ≥ 75% —— 触发自动交接" }
@@ -31,7 +31,7 @@
     },
     {
       "title": "主动 Checkpoint: 五件套落盘",
-      "desc": "跳过弹窗, 直接执行选项 b 全部保存动作: task_plan.md（Phase 定义与完成标准）、findings.md（关键决策）、progress.md（完成项+证据）、STATE.md（恢复锚点, Next Action 必须具体可执行）、HANDOFF.md（新会话的初始 prompt）。HANDOFF 只引导按序读文件, 不复制内容——重复内容会随进度过期, 路径引用不会。",
+      "desc": "跳过弹窗直接执行 b: 五件套（task_plan / findings / progress / STATE / HANDOFF）落盘。HANDOFF 只引导按序读, 不复制。",
       "append": {
         "main": [
           { "role": "assistant", "label": "Checkpoint 完成: 五件套落盘, HANDOFF.md 已生成" }
@@ -40,7 +40,7 @@
     },
     {
       "title": "会话 A 中断: 窗口关闭",
-      "desc": "注意左侧面板没有出现清空动作——也不需要: 窗口关闭时整个 messages[] 随进程一起消失。上下文不是被『删除』的, 是本体没了; checkpoint 的分界就在这里——内存必然失去, 写进文件的才带得走。",
+      "desc": "左侧面板没有清空动作——也不需要: 窗口关闭, messages[] 随进程一起消失。内存必然失去, 写进文件的才带得走——checkpoint 的分界就在这里。",
       "append": {
         "main": [
           { "role": "system", "label": "session ended —— 窗口关闭, messages[] 随进程消失" }
@@ -49,7 +49,7 @@
     },
     {
       "title": "新会话 B 启动: 从 HANDOFF 进入",
-      "desc": "右侧面板从 0 开始, 第一条消息就是 HANDOFF.md（或一句『读 .plan/HANDOFF.md』）——它作为初始 prompt 引导 B 按序读 STATE.md → task_plan.md → findings.md。STATE.md 的 Next Action 直接写明断点在哪一步: B 不需要问『上次做到哪了』。",
+      "desc": "右侧面板从 0 开始, 首条消息是 HANDOFF.md——初始 prompt 引导 B 按序读三件套, Next Action 写明断点: 不用问『上次做到哪』。",
       "append": {
         "child": [
           { "role": "user", "label": "读 .plan/HANDOFF.md 接手继续" }
@@ -58,7 +58,7 @@
     },
     {
       "title": "B 按续接清单工作: 零重复劳动",
-      "desc": "B 重做的只有『读三份文件』: A 已完成的 Phase 结果已 git commit, Phase Progress 表就是对账单——已完成的直接算数, 没人重跑一遍。从 Next Action 直达断点, 接着写断点处的代码。",
+      "desc": "B 重做的只有『读三份文件』: A 已完成 Phase 已 commit, Phase Progress 表即对账单——已完成的直接算数。从 Next Action 直达断点续写。",
       "append": {
         "child": [
           { "role": "assistant", "label": "恢复协议: 检测到 STATE.md, 从 Next Action 继续 (Phase 4)" },
@@ -69,7 +69,7 @@
     },
     {
       "title": "闭环: 交接的是状态, 不是历史",
-      "desc": "对比两面板 len: A 攒下的 9 条消息随窗口一起消失, B 从 0 开始却无损继续——长任务跨会话不断线, 这就是 75% 上下文自动交接的承诺。承重的信息早已写进文件系统, B 根本不需要 A 的历史。"
+      "desc": "对比两面板 len: A 攒的 9 条随窗口消失, B 从 0 开始却无损继续——承重信息已写进文件, B 不需要 A 的历史。长任务跨会话不断线, 就是 75% 自动交接的承诺。"
     }
   ]
 }

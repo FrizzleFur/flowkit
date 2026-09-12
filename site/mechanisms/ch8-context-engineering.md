@@ -20,16 +20,6 @@
 
 **三线分岔的那一刻, 就是 flowkit 存在的理由。**
 
-### 接力细节: 一次 Auto Handoff 的完整链路
-
-<div class="fs-replay" data-script="assets/scripts/ch8-autohandoff.json"></div>
-
-### 情景剧: 一次真实的断点与接手
-
-<div class="fs-replay" data-script="assets/scripts/ch8-recovery.json"></div>
-
-**看两面板 len: 新会话从 0 开始却无损继续——交接的是『状态』不是『历史』。**
-
 [原理篇第 2 章](../principles/ch2-context-three-axes.md)已经给了这套机制理论名分——Compaction、结构化笔记、子代理的「三板斧」坐标系，讲清了「为什么是这三个」。本章进入工程细节: 检测脚本怎么拿到真值、压缩矩阵何时压什么、交接的五件套逐项怎么落盘、新会话怎么从断点直达。主源是 `skills/flow-deep/references/context-management.md`（flow-deep 的「Stage X: 上下文管理详细指令」），本章每个操作都能在其中逐条对到。
 
 ## 怎么用（30 秒上手）
@@ -191,6 +181,10 @@ agent_hints:
 
 **HANDOFF.md 本身**是一份刻意做薄的指引文件，设计原则写在模板注释里: 「**不复制五件套内容，只引导新 agent 按序去读——重复内容会随进度过期，路径引用不会**」。骨架四段: 任务一句话（详见 spec.md Goal Contract）/ 当前进度（已完成·进行中·未开始）/ 必读文件按序（STATE.md → task_plan.md → findings.md）/ 建议（技能匹配与未决 blocker）。模板尾行还有一句安全警告: 敏感信息勿写入——**本文件会成为新会话的 prompt**。
 
+### 接力细节: 一次 Auto Handoff 的完整链路
+
+<div class="fs-replay" data-script="assets/scripts/ch8-autohandoff.json"></div>
+
 ### 恢复协议: 闭环的另一半
 
 新会话侧（无论 spawn 而来还是用户手动开的），flow-deep 启动时做恢复检查: 检测 `--plan-dir` 下是否存在 STATE.md，存在则读取并向用户展示上次中断位置，询问「恢复上次进度」还是「重新开始」（重新开始会把旧文件备份为 `STATE.md.bak`，不销毁）。若用户以 HANDOFF.md 开场，按其必读清单进入同一流程。
@@ -207,6 +201,12 @@ agent_hints:
 这张表是对「结构化笔记解决不了一切」的诚实承认: 笔记存得住**结果**，存不住**思考过程本身**——恢复协议的智慧在于按「哪里还剩上下文」分流，而不是假装文件能还原一切。
 
 两个收尾细节: HANDOFF.md 是一次性文件，恢复完成后可删除（STATE.md 才是持久锚点）; STATE.md 里的 `Auto Handoff: enabled` 随恢复带入续接会话——偏好跨代继承，防每代重复弹窗，用户随时可口头关闭。多会话串扰的最后一道防线: spawn 后旧会话不再做 Guard 检测，check_context.py 的 mtime 竞争由 first_msg 核对 + `--session` 纠偏兜底。
+
+### 情景剧: 一次真实的断点与接手
+
+<div class="fs-replay" data-script="assets/scripts/ch8-recovery.json"></div>
+
+**看两面板 len: 新会话从 0 开始却无损继续——交接的是『状态』不是『历史』。**
 
 ### 回放对照: 三部剧本 ↔ 协议
 

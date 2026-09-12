@@ -21,7 +21,7 @@
 - 想让它自己修到达标: `--iterate N` 启用 Stage 5.5; 即使不用参数，Stage 5 出现未达标项也会自动触发（默认 3 轮）
 - 迭代用完仍未达标: **双引擎在这里分叉**——flow-deep 自动进入 Stage 5.7（只要装了 ralph-loop 插件且未设 `--no-ralph`）; flow 侧需要 `--ralph` 显式启用（`skills/flow/SKILL.md:170`; `skills/flow-deep/SKILL.md:632`）——轻量管道把强制持续的开关交还给你，全量管道默认替你摁下
 - 执行中发现 Plan 走不通: Fallback 协议是半自动的——Claude 分析并建议退回，**你确认后才退**（`skills/flow-deep/references/fallback-protocol.md:143-148`）
-- 想先体感再读: 章中「红旗话术闸门」回放器（10 步）把 IL-2 的拦截演了一遍，「回弹轨道」（9 步）演示 keep/revert 的时序与 Guard 渐进三档
+- 看演示: 本章有 2 个可交互动画——「红旗话术闸门」回放器（10 步）演 IL-2 话术逐一进闸被拦，「回弹轨道」（9 步）演 keep/revert 时序与 Guard 渐进三档，播放按钮即演
 
 ## 为什么：从「应该可以」到证据表
 
@@ -138,7 +138,7 @@ direction: higher 或 lower（根据指标语义推断）
 
 <div class="fs-replay" data-script="assets/scripts/ch9-track.json"></div>
 
-绿线只进不退: revert 的意义不是失败, 是失败不付费。
+**绿线只进不退: revert 的意义不是失败, 是失败不付费。**
 
 **步 ↔ 机制对照**: 步 2-4 keep（验证绿）→ revert（验证红）→ 再 keep ↔ 结构化试错与「绿线只进不退」; 步 5-7 Guard 渐进 ↔ 冒烟 → 轻量集成 → 全量三档; 步 8 冲线 88 = target ↔ 参数从 Stage 5 失败项自动构造; 步 9 收尾 ↔ 轨道赌注的算术——落在哪由机械验证说了算。
 

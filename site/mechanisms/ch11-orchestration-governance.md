@@ -19,6 +19,7 @@
 - 你在给 flowkit 加新 Stage/新强制步骤 → 先过宪法四问，答案写进 plan（可追溯，非走形式）
 - 你在写新能力 → 先查 `skills/flow-deep/references/capability-registry.md`——已有覆盖就不新建; 新建则注册
 - 你改了 skill 本体 → 跑 evals（`evals/README.md`）确认机制没退化
+- 本章无可运行动画——治理是判断题不是演示题，文末「本章源码锚点表」即本章的『演示』
 
 ## 为什么：三道锁各防一种死法
 

@@ -17,7 +17,7 @@
   },
   "steps": [
     { "title": "baseline 起步",
-      "desc": "赌桌先摆好: baseline 30 与 target 88 都在开工前写进 Goal Contract。轨道赌注的每一枚迭代就是从 30 往 88 爬——但爬法有纪律, 不是乱试。",
+      "desc": "赌桌先摆好: baseline 30 与 target 88 开工前写进 Goal Contract。每枚迭代就是从 30 往 88 爬——但爬法有纪律, 不是乱试。",
       "reveal": { "target": 6, "keep": 2 } },
     { "title": "迭代 1: 验证绿, keep",
       "desc": "机械验证通过才 keep——上一版本已归档。绿线抬到 45 并停在新平台; 灰点冲高与绿线汇合, 成功的尝试长进轨道。",

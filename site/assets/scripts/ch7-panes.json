@@ -9,7 +9,7 @@
   "steps": [
     {
       "title": "分批派发: 前三席先上",
-      "desc": "panel 评审五席按同消息 ≤3 硬约束分两批分发——Agent(name) 命名，harness 自动分配 pane，每个 pane 是独立 Claude Code 进程的真交互 UI。",
+      "desc": "panel 评审五席按同消息 ≤3 硬约束分两批分发——Agent(name) 命名，harness 自动分配 pane，每个 pane 是独立进程的真交互 UI。",
       "lanes": { "set": {
         "panel-1": { "lane": "lane-alive", "state": "running", "label": "评审席 1", "note": "named agent · pane 已分配" },
         "panel-2": { "lane": "lane-alive", "state": "running", "label": "评审席 2", "note": "named agent · pane 已分配" },
@@ -35,7 +35,7 @@
     },
     {
       "title": "忘收——pane 泄漏发生",
-      "desc": "报告已落 findings，本体 idle 常驻——pane 泄漏发生。不收也没人报错：任务看似照常推进，直到 pane 越积越多（实测 dev:1.2/1.3 挂 7 分钟无人收）。",
+      "desc": "报告已落 findings，本体 idle 常驻——泄漏发生。不收也没人报错: 任务看似照常推进，pane 越积越多（实测挂 7 分钟无人收）。",
       "lanes": { "set": {
         "panel-1": { "lane": "lane-leak", "state": "failed", "label": "评审席 1", "note": "idle 常驻 · 无人收" },
         "panel-2": { "lane": "lane-leak", "state": "failed", "label": "评审席 2", "note": "idle 常驻 · 无人收" },
@@ -53,7 +53,7 @@
     },
     {
       "title": "逐席 TaskStop: 先收第一席",
-      "desc": "TaskStop(name) 收的是 agent 本体——pane 随之自动回收。措辞陷阱就在这:「kill pane」只是 tmux 附加动作，替代不了本体关闭（panel 五席血案的两因之一）。",
+      "desc": "TaskStop(name) 收的是 agent 本体——pane 随之自动回收。措辞陷阱:「kill pane」只是 tmux 附加动作，替代不了本体关闭（五席血案两因之一）。",
       "lanes": { "set": {
         "panel-1": { "lane": "lane-reclaimed", "state": "done", "label": "评审席 1", "note": "TaskStop · 本体已收" }
       } }

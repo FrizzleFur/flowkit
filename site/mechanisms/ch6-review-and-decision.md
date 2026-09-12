@@ -20,7 +20,7 @@
 
 <div class="fs-funnel"></div>
 
-漏斗吞掉的不是问题, 是你要做的 15 次决策
+**漏斗吞掉的不是问题, 是你要做的 15 次决策。**
 
 ## 怎么用（30 秒上手）
 
@@ -62,7 +62,7 @@
 
 <div class="fs-replay" data-script="assets/scripts/ch6-sunkcost.json"></div>
 
-右侧新会话没有「我写的」包袱——这就是强制独立审查的全部理由。
+**右侧新会话没有「我写的」包袱——这就是强制独立审查的全部理由。**
 
 ### 第二层: Stage 3.6 —— Design Review Board
 
