@@ -1,0 +1,22 @@
+{
+  "title": "同一个坑, 两种命运（召回 vs 无召回）",
+  "version": 2,
+  "messagesPanels": [
+    { "id": "a", "title": "任务 A · 无召回" },
+    { "id": "b", "title": "任务 B · Stage -1 召回" }
+  ],
+  "steps": [
+    { "title": "同一个坑", "desc": "上次任务调 spring 参数踩了三小时坑, 教训已沉淀入库。这次新任务又会遇到同类场景——两次任务, 命运会一样吗?" },
+    { "title": "任务 A: 从零开始", "desc": "无召回机制——新会话对历史一无所知, 只能重新调研、重新试错。",
+      "append": { "a": [ { "role": "assistant", "label": "先调研 spring 参数…（从零开始）" } ] } },
+    { "title": "任务 A: 重新踩坑", "desc": "同样的坑再踩一遍——教训随上次会话蒸发了, 这就是「任务做完, 经验蒸发」。",
+      "append": { "a": [ { "role": "tool_result", "label": "试错记录: 3 小时（与上次高度重合）" } ] } },
+    { "title": "任务 B: 先召回再动手", "desc": "Stage -1 强制召回: 抽关键词 → 匹配双库索引——不管是否已读, 重新做一次针对性匹配。",
+      "append": { "b": [ { "role": "task", "label": "Stage -1: 抽关键词 → 匹配双库" } ] } },
+    { "title": "命中上次的经验", "desc": "命中 experience 条目（上次验证过的解法）——召回结果写入 Goal Contract 的 Relevant History, 后续规划必须参考。",
+      "append": { "b": [ { "role": "tool_result", "label": "命中: spring 调参条目（已验证）" } ] } },
+    { "title": "直取经验", "desc": "按已验证参数直接实现——三小时的坑, 十分钟绕过。这就是召回侧的复利。",
+      "append": { "b": [ { "role": "assistant", "label": "按已验证参数实现 ✓" } ] } },
+    { "title": "闭环对照", "desc": "看两个面板: A 的第一 lesson 是重新踩坑, B 的第一 lesson 是站在 A 的沉淀上。差异不在能力, 在「有没有先召回」——这就是本章闭环存在的理由。" }
+  ]
+}

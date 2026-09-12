@@ -21,6 +21,11 @@
       loadSidebar: true,
       coverpage: true,
       subMaxLevel: 3,
+      alias: {
+        "/ch(.*)": "/mechanisms/ch$1",
+        "/principles/(.*)": "/principles/$1",
+        "/mechanisms/(.*)": "/mechanisms/$1"
+      },
       search: {
         placeholder: '搜索章节与机制',
         noData: '没有命中',
