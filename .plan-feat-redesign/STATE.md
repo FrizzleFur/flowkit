@@ -1,6 +1,6 @@
 # STATE.md — redesign 周期（内容组织与交互范式）
 
-current_stage: master-plan S1-S3 全交付 + 亮色主题转换完成——剩 quiz 首批(P1)与用户亮色验收
+current_stage: master-plan S1-S3 全交付 + 亮色转换 + quiz 首批完成——剩 ch2 三斧同屏(中优)/用户亮色验收/hexo d
 status: in-progress
 progress: 对位审计+S2 主题专项+S3 核心 100%; 剩余=对位新剧本(ch8曲线/ch2同屏)+ch12+quiz+S4 终验
 next_action: ①quiz 首批 3 章（Brown 规则, 需通用化 quiz 组件或逐章内嵌）②上线后观察: 高亮配色/三标签/动效的用户反馈 ③中优弹药: ch2 已建取舍法则, ch8 曲线证实已内建(threelines)撤销差距
@@ -33,3 +33,5 @@ next_action: ①quiz 首批 3 章（Brown 规则, 需通用化 quiz 组件或逐
 - quiz 出题是内容工作: 每章 2-3 题, 主会话亲写, P1 分批不塞波 4
 
 - 亮色转换 `f3ecde5` 后续: docsify 基础主题 dark→vue(亮), :root token 亮色翻转, 高亮色板亮底深色系, 封面渐变亮色, 列宽 1040px, 正文 16px——用户三指令(字号/宽度/亮色)全落地
+
+- quiz 首批 `d0ee798`: fs-quiz 组件（Brown 规则/声明式题库）+ ch4/ch6/ch9 题库 3 份 + 三章「学完自测」挂载 + verify quiz 断言
