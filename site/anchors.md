@@ -16,6 +16,7 @@
 | 9 | mechanisms/ch9-verification-loop.md | 验证与迭代：不达证据不罢休 | `234` | `~58` | — |
 | 10 | mechanisms/ch10-cross-session-memory.md | 跨会话记忆：auto-skill 双库的机制手册 | `234` | `~37` | — |
 | 11 | mechanisms/ch11-orchestration-governance.md | 编排治理与质量自举 | `82` | `~5` | constquiz |
-| — | **合计** | **11 章** | `2259` | `~354` | **6 处落位** |
+| 12 | mechanisms/ch12-live-walkthrough.md | 实战走查：这座站是怎么被建出来的 | `73` | `~8` | replay |
+| — | **合计** | **12 章** | `2259` | `~354` | **6 处落位** |
 
 > 剧本 JSON: `assets/scripts/`（管道流转 + Auto Handoff 两部, 经 python json 校验）。组件库: `assets/interactive/` 12 件, `node --check` 全过。

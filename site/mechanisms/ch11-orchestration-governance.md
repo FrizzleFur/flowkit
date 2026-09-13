@@ -77,6 +77,7 @@ registry 自己也会腐化——所以有 REC-4「registry 显式图化」与 L
 
 <nav class="fs-prevnext">
 <a class="fs-nav-prev" href="#/mechanisms/ch10-cross-session-memory"><span class="fs-arrow">←</span> 上一章 · 跨会话记忆</a>
+<a class="fs-nav-next" href="#/mechanisms/ch12-live-walkthrough">下一章 · 实战走查 <span class="fs-arrow">→</span><br><small>机制篇讲完了——这座站自己就是管道跑出来的产物: 五阶段走查，每步带真实产物。</small></a>
 </nav>
 
 > 至此机制篇收官。教程之外，研究还产出了对 flowkit 本体的[改进提案](../propositions.md)——REC 式，附触发条件，不达条件不实施: 治理哲学一以贯之。

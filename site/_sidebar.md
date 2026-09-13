@@ -21,6 +21,7 @@
   - [9. 验证与迭代](mechanisms/ch9-verification-loop.md)
   - [10. 跨会话记忆](mechanisms/ch10-cross-session-memory.md)
   - [11. 编排治理与质量自举](mechanisms/ch11-orchestration-governance.md)
+  - [12. 实战走查：这座站是怎么被建出来的](mechanisms/ch12-live-walkthrough.md)
 
 - [Learning Path](path.md)
 

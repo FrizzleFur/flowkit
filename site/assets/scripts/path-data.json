@@ -1,6 +1,6 @@
 {
   "title": "Learning Path",
-  "note": "11 章学习路径数据。anchors = 各章「本章源码锚点表」数据行数（章节增删或锚点表更新后需手工同步）。domain 取值见 pathview.js 的 DOMAINS 九域配色表（R3 机制地图域 A-I）。",
+  "note": "12 章学习路径数据。anchors = 各章「本章源码锚点表」数据行数（章节增删或锚点表更新后需手工同步）。domain 取值见 pathview.js 的 DOMAINS 九域配色表（R3 机制地图域 A-I）。",
   "chapters": [
     {
       "num": 1,
@@ -100,6 +100,15 @@
       "domain": "I",
       "anchors": 5,
       "quote": "契约测的是『写下来的行为』——写错的行为测不出来。"
+    },
+    {
+      "num": 12,
+      "file": "mechanisms/ch12-live-walkthrough.md",
+      "title": "实战走查：这座站是怎么被建出来的",
+      "sub": "把前十一章的机制放进一个真实任务的完整实录——立约、研究、规划、执行、验证、沉淀，案例就是这座站自己。",
+      "domain": "A",
+      "anchors": 8,
+      "quote": "教程类内容最怕「纸上管道」——这座站本身就是 flow-deep 管道的产物。"
     }
   ]
 }

@@ -23,7 +23,7 @@ scripts = sorted(p for p in glob.glob(f"{SITE}/assets/scripts/*.json")
 pv = f"{SITE}/assets/scripts/path-data.json"
 if os.path.exists(pv):
     d = json.load(open(pv, encoding="utf-8"))
-    check(len(d.get("chapters", [])) == 11, f"{pv}: chapters != 11")
+    check(len(d.get("chapters", [])) == 12, f"{pv}: chapters != 11")
 for p in scripts:
     try:
         d = json.load(open(p, encoding="utf-8"))
@@ -55,7 +55,7 @@ check(not os.path.exists(f"{SITE}/package.json"), "site/: 出现 package.json（
 
 # ---- 3. 章节完整性（11 章 + 锚点表 + 组件头） ----
 chapters = sorted(glob.glob(f"{SITE}/mechanisms/ch*.md")) + sorted(glob.glob(f"{SITE}/principles/ch*.md"))
-check(len(chapters) == 11, f"章节数 {len(chapters)} != 11")
+check(len(chapters) == 12, f"章节数 {len(chapters)} != 12")
 for p in chapters:
     t = open(p, encoding="utf-8").read()
     check("本章源码锚点表" in t, f"{p}: 缺源码锚点表")

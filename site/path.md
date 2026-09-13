@@ -1,6 +1,6 @@
 ## Learning Path
 
-十一条机制链路, 按锚点密度看每章的工程含量。
+十二条机制链路, 按锚点密度看每章的工程含量。
 
 <div class="fs-pathview"></div>
 
