@@ -84,6 +84,18 @@ for p in chapters + [f"{SITE}/README.md", f"{SITE}/path.md"]:
 for m in re.findall(r'<script src="(assets/[^"]+)"', idx):
     check(os.path.exists(os.path.join(SITE, m)), f"index.html: 本地脚本不存在 {m}")
 
+
+# ---- 7. quiz JSON 合同（fs-quiz 声明式题库） ----
+for p in sorted(glob.glob(f"{SITE}/assets/quiz/*.json")):
+    d = json.load(open(p, encoding="utf-8"))
+    qs = d.get("questions", [])
+    check(len(qs) >= 2, f"{p}: 题目 <2")
+    for i, q in enumerate(qs):
+        check(isinstance(q.get("answer"), int) and 0 <= q["answer"] < len(q.get("options", [])),
+              f"{p}: question[{i}] answer 下标越界")
+        check(bool(q.get("why")), f"{p}: question[{i}] 缺解析 why")
+        check(len(q.get("options", [])) >= 3, f"{p}: question[{i}] 选项 <3")
+
 print(f"剧本 {len(scripts)} 部 | 章节 {len(chapters)} 章 | 组件 {len(comps)} 个")
 for w in warns: print(f"WARN {w}")
 for f in fails: print(f"FAIL {f}")

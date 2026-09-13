@@ -129,3 +129,16 @@ body.fs-motion-armed .fs-m:not(.fs-in) { opacity: 0; }
 .fs-chip-in { animation: fs-chipin .18s ease-out both; }
 @keyframes fs-chipin { from { opacity: 0; transform: translateY(4px); } }
 @media (prefers-reduced-motion: reduce) { .fs-chip-in { animation: none; } }
+
+/* ===== fs-quiz 形成性自测（Brown 规则: 错选项锁定/看解析/localStorage 记录） ===== */
+.fs-quiz { border: 1px solid var(--lc-border); border-radius: 12px; margin: 1.2em 0; background: var(--lc-card); padding: 14px 16px; }
+.fs-qz-bar { display: flex; justify-content: space-between; font-size: 13px; color: var(--lc-blue-300); margin-bottom: 10px; }
+.fs-qz-q { font-size: 15px; font-weight: 600; color: var(--lc-text-h3); margin-bottom: 10px; line-height: 1.6; }
+.fs-qz-opts { display: flex; flex-direction: column; gap: 8px; }
+.fs-qz-opt { text-align: left; font-family: inherit; font-size: 13.5px; line-height: 1.55; color: var(--lc-text-body); background: var(--lc-bg1); border: 1px solid var(--lc-border2); border-radius: 8px; padding: 9px 12px; cursor: pointer; transition: border-color .15s ease, background-color .15s ease; }
+.fs-qz-opt:hover:not(:disabled) { border-color: var(--lc-border-hi); }
+.fs-qz-opt:disabled { cursor: default; opacity: .55; }
+.fs-qz-opt:disabled:not(.fs-opt-right):not(.fs-opt-wrong) { opacity: .35; }
+.fs-qz-fb { margin-top: 10px; border-radius: 8px; padding: 10px 12px; font-size: 13px; }
+.fs-qz-done { font-size: 14px; font-weight: 600; margin: 8px 0; color: var(--lc-text); }
+@media (prefers-reduced-motion: reduce) { .fs-qz-opt { transition: none; } }

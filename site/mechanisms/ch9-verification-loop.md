@@ -185,6 +185,12 @@ Ralph 插件本身不可用时走降级: 方案 A 提示用户手动启用（给
   退出循环（达标 / 诚实部分完成）
 ```
 
+### 学完自测
+
+形成性自测——三题对照本章主干（答错可换选重试，两次不对可看解析；作答记录存本地）——
+
+<div class="fs-quiz" data-quiz="assets/quiz/ch9.json"></div>
+
 <div class="fs-tabsep" data-label="本章源码锚点表"></div>
 
 | 断言 | 锚点 |

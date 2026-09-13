@@ -1,0 +1,36 @@
+{
+  "id": "ch9",
+  "title": "验证与迭代 · 形成性自测",
+  "questions": [
+    {
+      "q": "以下哪项**不属于** Stage 5 的三种合法完成态？",
+      "options": [
+        "DONE（所有标准均有新鲜证据）",
+        "PARTIAL（剩余项与下一步明确列出）",
+        "「should work 了」（感觉做完了）"
+      ],
+      "answer": 2,
+      "why": "铁律：No completion claims without fresh verification evidence——「应该可以」不在完成态里。"
+    },
+    {
+      "q": "Stage 5.5 的渐进式 Guard 为什么前 1/3 只跑轻量验证？",
+      "options": [
+        "机器算力不够跑全量",
+        "全量 guard 上得太早会扼杀方向探索",
+        "用户没要求全量"
+      ],
+      "answer": 1,
+      "why": "渐进式 Guard 承认一个事实：探索期需要空间——全量 guard 上得太早会扼杀方向探索。"
+    },
+    {
+      "q": "keep/revert 循环里，一轮迭代失败后的正确处置是？",
+      "options": [
+        "revert 回滚这次变更，带着记忆换下一个聚焦变更",
+        "连续重试同一个变更直到通过",
+        "revert 并直接宣告任务失败"
+      ],
+      "answer": 0,
+      "why": "每轮一个聚焦变更→机械验证→通过 keep 失败 revert——失败自动回滚，且不是盲目重试。"
+    }
+  ]
+}

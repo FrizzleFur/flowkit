@@ -1,0 +1,36 @@
+{
+  "id": "ch6",
+  "title": "评审与决策 · 形成性自测",
+  "questions": [
+    {
+      "q": "安全相关 MEDIUM 级发现在六原则判定链里的归宿是？",
+      "options": [
+        "P1 命中「行业标准」直接 AUTO_APPROVED",
+        "P2 只分级不裁决——特意不归 AUTO，继续下走留给 P5 一律上浮 TASTE_DECISION",
+        "P6 数文件数后自动处理"
+      ],
+      "answer": 1,
+      "why": "P2 的安全特例：安全问题不走 P1 自动采纳；MEDIUM 级特意不归 P2 的 AUTO，留给 P5 上浮——安全事项的默认归宿是用户，不是静默。"
+    },
+    {
+      "q": "「数据库 schema 变更只影响 2 个文件」该怎么判？",
+      "options": [
+        "影响面 <3 文件 → AUTO_APPROVED",
+        "P6 例外条款：schema 变更不论文件数一律上浮 TASTE_DECISION [IRREVERSIBLE]",
+        "P1 行业标准优先 → AUTO"
+      ],
+      "answer": 1,
+      "why": "先读例外再数文件——判错这题的人几乎都是先数了文件、漏读了 P6 的例外条款。"
+    },
+    {
+      "q": "Stage 3.5 与 3.6 两层评审的分工一句话是？",
+      "options": [
+        "3.5 广度优先快速 sanity check（对标 /review），3.6 深度优先专业维度（对标 /code-review <level>）",
+        "两者是重复建设，留一即可",
+        "3.6 必须在 3.5 失败后才启动"
+      ],
+      "answer": 0,
+      "why": "成本递进漏斗：大量 plan 在 3.5 就该被打回，不值得动用五席面板——两层不是重复建设。"
+    }
+  ]
+}

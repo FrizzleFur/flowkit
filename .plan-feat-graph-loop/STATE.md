@@ -17,4 +17,8 @@ plan_dir: .plan-feat-graph-loop/
 - 判定口径: 三态×验证四分类联动；LLM 即 graph 路线下文本 SOP 载体即实现形态
 - docs/ 有「研究仓 09 收官篇」裁决待继承复核
 
-next_action: "用户确认 plan 后 → Stage 3.5 Plan Review → Phase 1 摸底"
+next_action: "v2 计划经用户确认后 → Phase 1 摸底（reviewer 预声明修订后可直接 APPROVED）"
+
+## Stage 3.5 审查记录
+
+- 2026-09-13 plan-reviewer 结论 NEEDS_REVISION（3 必修 F8/F12/F4 + 14 发现），已全数采纳修订为 v2；reviewer 预声明「修完三处可直接 APPROVED」
