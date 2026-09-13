@@ -4,7 +4,7 @@
 
 *Three Locks on Itself*
 
-`5 anchors` · `78 行` · 组件 constquiz（宪法四问）· 约 5 分钟
+`5 anchors` · `82` · 组件 constquiz（宪法四问）· 约 5 分钟
 
 **本章位置**: 元层 · 治理与质量自举（管道给自己上的三道锁）· 上接[第 10 章 · 跨会话记忆](ch10-cross-session-memory.md) · 机制篇至此收官
 
@@ -14,14 +14,12 @@
 
 **机制定位**: 面向 flowkit 本体的演进者——加 Stage 先过宪法四问，写能力先查能力注册表，改 skill 必跑 evals 回归网; 三道锁各防一种死法。
 
+
+**快用**: 加 Stage/强制步骤 → 先过宪法四问写进 plan; 写新能力 → 先查 capability-registry，已有覆盖不新建; 改 skill 本体 → 跑 evals 确认机制没退化。三道锁的日常用法就这三条。
+
 </div>
 
-## 怎么用（30 秒上手）
-
-- 你在给 flowkit 加新 Stage/新强制步骤 → 先过宪法四问，答案写进 plan（可追溯，非走形式）
-- 你在写新能力 → 先查 `skills/flow-deep/references/capability-registry.md`——已有覆盖就不新建; 新建则注册
-- 你改了 skill 本体 → 跑 evals（`evals/README.md`）确认机制没退化
-- 本章唯一交互是「宪法四问自检」小测（锁一末尾）——治理是判断题不是演示题，小测把判断变成可操作的自检; 文末「本章源码锚点表」即本章的『演示』
+<div class="fs-tabsep" data-label="机制"></div>
 
 ## 为什么：三道锁各防一种死法
 
@@ -59,13 +57,7 @@ registry 自己也会腐化——所以有 REC-4「registry 显式图化」与 L
 
 诚实划界（本站第 1 章埋的线在这里收）: evals 是**回归网**（防退化），不是能力基准（测「有多好」）——它不回答「flowkit 比裸 Claude Code 好多少」这个问题，那是 BFCL/GAIA 类外部基准的事。教程叙事同样受此约束: 我们讲「机制存在且不退化」，不讲未经基准检验的「效果更优」。
 
-## 批判小节（局限与成本）
-
-- **自觉级约束**: 宪法自检依赖自觉——四问写在 SKILL.md 里，跳过它没有机械拦截（evals 的 L 规则能抓部分结构违规，抓不住「这次没问」）
-- **维护有成本**: registry 的能力图谱与实际安装状态漂移时，交叉比对会产生「幽灵能力」（注册了但不存在）——integrity-check 类体检工具是缓解而非根治
-- **覆盖是选择性的**: evals 契约测的是「写下来的行为」，写错的行为测不出来（第 6 章的 README 图腐化就是——图和 evals 都在，错的是共识本身）
-
-## 本章源码锚点表
+<div class="fs-tabsep" data-label="本章源码锚点表"></div>
 
 | 断言 | 锚点 |
 |---|---|
@@ -74,5 +66,17 @@ registry 自己也会腐化——所以有 REC-4「registry 显式图化」与 L
 | Stage 0 能力发现机制 | `skills/flow-deep/SKILL.md:99` |
 | evals 定位「skill 的回归测试」 | `evals/README.md` 开头导语 |
 | 文档腐化双实例（≤4 残留） | `skills/flow/SKILL.md:394`; `skills/flow/references/agent-dispatch.md:24` |
+
+<div class="fs-tabsep" data-label="批判小节（深挖: 局限与成本）"></div>
+
+- **自觉级约束**: 宪法自检依赖自觉——四问写在 SKILL.md 里，跳过它没有机械拦截（evals 的 L 规则能抓部分结构违规，抓不住「这次没问」）
+- **维护有成本**: registry 的能力图谱与实际安装状态漂移时，交叉比对会产生「幽灵能力」（注册了但不存在）——integrity-check 类体检工具是缓解而非根治
+- **覆盖是选择性的**: evals 契约测的是「写下来的行为」，写错的行为测不出来（第 6 章的 README 图腐化就是——图和 evals 都在，错的是共识本身）
+
+<div class="fs-tabsep" data-end="1"></div>
+
+<nav class="fs-prevnext">
+<a class="fs-nav-prev" href="#/mechanisms/ch10-cross-session-memory"><span class="fs-arrow">←</span> 上一章 · 跨会话记忆</a>
+</nav>
 
 > 至此机制篇收官。教程之外，研究还产出了对 flowkit 本体的[改进提案](../propositions.md)——REC 式，附触发条件，不达条件不实施: 治理哲学一以贯之。

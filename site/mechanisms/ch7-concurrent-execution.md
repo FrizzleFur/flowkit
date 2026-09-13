@@ -4,7 +4,7 @@
 
 *Parallel by Design, Budget by Default*
 
-`27 anchors` · `250 行` · 组件 `budget` 计算器 + `replay`×4（budget 9 / routing 7 / shards 10 / panes 8）· 约 30 分钟
+`27 anchors` · `252` · 组件 `budget` 计算器 + `replay`×4（budget 9 / routing 7 / shards 10 / panes 8）· 约 30 分钟
 
 **本章位置**: 机制篇第 4 站 · Stage 4 并发执行 · 上接[第 6 章 · 评审与决策](ch6-review-and-decision.md) · 下一站[第 8 章 · 上下文工程](ch8-context-engineering.md)
 
@@ -13,6 +13,9 @@
 **一句话机制**: 并发执行不是「多开几个 Agent」，是一套带预算的执行模型——主会话只当 Coordinator，任务切成互斥完备的分片，按并发预算分批派给命名 Agent，完成一个验收一个回收一个; 预算被 429 实测钉死，超了就限流给你看。
 
 **机制定位**: Stage 4 Execution Router 的 multi-agent 后端——执行模型四要素，加一条被 429 实测钉死的并发预算线。
+
+
+**快用**: 触发词「fan out subagents / 派团队深挖」即入——只读任务走 Fast Path; flow-deep 由 Stage 4 Router 自动判断后端; 规模档位 small(1-2) / medium(3 默认) / large 分批每批 ≤3。写入任务自动走 Full Path。
 
 </div>
 
@@ -28,13 +31,7 @@
 
 **步 ↔ 机制对照**: 步 1-3 液面爬到 3 ↔ 有效并发公式（主会话 1 + 运行中 subagent + 其他活跃会话）与 ≤3 安全档; 步 4 满配碰 4 ↔ 「1 主 + 3 sub 已是 4」的危险临界——实测 4 并发 + 主会话触发 429 的那条线; 步 5-6 骤降回 2 与退避窗口 ↔ 处置三步（暂停分发 / 主 Agent 接管关键路径 / 退避恢复）; 步 7-9 恢复爬升稳 3 ↔ 退避间隔后回到安全顶格，「预算是液位不是配额」即计算器三档判定的读表结论。
 
-## 怎么用（30 秒上手）
-
-- 说一句话就能触发: 「fan out subagents」「派团队深挖」「每个都深挖、别漏掉任何东西」——只读任务走 Fast Path 直接分发（`skills/multi-agent/SKILL.md:40-50`）
-- 在 flow-deep 里不用手动调: Stage 4 Execution Router 判断「2+ 独立子任务」才选 multi-agent 后端，单文件任务直接串行（`skills/flow-deep/SKILL.md:487-505`）
-- 想调规模: 档位表 small(1-2) / medium(3，默认) / large(>3 必须分批每批 ≤3)（`skills/multi-agent/SKILL.md:142-150`）
-- 写入型任务（改代码/改配置）自动走 Full Path: Step 0-5 完整流程，协作式方案经用户确认后才分发（`skills/multi-agent/SKILL.md:47-50`）
-- 上面的计算器就是本章主角之一: 拖动数字，看有效并发怎么被三路计数吃掉、什么时候变红
+<div class="fs-tabsep" data-label="机制"></div>
 
 ## 为什么：执行模型的四要素
 
@@ -208,14 +205,7 @@ Phase 之间还有 **Spot-check 三项**快速确认: 报告的文件是否存�
 
 顺带两处引用陷阱（本章写作时即遵守）: multi-agent Fast Path 清单存在重复编号（两个「汇总核对」，:64-65），引用按条目内容定位而非序号; 2→3 上调的 commit（6d0310a）发生在 v1.8.0 发版之后，CHANGELOG 的 Unreleased 段尚未收录——以 git 历史与 SKILL.md 实读为准。
 
-## 批判小节（局限与成本）
-
-- **协调成本是真实开销**: 分片、命名、pretrust、勾销、TaskStop——这一套对 2 个子任务的任务可能比串行还慢。Execution Router 的存在（Stage 4 ≠ 固定 multi-agent）就是系统自己承认: 并行收益要先抵掉协调成本（`skills/flow-deep/SKILL.md:487-505`）
-- **pane 可视化的天花板**: pane ≥4 时每行约 14 字符，基本不可读——可视化只对「确认 agent 活着、在干什么」有意义，深度信息仍靠主会话总结（`skills/multi-agent/SKILL.md:264`）
-- **预算是套餐相关的活数**: Lite/Pro/Max 套餐口径不同，高峰期还有账户级动态限流——≤3 是当前环境的经验值，不是普适常数，换环境要重新实测（`skills/multi-agent/SKILL.md:153-155`）
-- **纪律依然依赖执行**: 「完成即收」「判定行」「pretrust 出口」全是约定级检查，靠回复中的显式锚点事后审计——执行者不写判定行，违规只能靠人翻记录发现
-
-## 本章源码锚点表
+<div class="fs-tabsep" data-label="本章源码锚点表"></div>
 
 | 断言 | 锚点 |
 |---|---|
@@ -247,4 +237,16 @@ Phase 之间还有 **Spot-check 三项**快速确认: 报告的文件是否存�
 | 文档腐化实例一（残留 ≤4） | `skills/flow/SKILL.md:394` |
 | 文档腐化实例二（残留 ≤4） | `skills/flow/references/agent-dispatch.md:24` |
 
-> 下一章: [上下文工程](ch8-context-engineering.md)——并发让会话变多、任务变长，上下文怎么不被撑爆: STATE.md 活记忆与 Auto Handoff 的接力机制。
+<div class="fs-tabsep" data-label="批判小节（深挖: 局限与成本）"></div>
+
+- **协调成本是真实开销**: 分片、命名、pretrust、勾销、TaskStop——这一套对 2 个子任务的任务可能比串行还慢。Execution Router 的存在（Stage 4 ≠ 固定 multi-agent）就是系统自己承认: 并行收益要先抵掉协调成本（`skills/flow-deep/SKILL.md:487-505`）
+- **pane 可视化的天花板**: pane ≥4 时每行约 14 字符，基本不可读——可视化只对「确认 agent 活着、在干什么」有意义，深度信息仍靠主会话总结（`skills/multi-agent/SKILL.md:264`）
+- **预算是套餐相关的活数**: Lite/Pro/Max 套餐口径不同，高峰期还有账户级动态限流——≤3 是当前环境的经验值，不是普适常数，换环境要重新实测（`skills/multi-agent/SKILL.md:153-155`）
+- **纪律依然依赖执行**: 「完成即收」「判定行」「pretrust 出口」全是约定级检查，靠回复中的显式锚点事后审计——执行者不写判定行，违规只能靠人翻记录发现
+
+<div class="fs-tabsep" data-end="1"></div>
+
+<nav class="fs-prevnext">
+<a class="fs-nav-prev" href="#/mechanisms/ch6-review-and-decision"><span class="fs-arrow">←</span> 上一章 · 评审与决策</a>
+<a class="fs-nav-next" href="#/ch8-context-engineering">下一章 · 上下文工程 <span class="fs-arrow">→</span><br><small>并发让会话变多、任务变长，上下文怎么不被撑爆: STATE.md 活记忆与 Auto Handoff 的接力机制。</small></a>
+</nav>

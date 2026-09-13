@@ -4,7 +4,7 @@
 
 *Hand Off Before You Rot*
 
-`20 anchors` · `254 行` · 组件 `replay`×3（threelines 9 / autohandoff 10 / recovery 7）· 约 30 分钟
+`20 anchors` · `252` · 组件 `replay`×3（threelines 9 / autohandoff 10 / recovery 7）· 约 30 分钟
 
 **本章位置**: 横切层 · 上下文工程（贯穿全程）· 承[第 7 章 · 并发执行](ch7-concurrent-execution.md)的并发现场 · 启[第 9 章 · 验证与迭代](ch9-verification-loop.md)
 
@@ -13,6 +13,9 @@
 **一句话机制**: 上下文工程在 flow-deep 里是一套五层操作闭环——锚定（STATE.md 活记忆）、检测（脚本实测容量）、决策（四选项弹窗）、处置（压缩续命或交接换窗）、恢复（新会话直达断点）; 整套体系的出发点是一个物理事实: **模型感知不到自己的上下文占了多少**。
 
 **机制定位**: 上下文工程的工程细节层——理论坐标系见[原理篇第 2 章](../principles/ch2-context-three-axes.md)，本章每个操作都能对回主源 context-management.md。
+
+
+**快用**: 默认自动运行——每 Stage/Phase 边界容量检测，超 70% 弹窗四选项; `--no-context-guard` 关检测（不推荐）; `--handoff-max N` 接力上限（默认 3 代）; `--no-auto-handoff` 退自动交接; 1M 窗口加 `--window 1000000`。
 
 </div>
 
@@ -24,17 +27,7 @@
 
 [原理篇第 2 章](../principles/ch2-context-three-axes.md)已经给了这套机制理论名分——Compaction、结构化笔记、子代理的「三板斧」坐标系，讲清了「为什么是这三个」。本章进入工程细节: 检测脚本怎么拿到真值、压缩矩阵何时压什么、交接的五件套逐项怎么落盘、新会话怎么从断点直达。主源是 `skills/flow-deep/references/context-management.md`（flow-deep 的「Stage X: 上下文管理详细指令」），本章每个操作都能在其中逐条对到。
 
-## 怎么用（30 秒上手）
-
-这套机制默认自动运行，用户日常能碰到的是四个参数与一个弹窗:
-
-- 什么都不做 → 每个 Stage/Phase 边界自动跑容量检测，实测超 70% 弹窗问你（四选项见下文）
-- `--no-context-guard` → 关闭整套检测（长任务等于对 context rot 裸奔，不推荐）
-- `--handoff-max N` → 交接接力上限，默认 3 代
-- `--no-auto-handoff` → 退出自动交接状态（会话中口头关闭等效）
-- 1M 窗口模型 → 检测命令加 `--window 1000000`（默认按 200K 窗口算百分比）
-
-「接力细节」回放器演了一条完整链路: 边界告警 → 选「交接并记住自动」→ 五件套保存 → HANDOFF 交接 → 新会话从 Next Action 恢复（10 步），下文逐层拆解每步为什么。
+<div class="fs-tabsep" data-label="机制"></div>
 
 ## 为什么：五层操作体系逐层拆解
 
@@ -218,15 +211,7 @@ threelines 9 步对照: 步 1-3 三线同起点与 context rot（模型感知不
 
 recovery 7 步对照: 步 2 容量告警 ↔ 边界实测 75%（armed 动作链阈值）/ 步 3 主动 Checkpoint ↔ 保存动作清单的五件套落盘 / 步 5-6 新会话 B 从 HANDOFF 进入、按续接清单零重复劳动 ↔ 必读文件按序（STATE.md → task_plan.md → findings.md）/ 步 7 交接的是状态不是历史 ↔ Next Action 具体可执行、不依赖读其他文件。
 
-## 批判小节（局限与成本）
-
-- **检测是采样式的**: 边界点之外的 context 暴涨抓不到，P1 系统警告兜底时「通常已晚」; PreCompact hook 这条兜底路又被官方语义封死（stdout 不进上下文），目前防护依赖 75% 前置余量
-- **约定级约束**: 协议写在 references 里，约束的是「遵循 skill 的会话」——执行者不更新 STATE.md，锚点就是旧的，恢复协议救不回来
-- **交接有真实损耗**: `--handoff-max` 默认 3 代的上限本身就说明交接不能无限续; 每代新会话要重读三件套，固定成本客观存在
-- **压缩率是约定不是实测**: 矩阵里的 70%/90% 是设计约定（文档示例里的 ~73% 是单例），没有系统性 evals 度量「压缩后质量损失了多少」——这是改进空间
-- **改进输入（承接第 2 章）**: 五件套是手工定义的交接物，尚无 ContextPacket 式统一抽象（带 relevance/timestamp/token_count 元数据的信息包）与 GSSC 选择评分——理论侧的未吸收物是这套机制下一步演进的候选方向
-
-## 本章源码锚点表
+<div class="fs-tabsep" data-label="本章源码锚点表"></div>
 
 | 断言 | 锚点 |
 |---|---|
@@ -251,4 +236,17 @@ recovery 7 步对照: 步 2 容量告警 ↔ 边界实测 75%（armed 动作链�
 | check_context.py 真值原理（transcript 最后一条 usage 四项之和） | `skills/flow-deep/scripts/check_context.py:2-16`（头注释） |
 | Auto Handoff 通俗图解与四设计点 | `README.md:140-163` |
 
-> 下一章: [验证与迭代](ch9-verification-loop.md)——上下文工程保证任务「不断线」; 任务「没做完就宣告完成」的问题，交给 Stage 5 的证据表与 auto-iterate 的 keep/revert 循环。
+<div class="fs-tabsep" data-label="批判小节（深挖: 局限与成本）"></div>
+
+- **检测是采样式的**: 边界点之外的 context 暴涨抓不到，P1 系统警告兜底时「通常已晚」; PreCompact hook 这条兜底路又被官方语义封死（stdout 不进上下文），目前防护依赖 75% 前置余量
+- **约定级约束**: 协议写在 references 里，约束的是「遵循 skill 的会话」——执行者不更新 STATE.md，锚点就是旧的，恢复协议救不回来
+- **交接有真实损耗**: `--handoff-max` 默认 3 代的上限本身就说明交接不能无限续; 每代新会话要重读三件套，固定成本客观存在
+- **压缩率是约定不是实测**: 矩阵里的 70%/90% 是设计约定（文档示例里的 ~73% 是单例），没有系统性 evals 度量「压缩后质量损失了多少」——这是改进空间
+- **改进输入（承接第 2 章）**: 五件套是手工定义的交接物，尚无 ContextPacket 式统一抽象（带 relevance/timestamp/token_count 元数据的信息包）与 GSSC 选择评分——理论侧的未吸收物是这套机制下一步演进的候选方向
+
+<div class="fs-tabsep" data-end="1"></div>
+
+<nav class="fs-prevnext">
+<a class="fs-nav-prev" href="#/mechanisms/ch7-concurrent-execution"><span class="fs-arrow">←</span> 上一章 · 并发执行</a>
+<a class="fs-nav-next" href="#/ch9-verification-loop">下一章 · 验证与迭代 <span class="fs-arrow">→</span><br><small>上下文工程保证任务「不断线」; 「没做完就宣告完成」的问题，交给 Stage 5 的证据表与 keep/revert 循环。</small></a>
+</nav>

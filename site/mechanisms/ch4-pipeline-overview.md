@@ -4,7 +4,7 @@
 
 *Twelve Gates, One Journey*
 
-`25 anchors` · `219 行` · 组件 `replay ch4-pipeline`（12 步）· 约 30 分钟
+`25 anchors` · `221` · 组件 `replay ch4-pipeline`（12 步）· 约 30 分钟
 
 **本章位置**: 机制篇第 1 站 · 管道全景总览 · 下一站[第 5 章 · 输入与规划](ch5-input-and-planning.md)
 
@@ -14,17 +14,14 @@
 
 **机制定位**: flow-deep 全量管道的主干地图——十二道关「为什么存在、防什么漂移、过了会怎样」; 后续各章按支线展开，本章只讲主干。
 
+
+**快用**: 命令一句——`/flow-deep <任务>` 十二关全开; `--dry-run` 先看计划不执行; 单关 `--no-xxx` 逃生阀（清单见 `skills/flow-deep/SKILL.md:710-721`）; 三关不可跳过: S0 摸牌 / S0.5 立约 / S5 验收。
+
 </div>
 
 <div class="fs-replay" data-script="assets/scripts/ch4-pipeline.json"></div>
 
-## 怎么用（30 秒上手）
-
-- 命令就一句: `/flow-deep <任务表述>`——没有预设参数时十二关全开，这是它与 `/flow` 的根本区别（`skills/flow-deep/SKILL.md:146-154`）
-- 想先看管道会怎么走再决定跑不跑: `/flow-deep --dry-run <任务>`（只跑到 Stage 3 的计划，不执行）
-- 单关逃生阀: 几乎每关都有 `--no-xxx`（`--no-panel` 跳面板、`--no-recall` 跳召回、`--no-think` 跳深度思考……完整清单见 `skills/flow-deep/SKILL.md:710-721` 参数速查）
-- 但有三关标注**不可跳过**: Stage 0（摸牌）、Stage 0.5（立约）、Stage 5（验收）——砍掉任何一处，管道就失去存在意义
-- 上面的回放器走完了一条典型流转（12 步），下文逐关讲每步为什么存在
+<div class="fs-tabsep" data-label="机制"></div>
 
 ## 为什么：逐关走查十二关
 
@@ -179,14 +176,7 @@
 
 更深一层，设计宪法要求每次新增 Stage 前过四问: 必要性（已有纪律能否覆盖）/ 可拆性（能否降为按需启用）/ 可跳过性（有没有 `--no-xxx` 逃生阀）/ 控制权（是帮用户决策还是替用户决策）; 三条铁律之一是「强制 Stage 必须写清 why」（`skills/flow-deep/SKILL.md:33-48`）。关卡数量本身被治理着——每道关对应一种实测漂移，不是多多益善。
 
-## 批判小节（局限与成本）
-
-- **约定级而非沙箱级**: 十二关写在 SKILL.md 里，约束的是「遵循 skill 的会话」——执行者不读 skill，关卡就形同虚设。文档自身也会漂移（并发上限 2026-09-11 上调 2→3 后，个别文档残留旧表述，以 `flow-deep/SKILL.md:507` 与 multi-agent 为准）——这正是 evals 回归网存在的原因（详见[第 11 章](ch11-orchestration-governance.md)）
-- **全链成本客观存在**: 规划/双审查/验证本身消耗上下文与时间，Context Guard 的存在（Stage/Phase 边界 70% 阈值检测，`skills/flow-deep/SKILL.md:156-174`）就是系统自己承认这一点——它在管道内部盯着管道自己的开销（机制深读见[第 8 章](ch8-context-engineering.md)）
-- **无交互环境要降级**: 子代理/headless/Ralph 场景没有 AskUserQuestion 通道，所有决策点统一走三步降级（取推荐默认值→偏离留痕→确认点汇呈报）——2026-09 三臂行为 evals 发现三个执行者各自发明了三种降级后才收编为协议（`skills/flow-deep/SKILL.md:178-186`）
-- **回放剧本是教学简化**: 12 步压缩了真实流转（省略确认往返与失败分支），演示主干而非全貌; 各关的完整协议在 references/ 下还有十几份文件，本章只是地图
-
-## 本章源码锚点表
+<div class="fs-tabsep" data-label="本章源码锚点表"></div>
 
 | 断言 | 锚点 |
 |---|---|
@@ -216,4 +206,16 @@
 | Stage 5.7 Ralph 与 5.5 二分 | `skills/flow-deep/SKILL.md:630-652` |
 | Stage 5.8 验证后沉淀（失败不沉淀） | `skills/flow-deep/SKILL.md:654-687` |
 
-> 下一章: [输入质量与思考规划](ch5-input-and-planning.md)——进入第一条支线: Stage 0.5 的 Goal Contract 与 Stage 1 的 Prompt 评分如何联手挡住「垃圾进垃圾出」。
+<div class="fs-tabsep" data-label="批判小节（深挖: 局限与成本）"></div>
+
+- **约定级而非沙箱级**: 十二关写在 SKILL.md 里，约束的是「遵循 skill 的会话」——执行者不读 skill，关卡就形同虚设。文档自身也会漂移（并发上限 2026-09-11 上调 2→3 后，个别文档残留旧表述，以 `flow-deep/SKILL.md:507` 与 multi-agent 为准）——这正是 evals 回归网存在的原因（详见[第 11 章](ch11-orchestration-governance.md)）
+- **全链成本客观存在**: 规划/双审查/验证本身消耗上下文与时间，Context Guard 的存在（Stage/Phase 边界 70% 阈值检测，`skills/flow-deep/SKILL.md:156-174`）就是系统自己承认这一点——它在管道内部盯着管道自己的开销（机制深读见[第 8 章](ch8-context-engineering.md)）
+- **无交互环境要降级**: 子代理/headless/Ralph 场景没有 AskUserQuestion 通道，所有决策点统一走三步降级（取推荐默认值→偏离留痕→确认点汇呈报）——2026-09 三臂行为 evals 发现三个执行者各自发明了三种降级后才收编为协议（`skills/flow-deep/SKILL.md:178-186`）
+- **回放剧本是教学简化**: 12 步压缩了真实流转（省略确认往返与失败分支），演示主干而非全貌; 各关的完整协议在 references/ 下还有十几份文件，本章只是地图
+
+<div class="fs-tabsep" data-end="1"></div>
+
+<nav class="fs-prevnext">
+<a class="fs-nav-prev" href="#/principles/ch3-memory-loop"><span class="fs-arrow">←</span> 上一章 · 记忆与召回闭环</a>
+<a class="fs-nav-next" href="#/ch5-input-and-planning">下一章 · 输入质量与思考规划 <span class="fs-arrow">→</span><br><small>进入第一条支线: Stage 0.5 的 Goal Contract 与 Stage 1 的 Prompt 评分如何联手挡住「垃圾进垃圾出」。</small></a>
+</nav>

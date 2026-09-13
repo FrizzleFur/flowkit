@@ -4,7 +4,7 @@
 
 *Garbage In, Governance In*
 
-`15 anchors` · `220 行` · 组件 johari + feedsplit + replay ch5-paths（6 步）` · 组件 `johari`（2x2 象限判定）+ `feedsplit`（喂模式对比）· 约 25 分钟
+`15 anchors` · `223` · 组件 johari + feedsplit + replay ch5-paths（6 步）` · 组件 `johari`（2x2 象限判定）+ `feedsplit`（喂模式对比）· 约 25 分钟
 
 **本章位置**: 机制篇第 2 站 · 管道入口闸门 · 上接[第 4 章 · 全景](ch4-pipeline-overview.md) · 下一站[第 6 章 · 评审与决策](ch6-review-and-decision.md)
 
@@ -13,6 +13,9 @@
 **一句话机制**: 「高效地做错事」是 Agent 最贵的失败模式——管道前三关联手拦它: Stage 0.5 把目标写死（Goal Contract），Stage 1 把话说到 AI 听得懂（乔哈里视窗 + 3S），Stage 2a 把任务想透（六维分解）; 三关共同守着一条底线——**垃圾进，垃圾出**。
 
 **机制定位**: 管道最前端三关——先立约，再喂饱，后想清; 两道防线拦在「动手」之前。
+
+
+**快用**: 单评一段 Prompt → `/prompt <内容>`（1-10 评分+诊断+重写）; flow-deep 三关全自动（逃生阀 `--no-prompt` / `--no-think`）; flow 侧 ST 按需 `--think` / `--think-hard`。拿不准先玩上面的象限游戏。
 
 </div>
 
@@ -24,12 +27,7 @@
 
 > 看对比: 同一问句的两种命运——左边没喂模式，AI 只能泛泛而谈（评不了内部概念）; 右边喂了定义与示例，结构化作答（回答有据）。
 
-## 怎么用（30 秒上手）
-
-- 只想评一段 Prompt → `/prompt <内容>`（独立可用，输出 1-10 评分 + 四级问题诊断 + 优化重写版）
-- 走 flow-deep → 三关全自动: Stage 0.5 立契约 → Stage 1 优化表述（评分 >= 8 会主动问你「原文已够好，跳不跳」）→ Stage 2a 六维思考（`--no-think` 可关，但默认强制）; Stage 1 的逃生阀是 `--no-prompt`
-- 走 flow → ST 思考按需启用: `--think`（4K）/ `--think-hard`（10K）; Prompt 优化是 Stage 1 固定依赖
-- 拿不准自己的表述哪里有问题 → 先玩上面的象限游戏，错的那些基本都栽在「第四象限没喂」
+<div class="fs-tabsep" data-label="机制"></div>
 
 ## 为什么: 三关拦在「动手」之前
 
@@ -188,16 +186,7 @@ flow 与 flow-deep 在这一关的差异: flow 侧 `--think` 启用同样的前�
 
 本章两段的边界至此清晰: **输入质量防线管「人对 AI 的表述」**（乔哈里定位盲区、喂模式补盲区、3S 卡表达下限）——它假设目标已明确，只修通道; **思考规划防线管「AI 对任务的理解」**（Goal Contract 把目标钉死成可验证的字段、六维把任务拆成有依赖有审计的结构）——它假设表述已合格，只修理解。Stage 0.5 编号在 Stage 1 之前而主题归入「思考」，正因为它约束的不是措辞而是**理解的第一输入: 目标本身**。两道防线都不是能力增强——AI 不会因为过了三关就变聪明，但「做错事」的概率结构被提前改写了。
 
-## 批判小节（局限与成本）
-
-- **评分是主观的**: prompt 技能自己承认——「主观性评分，仅供参考」，且以中文优化为主，英文 Prompt 评分可能有偏差（`skills/prompt/SKILL.md:330-334`）。它是体检不是法官
-- **组件是简化版**: 站内象限游戏只练判定直觉，不含权重、诊断与重写——把「玩了游戏」当「会写 Prompt」是误读
-- **契约是约定级约束**: Goal Contract 写在 SKILL.md 与 spec.md 里，约束的是「遵循管道的会话」，非沙箱强制——与[第 1 章](../principles/ch1-agent-loop-and-pipeline.md)对关卡的那条批判同源
-- **六维不保证想全**: 4K/10K 思考是「有结构的深想」而非「必然穷尽」; 第 6 维的覆盖审计只能查「能力清单内」的遗漏，清单外的盲区它管不住
-- **三关全在动手之前**: 它们拦的是「已知类型的输入病」; 执行中途需求变了，只有「回 Stage 0.5 更新契约」这一条软规则接着——所以才还需要下一章的评审关卡在过程中持续兜底
-- **推演演示是理想路径**: 「一句话过三关」表展示的是规则命中，实际管道里三关并非总全部触发——评分够高可跳过 Stage 1、任务清晰可跳过 1.5。把它当 X 光片（看病灶在哪）用，别当必经流水账用
-
-## 本章源码锚点表
+<div class="fs-tabsep" data-label="本章源码锚点表"></div>
 
 | 断言 | 锚点 |
 |---|---|
@@ -217,4 +206,18 @@ flow 与 flow-deep 在这一关的差异: flow 侧 `--think` 启用同样的前�
 | flow 侧六维（第 6 维仅 --deep） | `skills/flow/references/stage2-details.md:13-20` |
 | README 乔哈里图（用户侧速览版） | `README.md:165-181` |
 
-> 下一章: [评审与决策](ch6-review-and-decision.md)——想得再透的 Plan 也是自己写的: 怎么用一个没写过方案的 Claude、八副专业眼镜和六条自动判定原则，接住思考规划的盲区。
+<div class="fs-tabsep" data-label="批判小节（深挖: 局限与成本）"></div>
+
+- **评分是主观的**: prompt 技能自己承认——「主观性评分，仅供参考」，且以中文优化为主，英文 Prompt 评分可能有偏差（`skills/prompt/SKILL.md:330-334`）。它是体检不是法官
+- **组件是简化版**: 站内象限游戏只练判定直觉，不含权重、诊断与重写——把「玩了游戏」当「会写 Prompt」是误读
+- **契约是约定级约束**: Goal Contract 写在 SKILL.md 与 spec.md 里，约束的是「遵循管道的会话」，非沙箱强制——与[第 1 章](../principles/ch1-agent-loop-and-pipeline.md)对关卡的那条批判同源
+- **六维不保证想全**: 4K/10K 思考是「有结构的深想」而非「必然穷尽」; 第 6 维的覆盖审计只能查「能力清单内」的遗漏，清单外的盲区它管不住
+- **三关全在动手之前**: 它们拦的是「已知类型的输入病」; 执行中途需求变了，只有「回 Stage 0.5 更新契约」这一条软规则接着——所以才还需要下一章的评审关卡在过程中持续兜底
+- **推演演示是理想路径**: 「一句话过三关」表展示的是规则命中，实际管道里三关并非总全部触发——评分够高可跳过 Stage 1、任务清晰可跳过 1.5。把它当 X 光片（看病灶在哪）用，别当必经流水账用
+
+<div class="fs-tabsep" data-end="1"></div>
+
+<nav class="fs-prevnext">
+<a class="fs-nav-prev" href="#/mechanisms/ch4-pipeline-overview"><span class="fs-arrow">←</span> 上一章 · 管道全景</a>
+<a class="fs-nav-next" href="#/ch6-review-and-decision">下一章 · 评审与决策 <span class="fs-arrow">→</span><br><small>想得再透的 Plan 也是自己写的: 用一个没写过方案的 Claude、八副专业眼镜和六条自动判定原则，接住思考规划的盲区。</small></a>
+</nav>

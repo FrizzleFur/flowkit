@@ -4,7 +4,7 @@
 
 *Two Folders, One Protocol*
 
-`18 anchors` · `233 行` · 组件 `replay`×2（compound 10 / snowball 8）· 约 25 分钟
+`18 anchors` · `234` · 组件 `replay`×2（compound 10 / snowball 8）· 约 25 分钟
 
 **本章位置**: 横切层 · 跨会话记忆（auto-skill 经验闭环）· 承[第 9 章 · 验证与迭代](ch9-verification-loop.md) · 启[第 11 章 · 编排治理](ch11-orchestration-governance.md)
 
@@ -13,6 +13,9 @@
 **一句话机制**: 会话失忆的解药是一套「文件 + 协议」的极简记忆系统——每回合五步循环管读（经验强制、知识条件），任务结束「总结→判值→询问→落库」四步管写，`_index.json` 索引管检索，`lastUpdated` + `subject_version` 双字段管过期; 全部机制落在两个目录、两个索引文件里——没有数据库，没有服务。
 
 **机制定位**: auto-skill 本体的机制手册——五步循环每一步的判定条件与成本设计、双库条目 schema、索引写入纪律、陈旧度标注的时间锚与版本锚，主源是 `skills/auto-skill/SKILL.md` 一个文件。
+
+
+**快用**: 装好即生效; 三个信号（已读取经验 / 已读取知识库 / 沉淀前询问）; 记忆库所有权在你——先问再写; 两档闭环 `--no-recall` / `--no-distill` 可关; `ls ~/.claude/skills/auto-skill/` 看自己的记忆。
 
 </div>
 
@@ -26,14 +29,7 @@
 
 [原理篇第 3 章](../principles/ch3-memory-loop.md)已经画了闭环全景——召回-沉淀四环节、验证闸门、条目质量三道闸，以及体检/巡检/混合检索的工程延伸。本章换一个更细的焦距: **auto-skill 本体的机制手册**。五步循环每一步的判定条件与成本设计、双库的条目 schema、索引的写入纪律、陈旧度标注的时间锚与版本锚——主源是 `skills/auto-skill/SKILL.md`（208 行，全部机制都在这一个文件里），本章每条断言都能在其中逐条对到。
 
-## 怎么用（30 秒上手）
-
-- **装好即生效，无需配置**: auto-skill 是元技能（所有任务的底层依赖），首次触发时会自动把「任务启动协议」写进你的全局规则文件（见下文 Step 0.5）——你此刻环境里 `~/.claude/CLAUDE.md` 中那段「新任务必须先读取 auto-skill 的 SKILL.md」，就是它自己焊进去的
-- **用户能看到的三个信号**: 回复中出现「我已读取经验: skill-xxx.md」（本回合用了某技能且经验库有货）/「我已读取知识库: design-layout.md, frontend-dev.md」（话题命中知识分类）/ 任务结束时被问「我想把这个经验记录到你的知识库……你觉得可以吗?」
-- **记忆库的所有权在你**: 沉淀永远先问再写，你说「可以」条目才落库
-- **两档闭环深度**: `/flow` 走对话层被动循环（每回合五步）; `/flow-deep` 额外叠加管道级强制召回（Stage -1）与验证后沉淀（Stage 5.8），两端可用 `--no-recall` / `--no-distill` 显式关闭
-- **想看自己的记忆**: `ls ~/.claude/skills/auto-skill/{knowledge-base,experience}/`——条目全是 Markdown，索引是两个 `_index.json`
-- 看演示: 本章有 2 个可交互动画——章首「记忆复利闭环」（10 步）演条目 0→8 滚雪球，章末「复利雪球」（8 步）演效率坐标系绿灰两线，播放按钮即演
+<div class="fs-tabsep" data-label="机制"></div>
 
 ## 为什么：五步循环的工程拆解
 
@@ -200,14 +196,7 @@ flow-deep 的两个端点不是另起炉灶，是对 auto-skill 内部机制的�
 
 **步 ↔ 机制对照**: 步 2-3 首次召回让绿线微抬 ↔ 省下的启动成本变成坡度; 步 4 灰线的真相 ↔ 不沉淀体系永远从任务 1 裸奔; 步 6 闭环断点 ↔ 写端断则退化（Stage 5.8 只在 DONE 后触发）; 步 8 「雪球是谁推的」 ↔ 点破——Stage 5.8 每次推了一把。
 
-## 批判小节（局限与成本）
-
-- **五步循环是约定级约束**: 全部机制写在 SKILL.md 里，靠遵循 skill 的会话自觉执行——没有沙箱强制，防不住不读协议的执行者（与第 1 章对关卡的那条批判同构）
-- **匹配多少读多少，无排序**: 命中条目平权全量加载，token 成本随库规模线性上涨——50 条触发 QMD 升级线，本质是对这个压力的官方承认; 时间衰减与重要性加权在召回排序中的缺位，见原理篇第 3 章「理论视角」的差距坐标系
-- **检索质量押注 keywords 人工成本**: 一条经验命不命中，取决于写条目时 keywords 想得全不全，写歪了没有反馈信号（漏召回是静默的）
-- **REC-3 落地率为零**: `consumed_by` 计数为 0——条目关系图还是设想，机制设计超前于使用习惯
-
-## 本章源码锚点表
+<div class="fs-tabsep" data-label="本章源码锚点表"></div>
 
 | 断言 | 锚点 |
 |---|---|
@@ -230,4 +219,16 @@ flow-deep 的两个端点不是另起炉灶，是对 auto-skill 内部机制的�
 | brain-integrity 基线（experience 40 / knowledge-base 44 零断链） | `evals/loops/brain-integrity-loop.md:9` |
 | 平台兼容映射（数据层平台无关，触发机制各平台映射） | `skills/auto-skill/references/codex-compat.md:5-13` |
 
-> 下一章: [编排治理与质量自举](ch11-orchestration-governance.md)——记忆闭环让系统越用越聪明; 但「管别人验证的体系」自己谁管? 设计宪法、能力注册表与 evals 回归网，是 flowkit 给自己上的三道锁。
+<div class="fs-tabsep" data-label="批判小节（深挖: 局限与成本）"></div>
+
+- **五步循环是约定级约束**: 全部机制写在 SKILL.md 里，靠遵循 skill 的会话自觉执行——没有沙箱强制，防不住不读协议的执行者（与第 1 章对关卡的那条批判同构）
+- **匹配多少读多少，无排序**: 命中条目平权全量加载，token 成本随库规模线性上涨——50 条触发 QMD 升级线，本质是对这个压力的官方承认; 时间衰减与重要性加权在召回排序中的缺位，见原理篇第 3 章「理论视角」的差距坐标系
+- **检索质量押注 keywords 人工成本**: 一条经验命不命中，取决于写条目时 keywords 想得全不全，写歪了没有反馈信号（漏召回是静默的）
+- **REC-3 落地率为零**: `consumed_by` 计数为 0——条目关系图还是设想，机制设计超前于使用习惯
+
+<div class="fs-tabsep" data-end="1"></div>
+
+<nav class="fs-prevnext">
+<a class="fs-nav-prev" href="#/mechanisms/ch9-verification-loop"><span class="fs-arrow">←</span> 上一章 · 验证与迭代</a>
+<a class="fs-nav-next" href="#/ch11-orchestration-governance">下一章 · 编排治理与质量自举 <span class="fs-arrow">→</span><br><small>记忆闭环让系统越用越聪明; 但「管别人验证的体系」自己谁管? 三道锁是 flowkit 给自己上的。</small></a>
+</nav>

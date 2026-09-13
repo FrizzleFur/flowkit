@@ -4,7 +4,7 @@
 
 *No Evidence, No Done*
 
-`29 anchors` · `233 行` · 组件 `replay`×2（redflags 10 / track 9）· 约 30 分钟
+`29 anchors` · `234` · 组件 `replay`×2（redflags 10 / track 9）· 约 30 分钟
 
 **本章位置**: 机制篇第 5 站 · Stage 5 验证闸门 · 上接[第 8 章 · 上下文工程](ch8-context-engineering.md) · 下一站[第 10 章 · 跨会话记忆](ch10-cross-session-memory.md)
 
@@ -14,16 +14,12 @@
 
 **机制定位**: 验证区的完整操作闭环——Stage 5 证据表三态收口，Fail 后回退三路分诊，修不完进 Stage 5.5 keep/revert 迭代，迭代用尽还有 Stage 5.7 Ralph 强制持续兜底。
 
+
+**快用**: flow-deep 零操作——Stage 5 不可跳过; flow 侧 `--no-verify` 可跳（代价自负）; `--iterate N` 启用 5.5 迭代; 迭代用尽 flow-deep 自动进 5.7 / flow 需 `--ralph` 显式启用; Fallback 半自动——你确认才退。
+
 </div>
 
-## 怎么用（30 秒上手）
-
-- flow-deep 里你什么都不用做: Stage 5 不可跳过，验证自动逐条核对 Goal Contract 的 Success Criteria（`skills/flow-deep/SKILL.md:613`）
-- flow 侧有逃生阀: `--no-verify` 可跳过（`skills/flow/references/stage5-verification.md:29-32`）——但跳过的代价由你自负
-- 想让它自己修到达标: `--iterate N` 启用 Stage 5.5; 即使不用参数，Stage 5 出现未达标项也会自动触发（默认 3 轮）
-- 迭代用完仍未达标: **双引擎在这里分叉**——flow-deep 自动进入 Stage 5.7（只要装了 ralph-loop 插件且未设 `--no-ralph`）; flow 侧需要 `--ralph` 显式启用（`skills/flow/SKILL.md:170`; `skills/flow-deep/SKILL.md:632`）——轻量管道把强制持续的开关交还给你，全量管道默认替你摁下
-- 执行中发现 Plan 走不通: Fallback 协议是半自动的——Claude 分析并建议退回，**你确认后才退**（`skills/flow-deep/references/fallback-protocol.md:143-148`）
-- 看演示: 本章有 2 个可交互动画——「红旗话术闸门」回放器（10 步）演 IL-2 话术逐一进闸被拦，「回弹轨道」（9 步）演 keep/revert 时序与 Guard 渐进三档，播放按钮即演
+<div class="fs-tabsep" data-label="机制"></div>
 
 ## 为什么：从「应该可以」到证据表
 
@@ -189,14 +185,7 @@ Ralph 插件本身不可用时走降级: 方案 A 提示用户手动启用（给
   退出循环（达标 / 诚实部分完成）
 ```
 
-## 批判小节（局限与成本）
-
-- **强制持续是双刃剑**: Ralph 防住了「过早放弃」（下界），但无人值守时还有反向风险——「产出失控」（上界缺失）。参考文档为此补了一道**产出闸门**: 挂机跑 Ralph 前确认「产出速率 ≤ 评审速率」，自动产生的变更堆积快于人工 review 速度时应主动降速分段（`ralph-integration.md:266`）——但这是自觉级约束，非 Hook 强制
-- **「新鲜」本身无法机械判定**: 时间戳可查，「证据是否覆盖了本轮变更的全部新面」仍需判断——铁律约束的是遵循 skill 的会话，与全站其他关卡一样是约定级而非沙箱级
-- **Needs Review 的兜底是人**: 证据类型里「人工检查点」自动化不了，Stage 5 把它显式标出来是诚实，但也意味着 DONE 的成本里包含你的注意力
-- **强制循环烧的是真金**: Ralph 默认上限 10 轮（`--ralph-max`，`skills/flow-deep/SKILL.md:647`），加上 `/cancel-ralph` 手动中断与诚实部分完成出口，三道泄压阀都在——但每轮都是完整的 auto-iterate + Stage 5 验证，token 账单不会说谎
-
-## 本章源码锚点表
+<div class="fs-tabsep" data-label="本章源码锚点表"></div>
 
 | 断言 | 锚点 |
 |---|---|
@@ -230,4 +219,16 @@ Ralph 插件本身不可用时走降级: 方案 A 提示用户手动启用（给
 | 「应该可以」问题定义（第一手） | `README.md:21`（Iron Laws ASCII 图 :51-76） |
 | 验证纪律自身被 eval 验证 | `evals/flow-deep/workspace/iteration-2/eval-1-research/cwd/.plan/task_plan.md:189` |
 
-> 下一章: [跨会话记忆](ch10-cross-session-memory.md)——验证通过不是终点，是沉淀的准入证: Stage 5.8 只在 Goal Verification 为 DONE 后触发，把这次任务的可复用经验写回记忆库，喂给下一次任务的 Stage -1。
+<div class="fs-tabsep" data-label="批判小节（深挖: 局限与成本）"></div>
+
+- **强制持续是双刃剑**: Ralph 防住了「过早放弃」（下界），但无人值守时还有反向风险——「产出失控」（上界缺失）。参考文档为此补了一道**产出闸门**: 挂机跑 Ralph 前确认「产出速率 ≤ 评审速率」，自动产生的变更堆积快于人工 review 速度时应主动降速分段（`ralph-integration.md:266`）——但这是自觉级约束，非 Hook 强制
+- **「新鲜」本身无法机械判定**: 时间戳可查，「证据是否覆盖了本轮变更的全部新面」仍需判断——铁律约束的是遵循 skill 的会话，与全站其他关卡一样是约定级而非沙箱级
+- **Needs Review 的兜底是人**: 证据类型里「人工检查点」自动化不了，Stage 5 把它显式标出来是诚实，但也意味着 DONE 的成本里包含你的注意力
+- **强制循环烧的是真金**: Ralph 默认上限 10 轮（`--ralph-max`，`skills/flow-deep/SKILL.md:647`），加上 `/cancel-ralph` 手动中断与诚实部分完成出口，三道泄压阀都在——但每轮都是完整的 auto-iterate + Stage 5 验证，token 账单不会说谎
+
+<div class="fs-tabsep" data-end="1"></div>
+
+<nav class="fs-prevnext">
+<a class="fs-nav-prev" href="#/mechanisms/ch8-context-engineering"><span class="fs-arrow">←</span> 上一章 · 上下文工程</a>
+<a class="fs-nav-next" href="#/ch10-cross-session-memory">下一章 · 跨会话记忆 <span class="fs-arrow">→</span><br><small>验证通过不是终点，是沉淀的准入证: Stage 5.8 把可复用经验写回记忆库，喂给下一次任务的 Stage -1。</small></a>
+</nav>
