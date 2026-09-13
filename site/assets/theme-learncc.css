@@ -209,3 +209,14 @@ body.close .sidebar-toggle { width: auto; }
 .markdown-section .token.inserted { color: #86efac; }
 .markdown-section .token.deleted { background-color: rgba(239, 68, 68, .15); }
 .markdown-section .token.inserted { background-color: rgba(34, 197, 94, .15); }
+/* ===== 代码高亮补全（2026-09-13: 覆盖 docsify dark.css 残留——property 金黄 c08b30/keyword 暗橙 e96900/灰底 282828 是「黄色突兀」根因） ===== */
+.markdown-section pre { background: transparent; }
+.markdown-section pre>code { background: transparent; color: #e2e8f0; }
+.markdown-section pre:after { color: var(--lc-text3); }
+.markdown-section .token.property, .markdown-section .token.attr-value, .markdown-section .token.directive, .markdown-section .token.unit { color: #fbbf24; }
+.markdown-section .token.statement { color: #34d399; }
+.markdown-section .token.placeholder { color: #94a3b8; }
+.markdown-section .token.important { color: #f87171; font-weight: 700; }
+.markdown-section .token.inserted { border-bottom: none; }
+.markdown-section .token.namespace { opacity: .7; }
+.markdown-section pre[data-lang]:after { content: attr(data-lang); }

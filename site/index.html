@@ -31,6 +31,10 @@
         noData: '没有命中',
         depth: 3
       },
+      markdown: {
+        // docsify@5 原生异步高亮管线: 语言数组（内置 Prism autoloader 按清单装载语法）
+        highlight: ['yaml', 'json', 'bash', 'python', 'markdown', 'js', 'sh', 'text']
+      },
       plugins: [
         function (hook) {
           // 每页渲染完成后初始化章内交互组件（组件在下方脚本定义 initAll）
@@ -75,6 +79,11 @@
     };
   </script>
   <script src="//cdn.jsdelivr.net/npm/docsify@5.0.0/lib/docsify.min.js" integrity="sha384-eAJE5BJ7MctwBKjSA81IDMLxyeqWlDXqJxRgHbmeZUn7Oc4MMHAQsc3zO1RSquIL" crossorigin="anonymous"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-yaml.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markdown.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify@5.0.0/lib/plugins/search.min.js" integrity="sha384-LthJPBJ4RGco78kBY+EmKz5rmISZ5vrtAu3+l2ALQ2mrZHOe6Wyf6knyKjeC4cL6" crossorigin="anonymous"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify-tabs@1.6.3/dist/docsify-tabs.min.js" integrity="sha384-QA3IVKzXq6xcKR8yQJHgDbI1FcJiQ137Cuetl1VWzUxJ6BQ7ew0MMq5fg2HbFK1o" crossorigin="anonymous"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify-copy-code@3.0.2/dist/docsify-copy-code.min.js" integrity="sha384-xvU4Qmx14Fe/3hDKuOUUQ8eOzoa7OVTL0vp3amTSv2KY8lCjlrga7DoqecFFOT7j" crossorigin="anonymous"></script>
