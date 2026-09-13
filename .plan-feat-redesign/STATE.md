@@ -1,9 +1,9 @@
 # STATE.md — redesign 周期（内容组织与交互范式）
 
-current_stage: master-plan S1/S2/S3核心 已交付——剩 ch8曲线/ch2三斧同屏(中优)/ch12/quiz/S4终验
+current_stage: master-plan S1/S2/S3 全交付(含 ch2 取舍法则回放+ch12 capstone+同步链)——剩 quiz 首批(P1)
 status: in-progress
 progress: 对位审计+S2 主题专项+S3 核心 100%; 剩余=对位新剧本(ch8曲线/ch2同屏)+ch12+quiz+S4 终验
-next_action: ①ch8 曲线剧本（C2: 三策略质量滑坡, curve 面板只写 JSON）②ch2 三斧同屏对比回放（中优）③ch12 实战走查章（实读三周期 git 链; path-data/机检 11→12）④quiz 首批 3 章 ⑤S4 终验+同步链
+next_action: ①quiz 首批 3 章（Brown 规则, 需通用化 quiz 组件或逐章内嵌）②上线后观察: 高亮配色/三标签/动效的用户反馈 ③中优弹药: ch2 已建取舍法则, ch8 曲线证实已内建(threelines)撤销差距
 
 ## 已裁决策（勿重新讨论）
 
