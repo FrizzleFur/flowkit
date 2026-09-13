@@ -111,14 +111,14 @@ FlowKit 的 README 开篇就给出了这个项目存在的问题定义: **「Age
 
 参数不用手填，从 Stage 5 的失败项自动构造（`stage55-iteration.md:14-25`）:
 
-```yaml
+<pre data-filename="iterate.gap 声明样例">
 scope: 未达标 Phase 涉及的文件 glob（从 task_plan.md 提取）
 metric_name: Stage 5 中失败的验证指标名
 verify_cmd: Stage 5 中使用的验证命令
 baseline_value: Stage 5 验证输出的当前值
 target_value: Stage 5 验证输出的目标值
 direction: higher 或 lower（根据指标语义推断）
-```
+</pre>
 
 验证之外还有 **Guard 双检查**: Verify 问「目标指标改进了吗」，Guard 问「其他东西坏了吗」（`skills/flow-deep/SKILL.md:624`）——只看 Verify 会修好一处弄坏三处而不自知。
 

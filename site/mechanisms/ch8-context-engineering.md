@@ -139,14 +139,14 @@ exit code 三态，各对应一条操作分支:
 
 其中 agent_hint 摘要是压缩后仍可直接派发的形态——文件清单、TDD 标志、依赖关系全保留:
 
-```yaml
+<pre data-filename="code-planning.agent_hint 样例">
 agent_hints:
   phase-2:
     type: code-implementation
     files: { create: [gateway.py], test: [test_gateway.py] }
     tdd: true
     depends_on: [phase-1]
-```
+</pre>
 
 配套一套符号系统加速书写（引用 context-optimization skill）: 依赖写 `A → B`、结论写 `∴`/`∵`，状态与风险用固定缩写——压缩后的文本仍保持机器可读的结构。
 
