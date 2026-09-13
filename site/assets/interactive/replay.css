@@ -1,25 +1,25 @@
 /* fs-replay v2 组件样式 — learncc zinc 深色主题对齐（2026-09-12 重制）
- * 色板: bg #09090b · 卡 #18181b · 可视化区 #0f172a · border #27272a/#3f3f46 · text #fafafa/#d4d4d8/#a1a1aa
+ * 色板: 亮色 token 化（--lc-* 自动跟随主题翻转）
  * 语义色全部引用 theme-learncc.css :root 五态 token（--lc-*），本文件不落语义 hex（S1）
  *   lane 四态 = 五态暗 badge 形态: queued 锌灰 / running 蓝 / done 绿 / failed 红（900/30 底 + 300 字）
  */
 .fs-replay { border: 1px solid var(--lc-border); border-radius: 12px; margin: 1.2em 0; background: var(--lc-card); overflow: hidden; }
 .fs-replay-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 14px; border-bottom: 1px solid var(--lc-border); background: var(--lc-bg1); }
-.fs-replay-title { font-weight: 600; color: #fafafa; font-size: 13.5px; }
+.fs-replay-title { font-weight: 600; color: var(--lc-text); font-size: 13.5px; }
 .fs-replay-ctrl { display: flex; gap: 6px; align-items: center; }
 .fs-replay-speed { border: 1px solid var(--lc-border2); border-radius: 6px; padding: 3px 6px; font-size: 12.5px; background: var(--lc-bg1); color: var(--lc-text-h3); }
 .fs-btn { border: 1px solid var(--lc-border2); background: var(--lc-bg1); border-radius: 6px; padding: 4px 12px; font-size: 12.5px; cursor: pointer; color: var(--lc-text-h3); transition: color .15s ease, background-color .15s ease, border-color .15s ease; }
 .fs-btn:hover:not(:disabled) { border-color: var(--lc-border-hi); color: var(--lc-text); }
 .fs-btn:disabled { opacity: .5; cursor: default; }
 .fs-btn-primary { background: var(--lc-text); border-color: var(--lc-text); color: var(--lc-bg0); }
-.fs-btn-primary:hover:not(:disabled) { background: #e4e4e7; border-color: #e4e4e7; color: var(--lc-bg0); }
+.fs-btn-primary:hover:not(:disabled) { background: #3f3f46; border-color: #3f3f46; color: #ffffff; }
 
 .fs-stage { max-height: 760px; overflow-y: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
 .fs-stage-flow { flex-direction: row; flex-wrap: wrap; align-items: flex-start; }
 .fs-flowhost { flex: 1.2 1 320px; min-width: 260px; border: 1px solid var(--lc-border); border-radius: 12px; background: var(--lc-code-bg); padding: 8px; }
 .fs-flowhost svg { width: auto; max-width: 100%; max-height: 600px; height: auto; margin: 0 auto; display: block; }
 .fs-node { fill: var(--lc-border); stroke: var(--lc-border2); stroke-width: 1; transition: fill .3s, stroke .3s; }
-.fs-node.on { fill: #1e3a8a; stroke: var(--lc-blue); stroke-width: 1.6; }
+.fs-node.on { fill: #dbeafe; stroke: var(--lc-blue); stroke-width: 1.6; }
 .fs-nodelabel { fill: var(--lc-text-body); font-size: 10px; font-family: ui-monospace, Menlo, monospace; text-anchor: middle; }
 .fs-edge { stroke: var(--lc-border2); fill: none; transition: stroke .3s; }
 .fs-edge.on { stroke: var(--lc-blue); stroke-width: 1.8; }
@@ -28,7 +28,7 @@
 .fs-msgwrap { flex: 1 1 260px; min-width: 250px; display: flex; flex-direction: column; gap: 10px; }
 .fs-msgpanel { border: 1px solid var(--lc-border); border-radius: 12px; background: var(--lc-bg1); overflow: hidden; }
 .fs-msgpanel-bar { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: var(--lc-code-bg); border-bottom: 1px solid var(--lc-border); font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: var(--lc-text2); }
-.fs-lenbadge { background: var(--lc-border2); border-radius: 6px; padding: 0 7px; font-size: 10.5px; color: #e4e4e7; font-variant-numeric: tabular-nums; }
+.fs-lenbadge { background: var(--lc-border2); border-radius: 6px; padding: 0 7px; font-size: 10.5px; color: #27272a; font-variant-numeric: tabular-nums; }
 .fs-msgpanel-body { padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; min-height: 60px; max-height: 340px; overflow-y: auto; }
 .fs-block { display: flex; align-items: baseline; gap: 6px; animation: fs-blockin .35s ease; }
 @keyframes fs-blockin { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
@@ -48,7 +48,7 @@
 .fs-hero { max-width: 620px; margin: 24px auto 4px; display: flex; flex-direction: column; gap: 8px; }
 .fs-hero-row { display: flex; gap: 6px; }
 .fs-hero-stage { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 4px; border: 1px solid var(--lc-border); border-radius: 8px; background: var(--lc-bg1); opacity: .55; transition: border-color .35s, background .35s, opacity .35s; }
-.fs-hero-on { border-color: var(--lc-blue); background: #172554; opacity: 1; }
+.fs-hero-on { border-color: var(--lc-blue); background: #dbeafe; opacity: 1; }
 .fs-hero-tag { font-family: ui-monospace, Menlo, monospace; font-size: 9px; color: var(--lc-text3); }
 .fs-hero-name { font-size: 12px; font-weight: 600; color: var(--lc-text2); transition: color .35s; }
 .fs-hero-on .fs-hero-name, .fs-hero-on .fs-hero-tag { color: var(--lc-blue-300); }
@@ -78,7 +78,7 @@
 /* ===== fs-funnel 吞噬漏斗（批量评审第二幕, zinc 深色） ===== */
 .fs-funnel { border: 1px solid var(--lc-border); border-radius: 12px; margin: 1.2em 0; background: var(--lc-card); overflow: hidden; }
 .fs-funnel-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 14px; border-bottom: 1px solid var(--lc-border); background: var(--lc-bg1); }
-.fs-funnel-title { font-weight: 600; color: #fafafa; font-size: 13.5px; }
+.fs-funnel-title { font-weight: 600; color: var(--lc-text); font-size: 13.5px; }
 .fs-fn-counts { display: flex; gap: 12px; }
 .fs-fn-count { font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: var(--lc-text3); font-variant-numeric: tabular-nums; }
 .fs-fn-count b { display: inline-block; font-size: 14px; color: var(--lc-text-h3); margin-left: 3px; min-width: 18px; text-align: right; font-variant-numeric: tabular-nums; }
@@ -92,7 +92,7 @@
 .fs-fn-wall { display: flex; gap: 8px; align-items: center; justify-content: center; border: 1px solid var(--lc-border2); border-radius: 8px; background: linear-gradient(180deg, #27272a, #18181b); padding: 5px 10px; }
 .fs-fn-wall:nth-child(1) { margin: 0 4px; } .fs-fn-wall:nth-child(2) { margin: 0 24px; } .fs-fn-wall:nth-child(3) { margin: 0 44px; }
 .fs-fn-wallname { font-family: ui-monospace, Menlo, monospace; font-size: 10px; color: var(--lc-text3); letter-spacing: .4px; }
-.fs-fn-ptag { font-family: ui-monospace, Menlo, monospace; font-size: 10px; background: #1e3a8a; color: var(--lc-blue-300); border-radius: 6px; padding: 1px 7px; visibility: hidden; animation: fs-fn-tagup 1s ease; }
+.fs-fn-ptag { font-family: ui-monospace, Menlo, monospace; font-size: 10px; background: #bfdbfe; color: #1e40af; border-radius: 6px; padding: 1px 7px; visibility: hidden; animation: fs-fn-tagup 1s ease; }
 @keyframes fs-fn-tagup { 0% { opacity: 0; transform: translateY(7px); } 25% { opacity: 1; transform: none; } 100% { opacity: .9; } }
 .fs-fn-air { position: absolute; inset: 0; pointer-events: none; }
 .fs-fn-card { position: absolute; width: 132px; border: 1px solid var(--lc-border2); border-radius: 8px; background: var(--lc-bg1); color: var(--lc-text-body); font-size: 10.5px; padding: 4px 8px; transition: transform .42s cubic-bezier(.55, 0, .75, .45), opacity .45s ease; will-change: transform; }
@@ -149,12 +149,12 @@
 .fs-chheader .dom { color: #3b82f6; }
 .fs-grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 1em 0; }
 .fs-grid3-card { display: block; background: #131316; border: 1px solid #27272a; border-radius: 12px; padding: 12px 14px; text-decoration: none; }
-.fs-grid3-card b { color: #fafafa; display: block; margin-bottom: 3px; }
+.fs-grid3-card b { color: var(--lc-text); display: block; margin-bottom: 3px; }
 .fs-grid3-card span { font-size: 12.5px; color: #a1a1aa; }
 .fs-grid3-card:hover { border-color: var(--lc-border-hi); }
 .fs-cta-ghost { opacity: .75; }
 .fs-cta-ghost:hover { opacity: 1; }
-.fs-tokenbadge { display: inline-block; background: rgba(139,92,246,.16); color: #c4b5fd; border: 1px solid rgba(139,92,246,.35); border-radius: 6px; padding: 1px 7px; font-family: ui-monospace, Menlo, monospace; font-size: 11px; }
+.fs-tokenbadge { display: inline-block; background: rgba(124,58,237,.08); color: #6d28d9; border: 1px solid rgba(124,58,237,.3); border-radius: 6px; padding: 1px 7px; font-family: ui-monospace, Menlo, monospace; font-size: 11px; }
 h2 .fs-tokenbadge { vertical-align: 3px; }
 
 /* ===== fs-budget 预算槽（iv-c 升级 2026-09-12: 数字行+槽体双出口同函数驱动） =====

@@ -1,6 +1,6 @@
 /* fs-pathview — Learning Path 学习路径时间线（zinc 深色主题对齐）
  * 色板: 容器 #18181b / 卡 = 页底色 #09090b + 1px 边框（learncc timeline 卡形态, G2）
- *       进度条轨 #27272a · 代码/金句底 #0f172a
+ *       亮色 token 化: 轨/底全部引用 --lc-*
  * 域色五态（G1）: pathview.js 按章域注入 --fs-pv-dom{,-300,-badge} / --fs-pv-line-dom（指向
  *       theme-learncc.css :root 九域 token）, 本文件只消费变量 —— 节点圆=实色、徽章=暗 badge
  *       （900/30 底 + 300 字）、连接线=下一章域色 /30、金句边框/进度条=域色, 四处同色贯穿
