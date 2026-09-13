@@ -119,3 +119,13 @@
 .fs-fs-note { margin-top: 12px; font-size: 12.5px; color: var(--lc-text2); }
 @media (max-width: 640px) { .fs-fs-grid { grid-template-columns: 1fr; } .fs-fs-div { height: 1px; } }
 @media (prefers-reduced-motion: reduce) { .fs-fs-on .fs-fs-item { animation: none; } }
+
+/* ===== fs-motion 入场体系（sweep R5-P1: learncc whileInView once 的 zinc 化适配） ===== */
+body.fs-motion-armed .fs-m:not(.fs-in) { opacity: 0; }
+.fs-m.fs-in { animation: fs-in .35s ease-out both; }
+@keyframes fs-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .fs-m.fs-in { animation: none; } body.fs-motion-armed .fs-m:not(.fs-in) { opacity: 1; } }
+/* replay 步进芯片: 淡入 + 60ms 错峰（引擎级, 剧本无需声明; PROTOCOL 定档记录） */
+.fs-chip-in { animation: fs-chipin .18s ease-out both; }
+@keyframes fs-chipin { from { opacity: 0; transform: translateY(4px); } }
+@media (prefers-reduced-motion: reduce) { .fs-chip-in { animation: none; } }

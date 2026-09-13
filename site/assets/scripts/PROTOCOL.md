@@ -42,6 +42,7 @@
 
 - `role` 取值: user / assistant / tool_call / tool_result / system / task / final（各有专属色）
 - **每步必有 `title` + `desc`**——无哑动画；desc 讲「这一步为什么」，不是复述画面
+- **步进节奏定档（引擎级）**: 步进间隔 1600ms/速度四档；同步多芯片 append 带 .18s 淡入 + 60ms 错峰（`fs-chip-in`，剧本无需声明）
 - 坐标系: SVG viewBox 原点在左上，引擎自动加 8px 内边距；节点 `x/y/w/h` 手排，避免重叠；回环边（A→下游→A）直接声明，直线绘制可接受
 - v1 旧剧本（steps[].role/content/annotation）仍被兼容，无需迁移；新剧本一律 v2
 

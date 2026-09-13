@@ -16,19 +16,14 @@
 
 **本章你将看到**: 一个八案例的判定游戏（先玩再读）· 把「自己检查自己」拆成三层防偏误的完整推理 · 六原则判定链与一张真实文档腐化案例。约 25 分钟；组件可交互，全文可按标签跳读。
 
+**快用**: Stage 3.5 强制、3.6 默认启用，两关都暂停等你确认——`--no-panel` 关面板评审，`--panel-depth quick|basic|advanced` 调强度（flow 侧 `--plan-review` 手动开 3.5）。
+
 </div>
 
 <div class="fs-autodecide"></div>
 
 *判定游戏: 八个真实感发现，先凭直觉判 AUTO / TASTE / BLOCKED——读完本章再回来对答案，错的那些通常都栽在「顺序」和「例外条款」上。*
 
-<div class="fs-tabsep" data-label="怎么用（30 秒上手）"></div>
-
-- flow-deep 里你什么都不用做: Stage 3.5 强制启用、Stage 3.6 默认启用——评审自动发生，且两关都**暂停等你确认**（半自动，裁决权在你）
-- 不想要面板评审: `--no-panel`（Stage 3.6 的逃生阀）; Stage 3.5 在 flow-deep 中**没有**逃生阀——高风险任务是它的定位
-- 想控制评审强度: `--panel-depth quick|basic|advanced`（1/3/5 个角色），或 `--panel-roles "R02,R03,R06"` 精确点名（角色数不受档位限制）
-- flow 侧（轻量管道）: `--plan-review` 手动启用 3.5; 满足条件（如改动影响 3+ 模块）会自动**建议**但不自动执行（`skills/flow-deep/references/plan-review.md:11-20`）
-- 顶部判定游戏的玩法: 先凭直觉判，读完「机制」标签的六原则判定链再回来对答案
 
 <div class="fs-tabsep" data-label="机制"></div>
 

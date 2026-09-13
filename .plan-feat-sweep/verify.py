@@ -59,12 +59,12 @@ check(len(chapters) == 11, f"章节数 {len(chapters)} != 11")
 for p in chapters:
     t = open(p, encoding="utf-8").read()
     check("本章源码锚点表" in t, f"{p}: 缺源码锚点表")
-    check("怎么用" in t, f"{p}: 缺「怎么用」节")
+    check(("怎么用" in t) or ("快用" in t), f"{p}: 缺「怎么用/快用」节")
     check("批判小节" in t, f"{p}: 缺「批判小节」节")
 
 # ---- 4. 组件协议（FlowSite.fns + data-ready; 持 timer 组件须 _fsClear） ----
 comps = glob.glob(f"{SITE}/assets/interactive/*.js")
-NON_MOUNTABLE = {"progress.js"}  # 站点服务类（全局打点/装饰, 幂等无挂载点）, data-ready 模式不适用
+NON_MOUNTABLE = {"progress.js", "fs-motion.js"}  # 站点服务类（全局打点/装饰, 幂等无挂载点）, data-ready 模式不适用
 for p in comps:
     t = open(p, encoding="utf-8").read()
     check("FlowSite.fns.push" in t, f"{p}: 未走 FlowSite.fns 协议")

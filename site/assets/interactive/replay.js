@@ -467,7 +467,12 @@
       if (s.reveal && curveObj) Object.keys(s.reveal).forEach(function (id) { curveObj.reveal(id, s.reveal[id]); });
       if (s.append) Object.keys(s.append).forEach(function (pid) {
         var p = msgPanels[pid]; if (!p) return;
-        s.append[pid].forEach(function (b) { p.body.appendChild(chipFor(b)); p.count++; });
+        s.append[pid].forEach(function (b, bi) {
+          var chip = chipFor(b);
+          chip.classList.add('fs-chip-in');              // 步进芯片淡入+错峰（learncc 节奏, PROTOCOL 定档）
+          chip.style.animationDelay = (bi * 60) + 'ms';
+          p.body.appendChild(chip); p.count++;
+        });
         p.len.textContent = 'len=' + p.count;
       });
       if (s.title || s.desc) {
