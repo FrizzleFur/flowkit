@@ -221,6 +221,9 @@ body.close .sidebar-toggle { width: auto; }
 .markdown-section .token.namespace { opacity: .7; }
 .markdown-section pre[data-lang]:after { content: attr(data-lang); }
 
+/* ===== 标题颜色夺回（docsify 亮色主题类选择器压过元素选择器——特异性升级） ===== */
+.markdown-section h1, .markdown-section h2, .markdown-section h3, .markdown-section h4, .markdown-section h5, .markdown-section h6 { color: var(--lc-text); }
+
 /* ===== 排版阶梯对齐 + docsify 浅色残留清零（三角色讨论 2026-09-13） ===== */
 /* A. 表格: 杀斑马白条（tr:nth-child #f8f8f8 为可读性事故根因）+ 行 hover 微亮 */
 .markdown-section tr:nth-child(2n) { background-color: transparent; }

@@ -32,9 +32,9 @@
 .fs-msgpanel-body { padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; min-height: 60px; max-height: 340px; overflow-y: auto; }
 .fs-block { display: flex; align-items: baseline; gap: 6px; animation: fs-blockin .35s ease; }
 @keyframes fs-blockin { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
-.fs-chip { font-family: ui-monospace, Menlo, monospace; font-size: 9.5px; border-radius: 6px; padding: 2px 7px; color: #fff; flex: 0 0 auto; }
-.fs-chip-user { background: var(--lc-blue); } .fs-chip-asst { background: var(--lc-text-dim); } .fs-chip-tool { background: var(--lc-emerald); }
-.fs-chip-sys { background: var(--lc-red); } .fs-chip-task { background: var(--lc-amber); color: #18181b !important; } .fs-chip-final { background: var(--lc-purple); }
+.fs-chip { font-family: ui-monospace, Menlo, monospace; font-size: 10.5px; font-weight: 600; border-radius: 6px; padding: 2px 8px; flex: 0 0 auto; }
+.fs-chip-user { background: rgba(37,99,235,.1); color: #1d4ed8; } .fs-chip-asst { background: rgba(113,113,122,.14); color: #3f3f46; } .fs-chip-tool { background: rgba(5,150,105,.1); color: #047857; }
+.fs-chip-sys { background: rgba(220,38,38,.08); color: #b91c1c; } .fs-chip-task { background: rgba(217,119,6,.14); color: #b45309; } .fs-chip-final { background: rgba(124,58,237,.1); color: #6d28d9; }
 .fs-blocklabel { font-size: 11px; color: var(--lc-text2); font-family: ui-monospace, Menlo, monospace; word-break: break-all; }
 
 .fs-annoc { margin: 0 14px 10px; border: 1px solid var(--lc-blue-border-60); background: var(--lc-blue-900-30); border-radius: 8px; padding: 8px 12px; font-size: 12.5px; color: var(--lc-blue-300); min-height: 20px; }

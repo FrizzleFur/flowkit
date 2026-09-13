@@ -52,7 +52,7 @@
 
     var bar = el('div', 'fs-hero-msgs');
     var barHead = el('div', 'fs-hero-msgsbar');
-    barHead.appendChild(el('span', null, 'messages[]'));
+    barHead.appendChild(el('span', null, '上下文消息流 messages[]'));
     var len = el('span', 'fs-lenbadge', 'len=0');
     barHead.appendChild(len);
     bar.appendChild(barHead);
