@@ -193,3 +193,19 @@ body.close .sidebar-toggle { width: auto; }
 .sidebar ul li a[data-done]::after { content: '✓'; color: var(--lc-emerald-300); margin-left: 6px; font-size: 12px; }
 .fs-pv-card[data-done] { border-color: var(--lc-emerald-border-60); }
 .fs-progress-reset { margin-top: 2em; text-align: right; }
+
+/* ===== 代码高亮主题（2026-09-13 对齐 learncc: Tailwind-400 系 hljs 色板逐类映射 Prism; .markdown-section 前缀提特异性压过 docsify 运行时注入主题; nagdy github-dark 佐证「低饱和深底浅字」方向） ===== */
+.markdown-section pre code { color: #e2e8f0; }
+.markdown-section .token.keyword, .markdown-section .token.important, .markdown-section .token.atrule, .markdown-section .token.rule { color: #c084fc; font-weight: 500; }
+.markdown-section .token.string, .markdown-section .token.char, .markdown-section .token.attr-value, .markdown-section .token.regex, .markdown-section .token.template-variable, .markdown-section .token.variable { color: #34d399; }
+.markdown-section .token.number, .markdown-section .token.boolean, .markdown-section .token.constant, .markdown-section .token.symbol { color: #fb923c; }
+.markdown-section .token.comment, .markdown-section .token.prolog, .markdown-section .token.cdata, .markdown-section .token.doctype { color: #64748b; font-style: italic; }
+.markdown-section .token.function, .markdown-section .token.class-name, .markdown-section .token.section { color: #60a5fa; font-weight: 600; }
+.markdown-section .token.builtin { color: #f472b6; }
+.markdown-section .token.attr-name { color: #fbbf24; }
+.markdown-section .token.tag, .markdown-section .token.deleted { color: #f87171; }
+.markdown-section .token.selector, .markdown-section .token.selector .token.operator { color: #a78bfa; }
+.markdown-section .token.operator, .markdown-section .token.entity, .markdown-section .token.punctuation, .markdown-section .token.meta { color: #94a3b8; }
+.markdown-section .token.inserted { color: #86efac; }
+.markdown-section .token.deleted { background-color: rgba(239, 68, 68, .15); }
+.markdown-section .token.inserted { background-color: rgba(34, 197, 94, .15); }
