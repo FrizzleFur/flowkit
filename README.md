@@ -6,7 +6,7 @@
 
 **[English](README_EN.md)** | 中文 |
 
-> **🎯 在线体验（主打）**: [交互教程站](https://frizzlefur.github.io/flowkit/)——12 章 · 17 部可交互演示/自测 · [Graph of Loops 概念讲解](https://frizzlefur.github.io/flowkit/graph-loop-explainer.html)；仓内 [site/](site/) 为源码（本地预览 `cd site && python3 -m http.server`）
+> **🎯 在线体验（主打）**: [交互教程站](https://frizzlefur.github.io/flowkit/)——12 章 · 20 部可交互演示/quiz 自测 · 亮色主题 · [Graph of Loops 概念讲解](https://frizzlefur.github.io/flowkit/graph-loop-explainer.html)；仓内 [site/](site/) 为源码（本地预览 `cd site && python3 -m http.server`）
 
 ![FlowKit multi-agent tmux 实录](docs/images/multi-agent-tmux.jpg)
 
