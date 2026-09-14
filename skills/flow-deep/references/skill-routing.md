@@ -34,6 +34,14 @@
 | `code-verification` | Claude Code Agent | **prime-agent** ← 自动路由 | prime-agent CLI (--no-session --mode json) |
 | `autonomous-task` | Claude Code Agent | **prime-agent** ← 自动路由 | prime-agent --autonomous + gate |
 
+## model 档位建议（2026-09-14 裁定：轻量条款）
+
+- **默认不传 `model` 参数**——模型选型权留 harness/用户层，skill 层不越位替用户决定（宪法第 4 问）
+- **用户显式指定优先**——用户在任务表述或 agent_hint 中点名模型时照传，不覆盖
+- **只写语义档位，禁硬编码模型名**——建议形如「大范围只读搜索可降档」，不写具体模型 ID（防过期；规划时点无法可靠感知可用模型清单）
+
+> 依据：GLM 套餐并发口径（Lite 1 / Pro 1-2 / Max 2+）下模型可用性随套餐波动；deer-flow 的模型槽位同样留在 config 层而非编排层（README:196）。执行模型不得自行传 model 越权。
+
 > **C36 多仓增强（叠加注入，不替代上面任何 type）**: 当任务为多仓/跨文件（Goal Contract 标注了目标仓库清单）时，`code-implementation` / `code-review` / `testing` 类 Agent **额外**注入下方「多仓代码修改 Agent（C36 路由）」的导航与编辑协议块——TDD 纪律不变，代码定位与编辑方式改走双图。协议详情见 `references/multi-repo-toolchain.md`。
 
 ## Agent Prompt 模板

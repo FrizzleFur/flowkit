@@ -20,6 +20,7 @@
   L7 frontmatter      —— name 与目录名一致、description 非空（error；description 是
                          available_skills 唯一常驻上下文 = 触发机制，即 trigger eval 的静态前提）
 
+选型判据（何时把纪律升为脚本）：见 evals/README.md「护栏选型判据（P-17）」——D1 必要 + D2/D3 至少其一 + D4 验收。
 用法：python3 scripts/lint_flowkit.py [--root <flowkit根目录>]
 退出码：0 = 无 error（warning/info 不阻塞）；1 = 存在 error。
 """
