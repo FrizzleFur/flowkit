@@ -1,46 +1,76 @@
-# HANDOFF — flowkit 教程站（redesign 周期进行中）
+# HANDOFF — flowkit 教程站 · 上线收尾交接（2026-09-14）
 
-> 更新: 2026-09-12 晚 | 前置: 三周期交付（9c60cd6）→ sweep 清扫（部分）→ redesign 重设计（波 1-3 已交付, 波 4 待做）| 工作树净, main 已推
+> 前置会话: redesign 全周期（研究→提案→波1-5→亮色转换→quiz→泳道→ch12→双 Pages 上线）
+> 本文件目标: 下一会话直接修两个线上问题 + 接手剩余队列。上下文 88.8% 触发 Context Guard 交接。
 
-## 一分钟读懂现状
+## 一分钟现状
 
-教程站 site/ 交付后进入「重设计周期」: 三路研究（learncc 活体+源码、10 站外部横评）→ 设计提案（proposal.md, T1-T5+章节组织已裁）→ 四波执行。**波 1-3 已落地**（交互基建 P0 三件套/进度系统/ch6 四标签试点/位置标记 ×8 章/双入口/最短路线）, 全部有 CDP 证据。**波 4 待做**: ch6 模板推广 7 章 + ch12 实战走查章 + quiz 分批。
+教程站已全量交付并推送: flowkit main 至 `d161a88`、BlogBackUp master 至 `1d4149ba`、博客已部署 `d62a5c4`（hexo clean+g+d 全链）、flowkit 仓 Pages（frizzlefur.github.io/flowkit）正常。**剩两个线上问题待修（诊断已到位）**。
 
-## 状态获取指令（新会话按序读）
+## 🔴 P1: michaelmaomao.github.io/flowkit/ 打开空白 — 根因已坐实
 
-1. `.plan-feat-redesign/STATE.md` — 主状态（波次账本/已裁决策/测试纪律/风险）
-2. `.plan-feat-redesign/proposal.md` — 设计提案与裁决记录
-3. `.plan-feat-redesign/notes/` — 三份研究底稿（lcx-live/lcx-src/bp-research）
-4. `.plan-feat-sweep/` — 前序清扫周期（对账 37 条挂账 + 交互评审报告 + verify.py 机检）
-5. `git log --oneline -5` — 提交链
+**诊断证据（2026-09-14 实测）**:
+- `flowkit/_sidebar.md` → **404**; `flowkit/README.md` → 200; index.html → 200
+- 部署仓根 `.nojekyll` → **404**
+- 但 hexo 部署清单里明明有 `flowkit/_sidebar.md`（文件已推到仓里）
 
-## 已裁决策（勿重新讨论）
+**根因**: michaelmaomao.github.io 是**用户页仓，GitHub Pages 默认跑 Jekyll**——Jekyll 构建时**丢弃下划线开头文件**（`_sidebar.md`/`_coverpage.md`）。文件在 git 里但 Jekyll 处理后不输出 → docsify 的 sidebar/coverpage fetch 404 → 站点渲染空白。frizzlefur.github.io/flowkit 正常是因为 gh-pages 分支根有 `.nojekyll`。
 
-- 章节集合 11 章不动 + **ch12 实战走查章已立项**; 顺序不重排; 原理篇=地基三讲（双入口已落地）
-- 分区容器 = **自写 fs-tabs.js**（docsify-tabs@1.6.3 与 docsify@5 不兼容已被 CDP 证伪; 标记 = `<div class="fs-tabsep" data-label="...">`, 结束 `data-end="1"`; 模板 = ch6）
-- quiz 做（Brown 规则: 重试至全对/看答案锁定/记录作答, constquiz 扩展）; 主播放钮颜色待 learncc 前台复验（T4）; 深挖折叠仅长条目
-- 优先级框架 = 三类读者（首读/回访/查阅）体验影响, 非审计驱动
-
-## 关键纪律（延续 + 本周期新增）
-
-- 原四条全延续: SC5 锚点实读 / 零依赖零构建 / 渲染交付 CDP 实测 / 博客同步链 site/ → BlogBackUp/source/flowkit/ → 用户 hexo d
-- **Chrome 启发式缓存鬼影**: 改资产后必须 `fetch(u, {cache:'reload'})` 强刷再 reload——旧 Last-Modified 可数小时不回源（本次教训, 40 分钟）
-- **截图强制帧法**: 后台 tab IO 不触发, `/screenshot` 强制合成帧可驱动 IO/timer 链——行为验证的核心手法
-- 预览服务: 4099 端口 no-store 版（重启脚本见 /tmp/fs-sweep-server.log 思路）
-- agent 完成即产物清点即 TaskStop（不等通知）; 机检 = `.plan-feat-sweep/verify.py`
-
-## 未决事项
-
-| 项 | 谁 | 说明 |
-|---|---|---|
-| 波 4 推广 + ch12 | 下会话 | STATE.md next_action 有逐步清单 |
-| sweep Phase 4 终验+博客同步 | 波 4 后 | 机检复跑 + CDP 抽查 + rsync BlogBackUp → 用户 hexo d |
-| :focus-visible 真实 Tab 键确认 | 用户 | 打开站点按 Tab 看焦点环 |
-| 主播放钮颜色（T4） | 待复验 | learncc 前台实拍采样后定 |
-| REC-P1~P4 | 持续观察 | 触发条件驱动, 核验表在 sweep/notes |
-
-## 本地预览
-
+**修法（下会话直接执行）**:
 ```bash
-cd site && python3 -m http.server 4099   # file:// 不支持 docsify; 服务已切 no-store 更佳
+touch /Users/new/Documents/Repos/BlogBackUp/source/.nojekyll   # hexo 复制到 public/ 根
+cd /Users/new/Documents/Repos/BlogBackUp && git add -f source/.nojekyll && git commit -m "fix: .nojekyll 禁 Jekyll——flowkit 子站的 _sidebar/_coverpage 不再被丢弃"
+# 然后全链: hexo clean && hexo generate && hexo deploy（用 /Users/new/.nvm/versions/node/v24.18.0/bin/hexo）
+# 注意: .nojekyll 只影响 GitHub Pages 的 Jekyll, 不影响 hexo 自身构建
 ```
+修后验证: `curl -o /dev/null -w "%{http_code}" https://michaelmaomao.github.io/flowkit/_sidebar.md` 应 200（注意 CDN ~10min 缓存, 加 `?cb=$RANDOM` 穿透）。
+
+## 🟡 P2: 博客主页导航无 FlowKit tab — 大概率浏览器缓存（复验已近实锤）
+
+**复验证据（交接前最后一查）**: 部署产物 public/index.html grep flowkit 13 处; 线上主页（缓存穿透）导航已见「思所」「读书」——它们只存在于新菜单（1d4149ba），证明新菜单已部署，FlowKit tab 应同在（探针 grep 采样被文章标题挤占，未单独确认）。
+**用户侧动作**: 硬刷新（Cmd+Shift+R）或无痕窗口打开主页。
+**若硬刷新后仍无**: 30 秒裁定——`curl -s "https://michaelmaomao.github.io/?cb=$RANDOM" | grep -oE 'FlowKit[^<]*' | head -5` 看导航区（区别于文章标题 FlowKit-xxx）; 仍无再查 node_modules/hexo-theme-melody（npm 版存在, 但 themes/melody 优先级更高, 已排除 _config.melody.yml 覆盖）。
+**原疑点记录（已部分排除）**:
+
+**诊断证据**: 主页 HTML（缓存穿透后）grep "flowkit" 只命中文章标题，无 `<nav>` 菜单项。
+**已排除**: 菜单配置已提交推送（`1d4149ba`: themes/melody/_config.yml menu 加了 `FlowKit: /flowkit/` + 思所/读书/相册）且推送在 hexo generate **之前**。
+**疑点（按概率排序）**:
+1. hexo 实际用的主题不是本地 `themes/melody`——查 `_config.yml` 的 `theme:` 解析与 `node_modules/hexo-theme-melody` 是否存在（npm 安装版会优先/覆盖）
+2. melody 菜单可能需 `hexo clean` 后才重渲染（已 clean 过, 存疑）
+3. 根 `_config.yml` 或 `_config.melody.yml`（hexo 5+ 的根级主题配置文件）覆盖了 themes/melody/_config.yml——**`ls /Users/new/Documents/Repos/BlogBackUp/_config.melody.yml` 一查便知, 若存在改它才生效**
+4. CDN 缓存（已用随机参穿透, 概率低）
+
+**验证路径**: `grep -i flowkit /Users/new/Documents/Repos/BlogBackUp/public/index.html`（部署产物里有没有）——有=CDN 缓存, 没有=生成链配置未生效。
+
+## 状态获取（新会话按序读）
+
+1. 本 HANDOFF.md
+2. `.plan-feat-redesign/STATE.md`（波次账本/已裁决策/风险）
+3. `.plan-feat-redesign/master-plan.md`（三轴总编排）
+4. `git -C /Users/new/Documents/Repos/flowkit log --oneline -6`
+
+## 剩余队列（修完 P1/P2 后）
+
+- quiz 二批: 其余 8 章出题（fs-quiz 组件已就绪, 模板 `site/assets/quiz/ch4.json`, 挂载范式见 ch4 机制 pane 尾）
+- 中优: ch2 三斧同屏回放（A 线设计现成, ch2-rules 已建可作参考）
+- 微挂账: S6 quote-soft / S13 coarse 指针
+- :focus-visible 真实 Tab 键人工确认（用户侧）
+
+## 关键纪律（延续）
+
+- **cwd 漂移是本会话最大事故源**（曾把 PicCal 仓切到 orphan 分支, 已恢复+补丁已推 `6a3b8cc`）——所有 git/分支操作**必须显式 cd 或 git -C 绝对路径**
+- hexo d 不隐含 generate: 改源码后必须 clean+g+d 全链
+- Chrome 启发式缓存: 改资产后 `fetch(u,{cache:'reload'})` 强刷; 线上验证加 `?cb=$RANDOM`
+- CDP IPv6 桥在跑（/tmp/ipv6-bridge.mjs, 127.0.0.1:9223→[::1]:9223）; 预览服务 4099 no-store
+- 机检: `cd /Users/new/Documents/Repos/flowkit && python3 .plan-feat-sweep/verify.py`（当前 17 剧本/12 章/13 组件/3 题库 ALL PASS）
+- 博客同步链: flowkit/site → rsync → BlogBackUp/source/flowkit/ → hexo clean+g+d
+- 并行会话在改 flowkit skills（check_context.py 等未提交改动是它的, 勿动勿捎带——本仓提交用显式路径 git add）
+
+## 上线地址速查
+
+| 产物 | 地址 | 状态 |
+|---|---|---|
+| flowkit 仓 Pages | https://frizzlefur.github.io/flowkit/ | ✅ 正常 |
+| Graph of Loops 讲解页 | https://frizzlefur.github.io/flowkit/graph-loop-explainer.html | ✅ |
+| 博客 | https://michaelmaomao.github.io/ | ⚠️ P2 导航缺 FlowKit |
+| 博客 /flowkit/ | https://michaelmaomao.github.io/flowkit/ | 🔴 P1 空白（Jekyll） |
