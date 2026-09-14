@@ -9,7 +9,7 @@
 | 层 | 防什么回归 | 成本 | 落点 | 现状 |
 |---|---|---|---|---|
 | L0 静态断言 | SKILL.md 行数爆炸 / references 断链 / codex-compat 失同步 / frontmatter 漂移 | 零 LLM，秒级 | `scripts/lint_flowkit.py`（L1-L7）+ `.github/workflows/lint.yml` | 已落地 |
-| L1 触发层 | description 改动导致误触发/漏触发（should / should-not near-miss 集） | ~20 次小模型调用 | `evals/<skill>/trigger-evals.json`（T-302，待建） | 待启动 |
+| L1 触发层 | description 改动导致误触发/漏触发（should / should-not near-miss 集） | ~20 次小模型调用 | `evals/trigger/`（T-302 已建：eval-set-v1 + runner + 两轮 results） | 已跑三轮（2026-09 停在竞技场注入失效归因，结论见 CHANGELOG T-302 条目；恢复跑前先修 `.claude/skills` 进 `claude -p` 技能视野的问题） |
 | L2 行为层 | stage 纪律丢失 / 五件套不落盘 / handoff 断链 | 会话级，手动触发 | `evals/<skill>/evals.json`（T-301） | 建设中 |
 
 L2 采用**单臂回归结构**（2026-09-09 用户裁决，替代原双臂 ≥4 会话方案）：
