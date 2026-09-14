@@ -1,0 +1,42 @@
+{
+  "title": "记忆闭环——条目在双库与主会话之间流动",
+  "version": 2,
+  "lanes": [
+    { "id": "main", "title": "主会话" },
+    { "id": "kb", "title": "knowledge-base" },
+    { "id": "exp", "title": "experience" }
+  ],
+  "steps": [
+    { "title": "环节一 · 召回",
+      "desc": "Stage -1: 从任务表述抽 3-8 个关键词，匹配双库 _index.json——命中条目全文加载，Relevant History 进契约。",
+      "clear": ["main"],
+      "lanes": { "set": {
+        "kb1": { "lane": "kb", "state": "queued", "label": "KB · docsify 零构建方法论", "note": "召回候选" },
+        "exp1": { "lane": "exp", "state": "queued", "label": "EXP · CDP 排障三法", "note": "召回候选" }
+      } } },
+    { "title": "环节二 · 使用",
+      "desc": "命中经验全文加载进当前会话——规划与执行站在旧经验上，不再从零踩坑。",
+      "lanes": { "set": {
+        "kb1": { "lane": "main", "state": "running", "label": "KB 条目参与规划" },
+        "exp1": { "lane": "main", "state": "running", "label": "EXP 条目参与执行" }
+      } } },
+    { "title": "环节三 · 验证",
+      "desc": "Stage 5: 逐条成功标准配新鲜证据——只有 DONE 才放行。失败方案入库 = 下次任务的误导源，所以非 DONE 一律不沉淀。",
+      "lanes": { "set": {
+        "kb1": { "lane": "main", "state": "done", "label": "经验受验证检验" },
+        "exp1": { "lane": "main", "state": "done", "label": "经验受验证检验" }
+      } } },
+    { "title": "环节四 · 沉淀（分流双库）",
+      "desc": "Stage 5.8: 提炼 → 按判断准则分流双库 → 主动询问用户 → 同意才写入，索引同步更新。通用流程进 knowledge-base，技能踩坑进 experience。",
+      "lanes": { "set": {
+        "kb2": { "lane": "kb", "state": "done", "label": "KB · 新条目（用户同意后入库）" },
+        "exp2": { "lane": "exp", "state": "done", "label": "EXP · 新踩坑记录" }
+      } } },
+    { "title": "下一个任务启动",
+      "desc": "经验落库，成为下一次环节一的召回候选——闭环首尾相接，管道不是直线。",
+      "lanes": { "set": {
+        "kb2": { "lane": "kb", "state": "queued", "label": "KB 新条目 · 等待下一次召回" },
+        "exp2": { "lane": "exp", "state": "queued", "label": "EXP 新条目 · 等待下一次召回" }
+      } } }
+  ]
+}

@@ -1,8 +1,20 @@
 # STATE
 
-status: in_progress
-current_stage: 3
+status: completed
+current_stage: 5
 plan_dir: .plan-feat-graph-loop/
+
+## 终态摘要
+
+- Goal Verification: DONE（SC1-4 全 Pass，证据见 findings.md GV 表）
+- 核心结论: 17 点矩阵 8 受监督/6 载体/3 部分/0 未实现——「实现超前于名词」成立；graph of loops 四查 3 项成立 2 项生长中（trigger 多样性/复利量化），已跨过 explainer「多数团队一两个循环」线
+- 关键追溯: 收官篇真身 = AIPrj/graph-engineering-research/research/09-loop-graph.md（仓外已实读继承裁决）
+- lint 实跑: exit 0（L3 warning 1 / L4 提醒 2 / L2 info 数条）
+- 用户侧后续: 需用户复核清单 4 条（findings.md 末节），首条 = brain-integrity-loop 挂载
+
+## Stage 3.5 审查记录
+
+- 2026-09-13 plan-reviewer 结论 NEEDS_REVISION（3 必修 F8/F12/F4 + 14 发现），已全数采纳修订为 v2；reviewer 预声明「修完三处可直接 APPROVED」；用户批准 v2 后执行完毕
 
 ## Phase 分解
 

@@ -77,16 +77,86 @@
 
 ## graph of loops 解析（Phase 3）
 
-（执行中填写）
+### 1. 视频语义（explainer 锚点）
 
-## 验证评估（Phase 3）
+- Carlos 提出「假设未来公司由一堆循环运作」[02:03]；核心主张：多循环的错误与改进会**复利叠加** [02:18]
+- UP 主定性：**非常新、尚未探索、还没有真正答案**——多数团队甚至还没建起一两个循环 [02:29]；下期主题 [22:11]
+- 与 knowledge graph 明确切割 [01:24]；与 control graph 的关系：control graph 让**单个**循环可靠，graph of loops 问**循环之间**如何连接与互相改进
 
-（执行中填写）
+### 2. 研究仓定稿（09-loop-graph.md，已实读继承）
+
+- 演进链四阶段（09:19-26）：单 agent loop → loop engineering（Jason Zhou 7-09 长文）→ graph of loops（Steinberger 7-18 推文，本身是术语调侃）→ 本篇定稿「**图由循环养出来，循环靠图复利**」
+- **loop 三判据**（09:28）：持久触发 + 共享记忆 + 越跑越值钱；无持久记忆的 fan-out 编排（即使 1000 agents/run）不是 loop graph
+- 三判据裁决（09:183-189）：loop 与 graph **分层不竞争**；好边是「两个循环读写同一个文件」的事实长出来的；**没有验证的 loop 是定时炸弹**
+- 术语战争一手真相（09:164-167）：Hamel《Loop Engineering Is Dead》正文无任何论述、纯梗图 GIF（抽帧验证）——命名通胀刹车，非技术论战
+
+### 3. flowkit 语境对应物（审计实证）
+
+| graph of loops 概念 | flowkit 对应物 | 状态 |
+|---|---|---|
+| loop 本体 | L1 经验 loop（Stage -1↔5.8）、L2 执行 loop（管道+STATE）、L3 研究 loop（zread→REC→落地→lint）、repo-integrity（cron 已跑）、brain-integrity（契约就绪待挂载） | 3 运行 + 2 定时契约 |
+| trigger | 用户发起（任务）/ CI cron（repo loop）/ launchd·手动（brain loop，待挂）/ Stop Hook（ralph，任务内） | cron 维度 09-10 已补 |
+| 共享 brain | auto-skill 双库（experience 46 条目 + knowledge-base 44 分类，本次 Stage -1 实测召回命中即证据） | 运行中 |
+| signal 边（跨 loop） | evals/README signal 登记总表（5 信号×写者×读者×载体）+ REC-3 consumed_by + [[wikilink]] 互链 | 结构就位，密度生长中 |
+| 复利机制 | REC 提案（改进复利载体，propositions.md）+ Stage 5.8 经验沉淀（经验复利）+ lint 战果→L3 消费 | 显式载体在；**量化追踪（REC-8 健康分）未跑** |
+| verifier | lint_flowkit.py + check_integrity.py + evals 三层 | 全部确定性、零 LLM |
+
+### 4. 最小承重结构四查结论
+
+**graph of loops 在 flowkit 不是「能不能实现」的问题，而是「已经长出来多少」的问题**：四项承重结构中三项成立（loop 本体 ✓ / signal 边 ✓ / verifier ✓），两项生长中（trigger 多样性、复利量化）——恰好处于 09 收官篇 §2.3 的自评位置：「已过从无到有，正处从有到密」。explainer 说「多数团队还没建起一两个循环」[02:29]——flowkit 有 3 运行 + 2 契约，**已跨过这条线**；但 explainer 的公司级多业务循环形态（实战一的 support/growth/SEO 循环族）不在 flowkit 射程内，其对应物是 loopany 类产品（09 §5.1 已勘测）。
+
+## 验证评估（Phase 3）——「能不能验证」三拆作答
+
+用户原话「是不是真的能验证了」实为三个不同问题（方法论者拆分）：
+
+### ①「理念已实现」能否验证？——**能，且本次已验证**
+
+覆盖矩阵 17 点全判定，每点 file:line 实读锚点，三态分布 8 受监督 / 6 载体 / 3 部分 / 0 未实现。验证方式 = 锚点可回溯（任何人可按 findings 引用重查）。
+
+### ②「机制是否生效」能否验证？——**分层可验，逐层给证据**
+
+| 层 | 验证方式 | 本次证据 |
+|---|---|---|
+| L0 结构面 | lint_flowkit.py | **exit 0**（warning：L3 flow-deep 733 行超宪法线 ×1、L4 验证命令实测提醒 ×2、L2 registry 图 info 数条——不阻塞） |
+| CI/trigger 面 | GitHub Actions cron | repo-integrity-loop 已挂载并运行（lint.yml:13 + contract Logs 首条 09-10 登记） |
+| 行为面 | T-301 行为 evals | 三臂全绿绿基线已建（benchmarks/iteration-1.json，24 机检断言） |
+| 触发面 | T-302 trigger evals | 已跑三轮，results 落盘（evals/trigger/results-*.json），near-miss 两轮零误触发 |
+| brain 面 | check_integrity.py | 验证器实存可跑（本次实读源码确认三类检查），**但 trigger 未挂载——「能否验证」在此维度的答案 = 能，差一次挂载（用户动作）** |
+| lint 证明力边界（F14 声明） | — | lint 绿只证「此刻结构完整」，不证 loop 有效——evals/README.md:41 自有恒真断言警告；故上表每行配独立证据源而非单靠 lint |
+
+### ③「概念假设本身」能否验证？——**当前不可判，属长期复利命题**
+
+「多循环的错误与改进会复利叠加」[02:18] 是设计假设而非可执行断言。flowkit 内可验证的是**吸收自洽性**（本报告①②）；假设本身为真需要复利数据积累（REC-8 健康分趋势、TSV 战果曲线、授粉密度变化）——数据源已布好（loop Logs 节即为此设计），但解读需时间窗口。标「暂不可验证（概念假设层）」，不作断言。
+
+### 审计发现汇总
+
+1. **README 过期冲突**：evals/README.md:12 称 trigger 层「待启动」，实际 T-302 已三轮跑完且有归因（CHANGELOG:32）——五条防漂移规则 #2 的活案例（需用户复核清单 #3）
+2. **flow SKILL.md:394「≤4」残留属实**（ch11:68 已记录在案的文档腐化实例，本审计复核确认仍在）
+3. **auto-iterate 在仓外**：L2 执行 loop 的迭代机械位于 ~/.claude/skills/ 而非 flowkit repo——矩阵按「生态资产（仓外）」标注
+4. **第五方独立收敛**（P-12）：Jason Zhou contract+state+logs 单文件 ≡ flowkit 四件套+REC-9——外部印证设计正确性
+
+## 需用户复核清单（F10 交付物）
+
+| # | 事项 | 说明 |
+|---|---|---|
+| 1 | brain-integrity-loop 挂载 | contract 就绪、验证器可跑，仅缺 launchctl 挂载或手动首跑（brain-integrity-loop.md:34-39 有一行命令）——graph of loops 复利量化的数据源在此 |
+| 2 | P-17 选型判据成文 | 「何时 SOP→代码护栏」实践已有（REC-10）但无显式条款，是否值得在 evals/README 或 lint docstring 外成文 |
+| 3 | evals/README.md L1 行更新 | 「待启动」→ 实际已跑三轮（含产品层裁定），文档修正属 repo 变更，本审计只读未动 |
+| 4 | P-06/P-09 强弱模型路由 | model 参数在而选型纪律缺，取舍待裁 |
 
 ## Plan Review（Stage 3.5）
 
-（待审查后填写）
+- 2026-09-13 plan-reviewer（独立上下文）审 v1：**NEEDS_REVISION**（3 必修 F8 口径拆级 / F12 收官篇前提证伪 / F4 验证器脚本层缺席 + 14 发现），全程实读带行号证据
+- v2 全数采纳修订（理念点 16→17、口径拆级、Phase 1 目标改写+失败分支、信息源补齐），reviewer 预声明修订后可直接 APPROVED；用户批准 v2 执行
+- 复审价值实证：F12 在执行前拦下「近似文档冒名收官篇」路径——真身实为仓外 graph-engineering-research/research/09-loop-graph.md，已实读继承
 
 ## Goal Verification（Stage 5）
 
-（待验证后填写）
+| Success Criteria | Evidence | Status |
+|---|---|---|
+| SC1 概念解析准确，逐锚点对照 explainer | 解析节全部锚点引用（[02:03]/[02:18]/[02:29]/[22:11]/[01:24]）+ 09 收官篇交叉实证；knowledge graph 切割已声明 | **Pass** |
+| SC2 矩阵 17 点全判定+三态分布+受监督级证据链+相似≠等价强制注记 | 覆盖矩阵 17/17 行，每行含证据 file:line + 注记列；三态分布明示（8/6/3/0）；8 个受监督级均附脚本/eval 证据 | **Pass** |
+| SC3 验证方式符合组合合法性规则 + lint 实跑留痕 | lint exit 0 + warning 明细记录（L3×1/L4×2/L2 info）；「需用户复核」「暂不可验证」均按 F9 规则使用 | **Pass** |
+| SC4 报告落盘+对话总结+需用户复核清单 | 本文件定稿 + 对话内总结 + 复核清单 4 条 | **Pass** |
+
+**结论：DONE**（全部 SC 有新鲜证据；唯一用户侧后续动作 = 复核清单，不阻塞审计结论）
