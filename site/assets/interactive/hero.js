@@ -109,3 +109,24 @@
 
   FlowSite.fns.push(initAll);
 })();
+
+/* fs-cta-prefetch — 封面 CTA 目标 md 预热（2026-09-14）
+ * 背景: 冷缓存首次点击「开始阅读」需现场 fetch 目标 md，网络慢时先见 404/旧内容再刷出。
+ * 做法: 封面在场时 idle 预取 CTA 指向的 md 进浏览器 HTTP 缓存（Pages 响应带 max-age=600），
+ *       docsify 点击时的同 URL xhr 直接命中缓存，实现"点开即渲染"。
+ * 路径: href 形如 #/principles/ch1-...，去 # 与前导 / 后按相对路径 fetch（子路径部署安全）。
+ */
+(function () {
+  function prefetch() {
+    if (!document.querySelector(".cover")) return;
+    var links = [].slice.call(document.querySelectorAll(".cover a.fs-cta, .cover a.fs-cta-ghost"));
+    links.forEach(function (a) {
+      var h = (a.getAttribute("href") || "").replace(/^#/, "").replace(/^\//, "");
+      if (!h) return;
+      fetch(h + ".md", { cache: "default" }).catch(function () {});
+    });
+  }
+  var ric = window.requestIdleCallback || function (f) { setTimeout(f, 600); };
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { ric(prefetch); });
+  else ric(prefetch);
+})();
