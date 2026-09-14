@@ -198,15 +198,17 @@ IN_TMUX（`[ -n "$TMUX" ]` 显式判定）时:
 
 ```bash
 tmux new-window -n "handoff-<run-id>-g<N>" -c "$PWD" \
-  "CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1 claude \"\$(cat <plan-dir>/HANDOFF.md)\""
+  "CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1 claude --permission-mode bypassPermissions \"\$(cat <plan-dir>/HANDOFF.md)\""
 ```
 
 三个关键点（官方文档核实，2026-08-28）:
 - `CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1`（v2.1.172+）: 从会话内 Bash 启动的嵌套交互式 TUI 默认被排除在 `--resume`/历史/`claude agents` 之外，此变量保证续接会话可追溯
 - `-c "$PWD"`: tmux 新窗口默认目录可能不是当前 pane 的 cwd，显式锚定项目目录
-- HANDOFF.md 即新会话的初始 prompt，其"必读文件"清单触发恢复协议；交互式窗口权限提示可正常确认（这是选 tmux 而非 headless 的原因）
+- HANDOFF.md 即新会话的初始 prompt，其"必读文件"清单触发恢复协议
 
-无 tmux 降级: 打印单条命令 `claude "$(cat <plan-dir>/HANDOFF.md)"` 由用户执行，其余动作（五件套 + 计数 + 报告）不变。
+**bypassPermissions 统一（2026-09-14 实测后用户决策）**: spawn 命令加 `--permission-mode bypassPermissions`，与 SKILL.md「Handoff Relay」节同款——理由同源: 续接会话执行的是原会话已授权工作，逐项再弹等于让用户重复点头。实测依据（2026-09-14，v2.1.268 headless 对照）: 无 flag 时续接会话落 acceptEdits（继承 defaultMode），工作目录外写文件被权限层拦截；带 flag 后 transcript `permissionMode=bypassPermissions`、目录外放行。`--dangerously-skip-permissions` 与本 flag 实测等效（transcript 同落 bypassPermissions），选用本 flag 因语义精确且无「仅推荐无网沙箱」警告语。bypass 只免权限弹窗不免 workspace trust 弹窗，pretrust 预信任仍是必要前置（见 SKILL.md Handoff Relay 节）。选 tmux 而非 headless 的原因相应更新: 新会话是用户可见可交互的真会话，异常时可人工接管（权限确认不再是 tmux 的存在理由）。
+
+无 tmux 降级: 打印单条命令 `claude --permission-mode bypassPermissions "$(cat <plan-dir>/HANDOFF.md)"` 由用户执行，其余动作（五件套 + 计数 + 报告）不变。
 
 **阈值分工**: ≥70% 且未 armed → 弹窗（四选项）；≥75% 且 armed → 自动交接。75% 留出写文件与 spawn 的余量；auto-compact 在窗口边界才触发，本协议始终跑在它前面。
 
