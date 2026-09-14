@@ -35,3 +35,5 @@ next_action: ①quiz 首批 3 章（Brown 规则, 需通用化 quiz 组件或逐
 - 亮色转换 `f3ecde5` 后续: docsify 基础主题 dark→vue(亮), :root token 亮色翻转, 高亮色板亮底深色系, 封面渐变亮色, 列宽 1040px, 正文 16px——用户三指令(字号/宽度/亮色)全落地
 
 - quiz 首批 `d0ee798`: fs-quiz 组件（Brown 规则/声明式题库）+ ch4/ch6/ch9 题库 3 份 + 三章「学完自测」挂载 + verify quiz 断言
+
+- 上线 `d62a5c4`(blog Pages): hexo clean+g+d 全链重部署——教训: hexo d 不隐含 generate, 改源码后必须 clean+g+d 全链
