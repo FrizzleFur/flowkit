@@ -27,3 +27,7 @@ cd site && python3 -m http.server 4000
 ```
 
 `file://` 协议不支持 docsify（运行时 fetch markdown 会被浏览器拦）, 需任意静态 HTTP 服务。CDN 资源钉版本（docsify 5.0.0）并带 SRI 完整性校验。
+
+## 更新日志
+
+- **2026-09-14**: 亮色主题（learncc 色板对齐/1040px 宽列/16px 正文）; 12 章三标签结构（机制/源码锚点/批判深挖）; fs-quiz 形成性自测（ch4/ch6/ch9, Brown 规则）; ch3 记忆闭环三泳道 + ch6 判定链短路电路回放; ch12 实战走查 capstone 章; 入场动效体系 + 播放仲裁; GitHub Pages 双上线（本站 + 博客 /flowkit/）
