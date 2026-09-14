@@ -18,9 +18,9 @@
     window.$docsify = {
       name: 'FlowKit 机制原理',
       repo: 'https://github.com/FrizzleFur/flowkit',
-      loadSidebar: true,
+      loadSidebar: 'sidebar.md', // GitHub Pages Jekyll/CDN 不发下划线路径——改名绕开（2026-09-14）
       auto2top: true,
-      coverpage: true,
+      coverpage: 'coverpage.md',
       subMaxLevel: 3,
       alias: {
         "/ch(.*)": "/mechanisms/ch$1",
