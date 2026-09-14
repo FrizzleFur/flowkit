@@ -1,0 +1,73 @@
+{
+  "title": "记忆复利闭环: 任务数在涨, 知识库跟着滚雪球",
+  "version": 2,
+  "flow": {
+    "nodes": [
+      { "id": "taskN", "label": "任务 N 进入", "x": 110, "y": 10, "w": 170, "h": 34, "type": "rect" },
+      { "id": "recall", "label": "Stage -1 召回", "x": 110, "y": 90, "w": 170, "h": 34, "type": "rect" },
+      { "id": "exec", "label": "执行", "x": 110, "y": 170, "w": 170, "h": 34, "type": "rect" },
+      { "id": "verify", "label": "Stage 5 验证", "x": 110, "y": 250, "w": 170, "h": 34, "type": "rect" },
+      { "id": "distill", "label": "5.8 沉淀", "x": 110, "y": 330, "w": 170, "h": 34, "type": "rect" },
+      { "id": "taskN1", "label": "任务 N+1", "x": 320, "y": 170, "w": 170, "h": 34, "type": "rect" }
+    ],
+    "edges": [
+      { "from": "taskN", "to": "recall" },
+      { "from": "recall", "to": "exec" },
+      { "from": "exec", "to": "verify" },
+      { "from": "verify", "to": "distill" },
+      { "from": "distill", "to": "taskN1", "label": "回环" },
+      { "from": "taskN1", "to": "recall", "label": "带着积累再召回" }
+    ]
+  },
+  "messagesPanels": [
+    { "id": "kb", "title": "knowledge-base 条目" }
+  ],
+  "steps": [
+    { "title": "任务 1: 从零裸奔",
+      "desc": "第一个任务进场: 召回没有库可查（len=0），执行全靠现场摸索——无召回无沉淀，一切从零。",
+      "on": ["taskN"], "edgesOn": ["taskN>recall"] },
+    { "title": "任务 1: 摸索着走完全程",
+      "desc": "召回扑空、执行踩坑、验证通过——过程正确，但踩坑换来的解法没有出口，会话结束即蒸发。",
+      "on": ["recall", "exec", "verify"], "edgesOn": ["recall>exec", "exec>verify"] },
+    { "title": "首次沉淀: len=2",
+      "desc": "Stage 5 判 DONE 后 5.8 触发，把本次踩坑的解法提炼成 2 条写入知识库——闭环第一次在写端闭合。",
+      "on": ["distill"], "edgesOn": ["verify>distill"],
+      "append": { "kb": [
+        { "role": "tool_result", "label": "条目 1: worktree 多仓桥接, 符号链接建在 :path 解析根下" },
+        { "role": "tool_result", "label": "条目 2: 大 diff 先 --stat 看全貌, 再按文件下钻" }
+      ] } },
+    { "title": "任务 2: 召回命中",
+      "desc": "同类问题进场，Stage -1 命中上次那 2 条——同类问题 30 秒进状态，不用重新踩一遍坑。",
+      "on": ["taskN1", "recall"], "edgesOn": ["distill>taskN1", "taskN1>recall"] },
+    { "title": "任务 2: 站在旧积累上执行",
+      "desc": "沿旧经验执行，上次踩过的坑这次直接绕开，顺利走到验证——召回省下的是试错成本。",
+      "on": ["exec", "verify"], "edgesOn": ["exec>verify"] },
+    { "title": "任务 2: 又沉淀 2 条, len=4",
+      "desc": "本次遇到的新坑也入库。每完成一个任务库就变厚一层——这就是滚雪球里的雪。",
+      "on": ["distill"], "edgesOn": ["verify>distill", "distill>taskN1"],
+      "append": { "kb": [
+        { "role": "tool_result", "label": "条目 3: 并发派发 429 限流, 同消息 <=3 分批 + 退避重试" },
+        { "role": "tool_result", "label": "条目 4: named agent 完成即收体, 不收则 pane 泄漏" }
+      ] } },
+    { "title": "任务 3: 跨域命中",
+      "desc": "这次的任务类型变了，召回却仍命中同族条目——经验开始跨任务复利，检索面由关键词而非任务类型决定。",
+      "on": ["taskN1", "recall"], "edgesOn": ["taskN1>recall"] },
+    { "title": "任务 3: 跨域解法入库, len=6",
+      "desc": "跨域解法沉淀后，下次连『另一个域』也有垫脚石——条目互链（REC-3）的关系网从这里开始生长。",
+      "on": ["distill"], "edgesOn": ["verify>distill", "distill>taskN1"],
+      "append": { "kb": [
+        { "role": "tool_result", "label": "条目 5: 幂等写入, 先快照再覆盖, 出事可回滚" },
+        { "role": "tool_result", "label": "条目 6: 验收清单前置, 分发时即钉在泳道等勾销" }
+      ] } },
+    { "title": "第 N 次任务: len=8+",
+      "desc": "条目数随任务数单调上涨（8+ 且继续滚）。新任务的启动成本趋近于零——大部分坑，过去的你已经替今天的你踩过。",
+      "on": ["taskN1", "recall", "exec"], "edgesOn": ["distill>taskN1", "taskN1>recall", "recall>exec"],
+      "append": { "kb": [
+        { "role": "tool_result", "label": "条目 7: 状态机用声明表而非增量 delta, 引擎负责对齐" },
+        { "role": "tool_result", "label": "条目 8: 索引与条目双向一致, 写入方自觉维持零断链" }
+      ] } },
+    { "title": "对照: 不沉淀的体系",
+      "desc": "对照组: 写端断掉，库永远空着，召回永远扑空——每次都是任务 1。复利的前提是先把第一笔本金存进去。",
+      "on": ["taskN"], "edgesOn": ["taskN>recall"] }
+  ]
+}

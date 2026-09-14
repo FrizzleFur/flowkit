@@ -1,0 +1,86 @@
+{
+  "title": "nothing missed 分片勾销",
+  "version": 2,
+  "lanes": [
+    { "id": "lane-queue", "title": "待分派" },
+    { "id": "lane-run", "title": "分片执行中" },
+    { "id": "lane-done", "title": "已验收勾销" }
+  ],
+  "steps": [
+    {
+      "title": "母任务拆成互斥完备的分片",
+      "desc": "nothing missed 的前提在分发之前：按信息源与独立性把母任务切成互斥且完备的三片，显式列出分片清单——分片有遗漏，汇总必有遗漏。",
+      "lanes": { "set": {
+        "shard-1": { "lane": "lane-queue", "state": "queued", "label": "S1: 抓取分片", "note": "数据源 A，与 S2 互斥" },
+        "shard-2": { "lane": "lane-queue", "state": "queued", "label": "S2: 分析分片", "note": "数据源 B，与 S1 互斥" },
+        "shard-3": { "lane": "lane-queue", "state": "queued", "label": "S3: 综合分片", "note": "汇总出口" },
+        "checklist": { "lane": "lane-queue", "state": "queued", "label": "验收清单: 分片清单", "note": "先列清单，后逐项勾销" }
+      } }
+    },
+    {
+      "title": "主会话派发 S1、S2",
+      "desc": "主会话只当 Coordinator：Agent(name) 命名分发、同消息 ≤3。S1/S2 换道进执行列；S3 留队不是被遗忘，是滚动调度。",
+      "lanes": { "set": {
+        "shard-1": { "lane": "lane-run", "state": "running", "label": "S1: 抓取分片", "note": "子代理后台执行" },
+        "shard-2": { "lane": "lane-run", "state": "running", "label": "S2: 分析分片", "note": "子代理后台执行" }
+      } }
+    },
+    {
+      "title": "S1 完成——第一格勾销",
+      "desc": "完成即总结即收：agent 返回的瞬间，主会话验收结论与证据锚点、TaskStop 收本体。done 的体感不是变色，是卡片从执行列换道进勾销列。",
+      "lanes": { "set": {
+        "shard-1": { "lane": "lane-done", "state": "done", "label": "S1: 抓取分片", "note": "清单勾掉第 1 项" }
+      } }
+    },
+    {
+      "title": "S2 撞上 429 限流",
+      "desc": "高峰期账户级限流不讲道理——6 并发、4 并发加主会话持续调用都实测触发过。处置第一步不是盲目重试（官方明确反对固定间隔高频重试），是先清点：谁还在跑、哪个分片没交付。",
+      "lanes": { "set": {
+        "shard-2": { "lane": "lane-run", "state": "failed", "label": "S2: 分析分片", "note": "429: 先清点再重派" }
+      } }
+    },
+    {
+      "title": "主会话接管重派",
+      "desc": "fallback 预案「API Error / 超时 → 主 Agent 接管」：主会话用 Bash / grep 接管关键路径，不让整条流水线停摆；恢复分发前还要先退避间隔。",
+      "lanes": { "set": {
+        "shard-2": { "lane": "lane-run", "state": "running", "label": "S2: 分析分片", "note": "主会话亲写" }
+      } }
+    },
+    {
+      "title": "前批过线，滚动补发 S3",
+      "desc": "large 档不必齐进齐出：前批完成 ≥60% 即发下批。S1 已勾销、S2 已有人接手——预算释放出来的路，立刻补给留队的 S3。",
+      "lanes": { "set": {
+        "shard-3": { "lane": "lane-run", "state": "running", "label": "S3: 综合分片", "note": "滚动补发" }
+      } }
+    },
+    {
+      "title": "S3 完成换道",
+      "desc": "Agent 的「我做完了」要快速核对——Spot-check 三项：报告的文件在不在、git log 有没有新提交、测试过没过。核对过才允许进勾销列。",
+      "lanes": { "set": {
+        "shard-3": { "lane": "lane-done", "state": "done", "label": "S3: 综合分片", "note": "证据锚点齐全" }
+      } }
+    },
+    {
+      "title": "S2 复跑完成——清单三项全勾",
+      "desc": "失败分片不消失也不重开炉灶：同一张卡、同一条分片边界，被接管后照样走到勾销列。「不漏」的另一半是「不弃」。",
+      "lanes": { "set": {
+        "shard-2": { "lane": "lane-done", "state": "done", "label": "S2: 分析分片", "note": "被接管的分片照样交付" },
+        "checklist": { "lane": "lane-queue", "state": "queued", "label": "验收清单: 分片清单", "note": "清单三项全勾" }
+      } }
+    },
+    {
+      "title": "汇总验收：逐项核对清单",
+      "desc": "汇总不是把三份报告粘起来——主会话对照清单逐项核对，未覆盖或证据不足就 SendMessage 补查该分片，全部勾销才算完成。",
+      "lanes": { "set": {
+        "checklist": { "lane": "lane-run", "state": "running", "label": "验收清单: 分片清单", "note": "逐项核对中" }
+      } }
+    },
+    {
+      "title": "全勾销，交付",
+      "desc": "nothing missed——分片逐项勾销，交付出口径。「别漏掉任何东西」从触发词里的承诺，变成三列泳道里看得见的勾销体感。",
+      "lanes": { "set": {
+        "checklist": { "lane": "lane-done", "state": "done", "label": "验收清单: 分片清单", "note": "nothing missed" }
+      } }
+    }
+  ]
+}

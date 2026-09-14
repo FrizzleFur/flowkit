@@ -1,0 +1,34 @@
+{
+  "title": "五阶段走查——这座站的管道实录",
+  "version": 2,
+  "messagesPanels": [
+    { "id": "main", "title": "site-building messages[]" }
+  ],
+  "steps": [
+    { "title": "Stage 0.5 立约",
+      "desc": "清扫周期与重设计周期各有 Goal Contract 落盘（.plan-feat-sweep/spec.md、.plan-feat-redesign/spec.md）——六字段先把「做什么/不做什么/怎么证明」写死。",
+      "clear": ["main"],
+      "append": { "main": [ { "role": "system", "label": "立约: Objective=三轴对齐（内容/主题色/动效）; Non-goals=不改 skills 源码、不推翻内容事实" } ] } },
+    { "title": "Stage -1/-2: 召回与研究",
+      "desc": "三路并行研究（learncc 活体走查 / 源码内容模型 / 10 站外部横评）产出 479 行底稿——结论先于动手，Stage 2 的能力规划对着研究选形。",
+      "append": { "main": [ { "role": "assistant", "label": "研究底稿: notes/lcx-live + lcx-src + bp-research（对位审计的依据）" } ] } },
+    { "title": "Stage 3 规划 + 确认点",
+      "desc": "master-plan.md 三轴编排 + 章节×动效对位表; 三角色两轮讨论产出章节组织共识——规划落盘后由用户对话内确认，不走弹窗。",
+      "append": { "main": [ { "role": "assistant", "label": "对位表: 9/11 章已对位, ch2/ch8 差距点名（ch8 后证实已内建, 审计自我修正）" } ] } },
+    { "title": "Stage 3.5/3.6: 双评审实录",
+      "desc": "独立 Agent 审查（对位审计即其产物——9/11 判定逐条带文件证据）+ 交互评审报告以 CDP 行为探针出 P0 清单——评审不是走过场，是真拦过问题。",
+      "append": { "main": [ { "role": "tool_result", "label": "评审产物: reconciliation.md(75 条对账) + review-interaction-fluidity.md(动效评审)" } ] } },
+    { "title": "Stage 4: 波次分批执行",
+      "desc": "波 1 基建 → 波 2 ch6 试点 → 波 3 全站铺开 → 波 3.5 密度补齐——每波独立提交独立验收，Agent 完成即产物清点即收。",
+      "append": { "main": [ { "role": "tool_call", "label": "commits: 3d081d9 基建 → ed4405e 试点 → 02c60b9 铺开 → c2d0800 密度" } ] } },
+    { "title": "执行偏差实录: 高亮四层根因",
+      "desc": "「高亮发黄」的真根因挖了四层（高亮器外置/组件顺序/默认色板/主题零规则）——执行偏差就地修，plan 假设有误（docsify-tabs 兼容）回规划换方案。",
+      "append": { "main": [ { "role": "system", "label": "教训入库: SRI 必须浏览器侧实测; 启发式缓存必须 cache:reload 强刷" } ] } },
+    { "title": "Stage 5: 证据表收口",
+      "desc": "每波验收不靠「应该可以」: 机检脚本 ALL PASS + CDP 强制帧法行为断言（仲裁不变量/三标签/高亮色板逐项采样）+ 截图留档。",
+      "append": { "main": [ { "role": "tool_result", "label": "证据: verify.py ALL PASS + shots/ 截图 + 交互实验记录" } ] } },
+    { "title": "Stage 5.8: 沉淀",
+      "desc": "验证通过才沉淀: docsify 零构建站点方法论、伪验收防御、CDP 排障三法入库——这座站的教训，下次建站直接召回。你现在读的这一章，就是 Stage -1 能召回的那批经验的说明书。",
+      "append": { "main": [ { "role": "final", "label": "沉淀: knowledge-base/docsify-zero-build-site.md 等 6+ 条——管道首尾相接" } ] } }
+  ]
+}

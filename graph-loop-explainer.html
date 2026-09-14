@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Graph of Loops 概念讲解 · BV1katc67EUN 拆解</title>
+<!-- ============================================================
+  ex-web 概念讲解页（2026-09-13）
+  源：AIJasonZ《【Graph Engineering 拆解】把 Agent 的 SOP 画成 graph，它就能自己跑》
+  锚点纪律：本页所有论断锚点 = 视频时间戳 [MM:SS]，经 573 条字幕转录稿逐条实测
+  概念页降级形态：file:line 锚点 → [MM:SS]；端点表 → 概念/能力表
+============================================================= -->
+<style>
+  :root {
+    --primary: #0f62be;   /* 主线/智能体节点 */
+    --success: #198038;   /* 推荐/收益/通过分支 */
+    --warning: #ff832b;   /* 关键机制/原语 */
+    --danger:  #da1e28;   /* 反模式/风险/未通过分支 */
+    --ink: #161616; --muted: #6f6f6f; --line: #d8d8d8;
+    --bg: #f4f5f7; --card: #ffffff; --code-bg: #eef1f6;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+    background: var(--bg); color: var(--ink);
+    padding: 40px 24px 64px; line-height: 1.6;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+
+  /* ---------- header ---------- */
+  .eyebrow {
+    display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: .12em;
+    color: var(--primary); background: rgba(15,98,190,.08);
+    border: 1px solid rgba(15,98,190,.25); border-radius: 999px;
+    padding: 2px 12px; margin-bottom: 10px;
+  }
+  h1 { font-size: 26px; font-weight: 700; }
+  .meta { color: var(--muted); font-size: 13px; margin-top: 6px; }
+  .meta code { font-size: 12px; }
+
+  /* ---------- legend ---------- */
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 14px; align-items: center;
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 10px 16px; margin-bottom: 28px; font-size: 12.5px; color: var(--muted);
+  }
+  .legend b { color: var(--ink); font-weight: 600; }
+  .dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; vertical-align: 1px; }
+
+  /* ---------- 统计卡 ---------- */
+  .stats { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+  .stat-card {
+    flex: 1; min-width: 150px; background: var(--card); border: 1px solid var(--line);
+    border-radius: 10px; padding: 12px 16px; text-align: center;
+  }
+  .stat-card .num { font-size: 22px; font-weight: 700; color: var(--primary); }
+  .stat-card .lbl { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+
+  /* ---------- 泳道 ---------- */
+  .lane {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 22px 24px 24px; margin-bottom: 26px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+  }
+  .lane-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px; flex-wrap: wrap; }
+  .lane-tag {
+    font-size: 12px; font-weight: 700; color: #fff; border-radius: 6px;
+    padding: 3px 10px; letter-spacing: .04em; white-space: nowrap;
+  }
+  .lane-sub { color: var(--muted); font-size: 12.5px; }
+  .flow { display: flex; flex-wrap: wrap; align-items: stretch; row-gap: 18px; padding-top: 16px; }
+
+  /* node card 四件套 */
+  .node {
+    background: var(--card); border: 1.5px solid var(--line); border-radius: 12px;
+    padding: 12px 14px 11px; width: 236px; position: relative;
+    transition: box-shadow .15s, transform .15s;
+  }
+  .node:hover { box-shadow: 0 4px 14px rgba(15,98,190,.14); transform: translateY(-2px); }
+  .node .top { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+  .seq {
+    width: 22px; height: 22px; border-radius: 50%; flex: none;
+    background: var(--ink); color: #fff; font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .method {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .05em;
+    border-radius: 5px; padding: 2px 7px; color: #fff; white-space: nowrap;
+  }
+  .m-post { background: var(--primary); }   /* 智能体节点 / 主体步骤 */
+  .m-put  { background: var(--warning); }   /* 关键机制 / 原语 */
+  .m-web  { background: #7889a4; }          /* 外部例证 / 他人实践 */
+  .node .path {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 11.5px; color: var(--primary); background: var(--code-bg);
+    border-radius: 5px; padding: 3px 8px; word-break: break-all; margin-bottom: 7px;
+    display: block;
+  }
+  .node .use { font-size: 12.5px; color: var(--ink); }
+  .node .loc {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 10.5px; color: var(--muted); margin-top: 6px;
+    border-top: 1px dashed var(--line); padding-top: 5px;
+  }
+  .node.oss { border-style: dashed; }                    /* 虚线框 = 外部例证 */
+  .node.danger { border-color: rgba(218,30,40,.55); }
+  .node.danger .seq { background: var(--danger); }
+  .node.good { border-color: rgba(25,128,56,.45); }
+  .node.good .seq { background: var(--success); }
+  .node .badge {
+    position: absolute; top: -9px; right: 10px; font-size: 10px; font-weight: 700;
+    background: var(--warning); color: #fff; border-radius: 999px; padding: 1px 8px;
+  }
+  .node.wide { width: 100%; max-width: 980px; }
+
+  .arrow {
+    align-self: center; flex: none; display: flex; align-items: center; gap: 6px;
+    color: var(--muted); font-size: 11px; padding: 0 4px;
+  }
+  .arrow .shaft { width: 26px; height: 2px; background: #9aa5b5; position: relative; }
+  .arrow .shaft::after {
+    content: ""; position: absolute; right: -1px; top: -3.5px;
+    border-left: 7px solid #9aa5b5; border-top: 4.5px solid transparent; border-bottom: 4.5px solid transparent;
+  }
+  .arrow .lbl { white-space: nowrap; background: var(--bg); padding: 1px 4px; border-radius: 4px; }
+
+  .branch { display: flex; flex-direction: column; gap: 10px; }
+  .branch-row { display: flex; align-items: center; }
+  .cond {
+    flex: none; width: 92px; text-align: center; font-size: 11.5px; font-weight: 600;
+    border-radius: 8px; padding: 6px 8px; line-height: 1.35;
+  }
+  .cond.yes { color: var(--danger); background: rgba(218,30,40,.07); border: 1px solid rgba(218,30,40,.3); }
+  .cond.no  { color: var(--success); background: rgba(25,128,56,.07); border: 1px solid rgba(25,128,56,.3); }
+
+  /* ---------- 分层 ---------- */
+  .layer-stack { display: flex; flex-direction: column; gap: 0; }
+  .layer {
+    display: grid; grid-template-columns: 168px 1fr; gap: 0;
+    border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+    background: var(--card);
+  }
+  .layer-gap { height: 26px; display: flex; justify-content: center; align-items: center; }
+  .layer-gap span { color: #9aa5b5; font-size: 12px; }
+  .layer-title {
+    background: #eef1f6; padding: 12px 14px; font-size: 12px; font-weight: 700;
+    display: flex; flex-direction: column; justify-content: center; gap: 2px;
+  }
+  .layer-title small { font-weight: 400; color: var(--muted); font-size: 10.5px; }
+  .chips { padding: 10px 14px; display: flex; flex-wrap: wrap; gap: 8px; align-content: center; }
+  .chip {
+    border: 1px solid var(--line); border-radius: 8px; padding: 5px 10px;
+    font-size: 11.5px; background: #fbfcfe; display: flex; flex-direction: column; gap: 1px;
+  }
+  .chip b { font-family: "SF Mono", Menlo, monospace; font-size: 11px; color: var(--primary); font-weight: 600; }
+  .chip small { color: var(--muted); font-size: 10px; }
+  .chip.common { border-color: rgba(25,128,56,.4); }
+  .chip.common b { color: var(--success); }
+
+  /* ---------- 链路栈 ---------- */
+  .chains { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 18px; }
+  .chain {
+    border: 1px solid var(--line); border-radius: 12px; background: var(--card); overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+  }
+  .chain-head { padding: 10px 16px; font-size: 13px; font-weight: 700; color: #fff; }
+  .chain pre {
+    margin: 0; padding: 14px 16px 16px; overflow-x: auto;
+    font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 11.5px; line-height: 1.75;
+    color: var(--ink); white-space: pre;
+  }
+  .chain pre .c  { color: var(--primary); font-weight: 600; }   /* 概念/载体名 */
+  .chain pre .m  { color: var(--ink); font-weight: 600; }        /* 步骤名 */
+  .chain pre .ep { color: var(--warning); font-weight: 700; }    /* 产出物 / 机制 */
+  .chain pre .cm { color: #8a919e; }                              /* 注释 */
+  .chain pre .br { color: var(--danger); font-weight: 600; }     /* 条件分支 */
+  .chain pre .ok { color: var(--success); font-weight: 600; }    /* 通过分支 */
+  .chain pre .ts { color: #9aa5b5; }                              /* 时间戳锚点 */
+
+  /* ---------- 表格 ---------- */
+  h2 { font-size: 18px; margin: 34px 0 12px; }
+  h2 small { font-size: 12px; color: var(--muted); font-weight: 400; margin-left: 8px; }
+  table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; font-size: 13px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+  th { background: #e8ecf2; text-align: left; padding: 9px 14px; font-size: 12px; letter-spacing: .03em; color: #3d3d3d; }
+  td { padding: 9px 14px; border-top: 1px solid #eceff3; vertical-align: top; }
+  td code, .mono { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 11.5px; }
+  td code.ep { color: var(--primary); }
+  tr:hover td { background: #f7f9fc; }
+  .pill { font-size: 10.5px; font-weight: 700; border-radius: 4px; padding: 1px 7px; color: #fff; }
+  .ts { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 10.5px; color: var(--muted); white-space: nowrap; }
+
+  /* 要点提示卡 */
+  .callout {
+    border-radius: 10px; padding: 12px 16px; margin: 14px 0 0; font-size: 12.5px; line-height: 1.7;
+  }
+  .callout.warn { background: rgba(218,30,40,.06); border: 1px solid rgba(218,30,40,.3); }
+  .callout.good { background: rgba(25,128,56,.06); border: 1px solid rgba(25,128,56,.3); }
+  .callout b.t { display: block; margin-bottom: 2px; }
+  .callout.warn b.t { color: var(--danger); }
+  .callout.good b.t { color: var(--success); }
+
+  footer { margin-top: 26px; color: var(--muted); font-size: 12px; }
+  footer code { font-size: 11px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ========== header ========== -->
+  <header>
+    <span class="eyebrow">Graph Engineering · BV1katc67EUN 概念拆解</span>
+    <h1>把 Agent 的 SOP 画成图：从 Control Graph 到 Graph of Loops</h1>
+    <div class="meta">
+      源：AIJasonZ《【Graph Engineering 拆解】把 Agent 的 SOP 画成 graph，它就能自己跑》（22:26 ·
+      <a href="https://www.bilibili.com/video/BV1katc67EUN/">BV1katc67EUN</a>）·
+      本页所有论断锚点为视频时间戳 <code>[MM:SS]</code>，经 573 条字幕转录稿逐条实测，可回源验证
+    </div>
+  </header>
+
+  <div class="legend">
+    <b>图例</b>
+    <span><span class="dot" style="background:var(--primary)"></span>智能体节点 / 主体步骤</span>
+    <span><span class="dot" style="background:var(--warning)"></span>关键机制 / 原语</span>
+    <span><span class="dot" style="background:#7889a4"></span>外部例证（他人实践）</span>
+    <span><span class="dot" style="background:var(--danger)"></span>反模式 / 风险</span>
+    <span>┄ 虚线框 = 外部人物 / 项目</span>
+    <span>树形符号：└▶ 步骤推进 · ─▶ 动作/产出 · └─ 条件分支 · ✔ 产出物/状态</span>
+    <span>卡片底部灰字 = 时间戳锚点</span>
+  </div>
+
+  <!-- ========== SECTION ⓪ 总览 ========== -->
+  <div class="stats">
+    <div class="stat-card"><div class="num">3</div><div class="lbl">被混用的 graph 概念</div></div>
+    <div class="stat-card"><div class="num">3</div><div class="lbl">graph 三要素（节点/边/状态）</div></div>
+    <div class="stat-card"><div class="num">2</div><div class="lbl">实现路线（代码 / LLM）</div></div>
+    <div class="stat-card"><div class="num">4</div><div class="lbl">条设计原则</div></div>
+    <div class="stat-card"><div class="num">2</div><div class="lbl">个生产级 loop 实战</div></div>
+  </div>
+
+  <h2>先理清楚：「graph」到底在吵什么 <small>同一个词，三个完全不同的概念 [00:41]</small></h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:150px">概念</th>
+        <th>一句话定义</th>
+        <th style="width:230px">典型形态</th>
+        <th style="width:200px">缘起 / 例证</th>
+        <th style="width:170px">视频的判断</th>
+        <th style="width:90px">锚点</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b style="color:var(--primary)">控制 graph</b><br><span class="mono">control graph</span></td>
+        <td>把智能体任务的 SOP 显式化为「节点-边-状态」的执行结构，确保结果可靠。大多数智能体任务背后都有某种 SOP [03:03]</td>
+        <td>LangGraph、Dynamic Workflow 动态工作流、写成文本的 SOP [00:46]</td>
+        <td>Peter 推文「我们还在讨论循环吗，还是已经转向 graph 了」所指的本意 [00:24][02:50]</td>
+        <td><span class="pill" style="background:var(--primary)">本页主角</span> 对当下的大多数公司真正有用</td>
+        <td class="ts">[00:46]</td>
+      </tr>
+      <tr>
+        <td><b style="color:var(--muted)">知识图谱</b><br><span class="mono">knowledge graph</span></td>
+        <td>表示不同实体之间关系的绝佳方式，用于有效检索信息</td>
+        <td>Graph RAG、LLM wiki、智能体记忆 [01:48]</td>
+        <td>Andrew Ng 发布构建巨大 knowledge graph 的内容后被混入讨论 [01:18]</td>
+        <td>完全无关且不同的概念 [01:24]，勿混淆</td>
+        <td class="ts">[01:18]</td>
+      </tr>
+      <tr>
+        <td><b style="color:var(--warning)">graph of loops</b><br><span class="mono">循环的 graph</span></td>
+        <td>假设未来公司由一堆循环运作：如何让所有循环都执行良好并持续改进——多循环的错误与改进会迅速<b>复利叠加</b> [02:18]</td>
+        <td>公司级多循环的执行/改进网络</td>
+        <td>Carlos 提出 [02:03]；UP 主团队探索两个月 [02:34]</td>
+        <td>非常新、尚未探索，还没有真正答案——多数团队甚至还没建起一两个循环 [02:29]；<b>下期主题</b> [22:11]</td>
+        <td class="ts">[01:55]</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout good">
+    <b class="t">一句话总览</b>
+    graph engineering = 当团队从「人提示智能体」转向「其他东西代表人类提示智能体」[03:18]，
+    人被抬到实际工作之上的一层 [05:33]，可靠性成为采用前提 [05:44]——
+    此时把 SOP 画成 control graph（节点、边、状态 [06:19]），让智能体循着图跑，就是让循环可靠、可复利的方法论。
+    它可以用代码实现，也可以只是一份文档化的 SOP [09:15]。
+  </div>
+
+  <!-- ========== SECTION ① 为什么现在需要 ========== -->
+  <h2>为什么是现在：两种模式把人抬离执行层 <small>可靠性从「加分项」变成「硬需求」</small></h2>
+
+  <section class="lane">
+    <div class="lane-head">
+      <span class="lane-tag" style="background:var(--primary)">模式一 · 循环 Loop</span>
+      <span class="lane-sub">不再由人对每个任务提示智能体，而是设置触发器 [03:32]</span>
+    </div>
+    <div class="flow">
+      <div class="node">
+        <div class="top"><span class="seq">1</span><span class="method m-put">触发器</span></div>
+        <span class="path">trigger: 时间 / 目标 / 事件</span>
+        <div class="use">时间：每天拉取最新 GitHub issue 并修复 [03:47]<br>目标：持续优化前端直到性能提升 200% [03:51]<br>事件：每封邮件进来唤醒智能体干活 [03:57]</div>
+        <div class="loc">[03:32]-[04:01]</div>
+      </div>
+      <div class="arrow"><span class="lbl">唤醒</span><span class="shaft"></span></div>
+      <div class="node">
+        <div class="top"><span class="seq">2</span><span class="method m-post">智能体</span></div>
+        <span class="path">agent: 自主执行</span>
+        <div class="use">智能体自主干活，只有当智能体认为有必要时，人类才会介入 [04:03]</div>
+        <div class="loc">[04:03]</div>
+      </div>
+      <div class="arrow"><span class="lbl">关键设计</span><span class="shaft"></span></div>
+      <div class="node good">
+        <div class="top"><span class="seq">3</span><span class="method m-put">边界</span></div>
+        <span class="path">boundary: 人机分工表</span>
+        <div class="use">每个循环最重要的事之一：定义哪些事智能体可独立完成、哪些确实需要人类参与 [04:09]</div>
+        <div class="loc">[04:09]</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="lane">
+    <div class="lane-head">
+      <span class="lane-tag" style="background:var(--success)">模式二 · 编排智能体 Orchestrator</span>
+      <span class="lane-sub">人与拥有全局上下文的编排者对话，由它起团队、做监控 [04:24]</span>
+    </div>
+    <div class="flow">
+      <div class="node">
+        <div class="top"><span class="seq">1</span><span class="method m-post">编排者</span></div>
+        <span class="path">orchestrator: 全局上下文</span>
+        <div class="use">人与编排智能体对话，它启动一个智能体团队执行具体任务，并在过程中监控 [04:38]</div>
+        <div class="loc">[04:33]-[04:41]</div>
+      </div>
+      <div class="arrow"><span class="lbl">拆解分发</span><span class="shaft"></span></div>
+      <div class="node oss">
+        <div class="top"><span class="seq">2</span><span class="method m-web">例证</span></div>
+        <span class="path">Boris（Claude 创作者）</span>
+        <div class="use">「我现在大多是与一个 Claude 交流、指挥其他 Claude，而不是直接为具体工作提示智能体」[04:43]</div>
+        <div class="loc">[04:43]-[04:53]</div>
+      </div>
+      <div class="arrow"><span class="lbl">规模效应</span><span class="shaft"></span></div>
+      <div class="node">
+        <div class="top"><span class="seq">3</span><span class="method m-post">智能体组织</span></div>
+        <span class="path">agents × N</span>
+        <div class="use">智能体提示智能体 [04:56]；UP 主任何时刻至少几个智能体在跑，夜间运行几千个处理复杂工作——这在三个月前还不可行 [05:14]</div>
+        <div class="loc">[04:56]-[05:18]</div>
+      </div>
+    </div>
+  </section>
+
+  <h2 style="margin-top:18px">两种模式汇合处：control graph 的位置</h2>
+  <table>
+    <tbody>
+      <tr><td style="width:220px"><b>共同结果</b></td><td>两种模式都让人类处于实际工作<b>之上的一层</b>，不再全程盯执行智能体的步骤与检查点</td><td class="ts" style="width:80px">[05:31]</td></tr>
+      <tr><td><b>随之而来的硬需求</b></td><td>可靠性——它能让你有信心去采用这类方案</td><td class="ts">[05:44]</td></tr>
+      <tr><td><b>第一道护栏</b></td><td>至少在代码库中设置一个<b>验证器（validator）</b>，对智能体发布的内容更有信心；验证器设置 skill 可从 GitHub 获取</td><td class="ts">[05:50]</td></tr>
+      <tr><td><b>护栏的泛化</b></td><td>验证器只是护栏之一；针对不同业务流程可注入不同的护栏和 SOP —— <b>这就是 control graph 变得有趣的地方</b></td><td class="ts">[06:08]</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ========== SECTION ② 三要素与节点演化 ========== -->
+  <h2>graph 三要素，与「节点」含义的三次演化 <small>概念不新，新的是节点长什么样</small></h2>
+
+  <div class="stats" style="margin-bottom:14px">
+    <div class="stat-card"><div class="num" style="font-size:16px">节点 Node</div><div class="lbl">将采取的行动 [06:22]</div></div>
+    <div class="stat-card"><div class="num" style="font-size:16px">边 Edge</div><div class="lbl">决定每个节点之后发生什么 [06:25]</div></div>
+    <div class="stat-card"><div class="num" style="font-size:16px">状态 State</div><div class="lbl">每个节点/步骤上携带哪些数据 [06:29]</div></div>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th style="width:170px">阶段</th><th style="width:300px">一个节点是什么</th><th>代表平台 / 形态</th><th style="width:90px">锚点</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><b>传统工作流自动化</b><br><span class="ts">已存在几十年 [06:15]</span></td><td>简单的基础动作</td><td>运行脚本、条件检查</td><td class="ts">[06:41]</td></tr>
+      <tr><td><b>LLM 进入节点</b><br><span class="ts">约 3 年前 [06:49]</span></td><td>大语言模型节点</td><td>n8n* 这类平台，可处理更多长尾用例</td><td class="ts">[06:51]</td></tr>
+      <tr><td><b>智能体节点</b><br><span class="ts">直到最近 [06:59]</span></td><td>一个完整的智能体，能完成多种不同的事</td><td>你可能已经在用：Claude Code / Codex 的 goal 功能就是一个 graph [07:10]</td><td class="ts">[06:59]</td></tr>
+    </tbody>
+  </table>
+  <div class="meta" style="margin-top:6px">* 原字幕转写为「NATN」，按上下文校准为 n8n（见文末术语校准表）</div>
+
+  <!-- ========== SECTION ③ 三个现成例子 ========== -->
+  <h2>三个现成例子：graph 早已在你身边 <small>归纳依据——先看事实，再看抽象</small></h2>
+
+  <div class="chains">
+    <div class="chain">
+      <div class="chain-head" style="background:var(--primary)">例 1 · goal 功能（Claude Code / Codex）[07:10]</div>
+<pre><span class="c">用户提示词</span> <span class="ts">[07:18]</span>
+ └▶ <span class="m">智能体循环中运行任务</span> <span class="ts">[07:20]</span>
+     └▶ 完成时 ─▶ <span class="ep">调用 LLM 分类：目标达成了吗？</span> <span class="ts">[07:25]</span>
+         <span class="br">└─ 达成？</span><span class="ok"> → 结束</span> <span class="ts">[07:29]</span>
+         <span class="br">└─ 未达成</span> → 发一条新消息回智能体，继续循环 <span class="ts">[07:31]</span>
+ <span class="cm">✔ 实现机制：循环 + 停止钩子（stop hook）系统</span> <span class="ts">[07:34]</span>
+ <span class="cm">   （原字幕转写"RH循环"，见术语校准表）</span>
+ <span class="cm">⇒ 你可能一直在用 graph，只是没人这么叫它</span> <span class="ts">[07:05]</span></pre>
+    </div>
+
+    <div class="chain">
+      <div class="chain-head" style="background:var(--warning)">例 2 · Karpathy 自动研究（auto research）[07:39]</div>
+<pre><span class="c">program.md</span> <span class="cm">（提示词 = 文档化 SOP，描述整个流程）</span> <span class="ts">[07:58]</span>
+ └▶ <span class="m">更新 train.py</span> <span class="cm">（软件脚本本身）+ 带入实验想法</span> <span class="ts">[08:04]</span>
+     └▶ <span class="m">运行实验并评估结果</span> <span class="ts">[08:13]</span>
+         <span class="br">└─ 指标变好？</span><span class="ok"> → 提交并推送变更</span> <span class="ts">[08:37]</span>
+         <span class="br">└─ 没变好</span> → 丢弃、回滚、尝试下一个想法 <span class="ts">[08:40]</span>
+ <span class="cm">✔ 状态 = train.py（被修改的软件）</span>
+ <span class="cm">        + results.tsv（记录所有待尝试的事）</span> <span class="ts">[08:44]</span>
+ <span class="cm">关键：没有用任何复杂机制</span> <span class="ts">[08:59]</span>
+ <span class="cm">  —— 没有 Ralph 循环、没有 goal 工具</span> <span class="ts">[09:04]</span>
+ <span class="cm">  —— 只说一句"你永远重复这个过程"，智能体就照做了</span> <span class="ts">[09:09]</span>
+ <span class="ok">⇒ graph 的实现不一定是代码</span> <span class="ts">[09:15]</span>
+ <span class="cm">   可以只是文档化 SOP + 预定义脚本 + 边界</span> <span class="ts">[09:17]</span></pre>
+    </div>
+
+    <div class="chain">
+      <div class="chain-head" style="background:#7889a4">例 3 · Deep Research（常见模式）[09:24]</div>
+<pre><span class="c">用户提示词</span> <span class="ts">[09:34]</span>
+ └▶ <span class="m">编排智能体规划：应涵盖哪些主题</span> <span class="ts">[09:38]</span>
+     └▶ <span class="m">分发给一组子智能体</span>
+        <span class="cm">各研究一个具体主题</span> <span class="ts">[09:41]</span>
+         └▶ <span class="m">汇总评审：信息足以成报？</span> <span class="ts">[09:47]</span>
+             <span class="br">└─ 不足</span> → 回到上一步（继续研究） <span class="ts">[09:53]</span>
+             <span class="br">└─ 足够</span><span class="ok"> → 结束并生成报告</span> <span class="ts">[09:55]</span>
+ <span class="cm">⇒ 再说一次：这就是一个 graph</span> <span class="ts">[09:58]</span></pre>
+    </div>
+  </div>
+
+  <!-- ========== SECTION ④ 两种实现 ========== -->
+  <h2>两种实现路线：代码即 graph vs LLM 即 graph <small>都能强制执行同一个 graph [10:02]</small></h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:130px">维度</th>
+        <th><span class="pill" style="background:var(--primary)">代码即 graph</span></th>
+        <th><span class="pill" style="background:var(--success)">LLM 即 graph</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>载体</b></td>
+        <td><code class="ep">Dynamic Workflow</code>（Claude Code / Codex code mode）、LangGraph [10:11]</td>
+        <td>SOP 文本 / JSON / mermaid 图表写进上下文 [10:29]，转化为智能体可调用的 <b>skill</b> [10:44]</td>
+      </tr>
+      <tr>
+        <td><b>为什么可行</b></td>
+        <td>代码硬编码执行逻辑</td>
+        <td>现代模型已非常擅长理解工作流并贯彻执行 [10:34]——Karpathy 的 auto research 就是纯提示实现 [10:50]</td>
+      </tr>
+      <tr>
+        <td><b>输出物</b></td>
+        <td>一段可运行的 JavaScript 脚本 [14:27]</td>
+        <td>一个 skill，可被每次循环运行或临时唤醒 [14:22]</td>
+      </tr>
+      <tr>
+        <td><b>选型建议</b></td>
+        <td>任务<b>非常庞大</b>时是好方法 [22:08]</td>
+        <td><b>大多数情况的首选</b> [21:50]——因为 Dynamic Workflow / Codex code mode 每次都启动新会话，无法恢复之前的对话，很烦人 [21:55]</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 style="margin-top:20px">LLM 即 graph 可依赖的三个原语 <small>智能体框架已经内置 [10:52]</small></h2>
+  <div class="layer-stack">
+    <div class="layer">
+      <div class="layer-title">原语 1 · bash 执行<small>确定性行为</small></div>
+      <div class="chips">
+        <span class="chip"><b>预定义脚本</b><small>智能体可运行 bash → 执行你为确定性步骤定义的脚本 [10:55]</small></span>
+      </div>
+    </div>
+    <div class="layer-gap"><span>▼ 结构化拆解</span></div>
+    <div class="layer">
+      <div class="layer-title">原语 2 · 子智能体与团队通信<small>编排能力</small></div>
+      <div class="chips">
+        <span class="chip"><b>subagent / team 协议</b><small>主编排智能体把 SOP 分解为若干步骤，唤醒一组子智能体 [11:04]</small></span>
+      </div>
+    </div>
+    <div class="layer-gap"><span>▼ 硬性卡点</span></div>
+    <div class="layer">
+      <div class="layer-title">原语 3 · 钩子 hooks<small>注入真确定性</small></div>
+      <div class="chips">
+        <span class="chip"><b>stop hook 等</b><small>把检查点注入智能体运行时 [11:15]——goal 功能就是这么实现的 [11:21]</small></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== SECTION ⑤ 四个设计原则 ========== -->
+  <h2>四个设计原则 <small>确保智能体真正遵循 SOP [11:39]</small></h2>
+  <table>
+    <thead>
+      <tr><th style="width:36px">#</th><th style="width:170px">原则</th><th>视频给出的判断与做法</th><th style="width:110px">锚点</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td><b>何时拆智能体节点</b></td>
+        <td>技术上可以把所有 SOP 塞进一个智能体，模型越强越可能直接完成 [11:47]；但要理解模型边界：<b>模型再强，自我验证自己的工作都做不好</b>——所以验证器通常是独立的智能体节点 [12:03]；OpenAI 与 Anthropic 的研究表明复杂任务需要一个深思熟虑的<b>规划智能体</b> [12:10]；另考虑什么可并行 [12:24]、什么适合更强/更弱的模型 [12:28]</td>
+        <td class="ts">[11:42]</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td><b>合理时用代码（脚本）</b></td>
+        <td>提高可靠性、跑得更快、减少不必要的错误 [12:41]。常见场景：复杂数据获取（与其让智能体调多个 API 整合，不如写脚本）[12:54]、常见数据分析 [13:05]、直接把 server 跑起来 [13:09]、让智能体具备评估结果 / 端到端测试的能力 [13:14]</td>
+        <td class="ts">[12:38]</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td><b>定义输入与输出</b></td>
+        <td>每个智能体节点都要定义输入和输出，确保每个节点的边界非常清晰 [13:24]</td>
+        <td class="ts">[13:18]</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td><b>状态放哪</b></td>
+        <td>无论哪种实现，都需要让不同智能体快速理解当前工作状态 [13:35]；最简单的方法：<b>用一个 markdown 文件记录最新状态 + 每个智能体每次运行的日志</b> [13:43]</td>
+        <td class="ts">[13:29]</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout good">
+    <b class="t">方法论收口（任何想让它重复、可靠执行的任务都适用）[13:55]</b>
+    规划出 SOP、想清楚所有步骤 [14:00] → 按设计模式把内容分组到不同节点和边 [14:04] → 定义一个能记录状态的产出文档 [14:08]。
+    两种路线的区别只在输出物：LLM 即 graph 产出一个 skill，代码即 graph 产出一段可运行 JS [14:17]。
+  </div>
+
+  <!-- ========== SECTION ⑥ 实战一 ========== -->
+  <h2>实战一 · 每日糟糕设计分拣 <small>LLM 即 graph 的生产实现 · Superdesign 团队 [14:31]</small></h2>
+
+  <div class="lane">
+    <div class="lane-head">
+      <span class="lane-tag" style="background:var(--primary)">Loop · 每日糟糕设计分拣</span>
+      <span class="lane-sub">目标：每天审查全部用户设计，捕捉糟糕设计/投诉，持续积累评估数据集以改进智能体 [15:42]</span>
+    </div>
+    <div class="flow">
+      <div class="node">
+        <div class="top"><span class="seq">1</span><span class="method m-post">每日触发</span></div>
+        <span class="path">cron: 每天一次</span>
+        <div class="use">让智能体筛选哪些设计可能存在问题；配一份启发式指标清单 [16:18]</div>
+        <div class="loc">[16:18]</div>
+      </div>
+      <div class="arrow"><span class="lbl">查库</span><span class="shaft"></span></div>
+      <div class="node">
+        <div class="top"><span class="seq">2</span><span class="method m-put">脚本</span></div>
+        <span class="path">fetch_candidates</span>
+        <div class="use">从数据库提取原始数据，拿到潜在糟糕设计候选名单 [16:27]</div>
+        <div class="loc">[16:24]</div>
+      </div>
+      <div class="branch">
+        <div class="branch-row">
+          <span class="cond yes">候选为空？</span>
+          <span style="font-size:12px;color:var(--muted)">→ 直接结束本次运行 [16:34]</span>
+        </div>
+        <div class="branch-row">
+          <span class="cond no">有候选 ↓</span>
+          <span style="font-size:12px;color:var(--muted)">进入 graph 流程 [16:36]</span>
+        </div>
+      </div>
+      <div class="node">
+        <div class="top"><span class="seq">3</span><span class="method m-put">脚本 ×N</span></div>
+        <span class="path">heuristic_check</span>
+        <div class="use">确定性脚本程序化检查：是否存在报错、设计完全崩坏、无响应等 [16:48]，命中的直接入清单 [16:59]</div>
+        <div class="loc">[16:41]</div>
+      </div>
+      <div class="arrow"><span class="lbl">其余候选</span><span class="shaft"></span></div>
+      <div class="node">
+        <div class="top"><span class="seq">4</span><span class="method m-post">子智能体 ×N</span><span class="badge">严格 schema</span></div>
+        <span class="path">vlm_review × batch</span>
+        <div class="use">一批子智能体各处理一批工作：截图设计、与真实用户需求对比评估（视觉语言模型评审），输出按严格 schema [17:56]</div>
+        <div class="loc">[17:01]-[18:00]</div>
+      </div>
+      <div class="arrow"><span class="lbl">汇总</span><span class="shaft"></span></div>
+      <div class="node good">
+        <div class="top"><span class="seq">5</span><span class="method m-post">主智能体</span></div>
+        <span class="path">daily_list.md</span>
+        <div class="use">为糟糕设计排名，发布「今日清单」——只是仓库里的一个简单文件，换来可见性 [17:15]</div>
+        <div class="loc">[17:12]-[17:19]</div>
+      </div>
+      <div class="arrow"><span class="lbl">流向</span><span class="shaft"></span></div>
+      <div class="node">
+        <div class="top"><span class="seq">6</span><span class="method m-post">回流</span></div>
+        <span class="path">eval_set / improve</span>
+        <div class="use">加入评估数据集；或再启动一组智能体去改进智能体本身 [17:22]</div>
+        <div class="loc">[17:22]-[17:27]</div>
+      </div>
+    </div>
+
+    <div class="chips" style="padding:16px 0 0">
+      <span class="chip common"><b>skill = 操作流程载体</b><small>记录该运行哪个脚本拿候选、何时程序化检查、何时分发子智能体 [17:31]</small></span>
+      <span class="chip"><b>脚本 = 确定性步骤</b><small>尽早发现问题的程序化检查 [17:50]</small></span>
+      <span class="chip"><b>输出契约 + 护栏</b><small>为整个循环制定输出契约并设置护栏 [18:08]</small></span>
+      <span class="chip"><b>运行方式</b><small>每天启动循环、把智能体指向这些 skills 和脚本即可 [18:13]</small></span>
+    </div>
+  </div>
+
+  <div class="callout good">
+    <b class="t">底座设计：SuperDesign AGI 仓库</b>
+    团队维护一个独立仓库 <code>SuperDesign AGI</code> 作为所有事情的状态追踪与知识库 [14:59]——
+    每个实例、每个支持工单、每个已发布工程工单都在里面 [15:21]。改代码时不再去平台所在仓库，
+    而是直接在这个仓库启动智能体，因为它拥有「发生过的一切」的上下文 [15:09]。
+    仓库顶部的一堆 skills，就是用 skill 构建的小型 graph [15:33]。
+    ——这是原则四「状态放哪」的公司级实现。
+  </div>
+
+  <div class="callout good" style="margin-top:10px">
+    <b class="t">UP 主的结论</b>
+    「这实际上是一个相当复杂的工作流，但我们只需通过注入 skills 和脚本，就能轻松获得非常好的输出」[18:28]
+  </div>
+
+  <!-- ========== SECTION ⑦ 实战二 ========== -->
+  <h2>实战二 · Dynamic Workflow 发布变更 <small>代码即 graph 的生产实现 [18:28]</small></h2>
+
+  <div class="stats" style="margin-bottom:14px">
+    <div class="stat-card"><div class="num" style="font-size:15px">agent()</div><div class="lbl">原语：生成智能体 [18:51]</div></div>
+    <div class="stat-card"><div class="num" style="font-size:15px">pipeline()</div><div class="lbl">原语：阶段间依赖 [18:54]</div></div>
+    <div class="stat-card"><div class="num" style="font-size:15px">parallel()</div><div class="lbl">原语：并行分发智能体 [18:59]</div></div>
+    <div class="stat-card"><div class="num" style="font-size:15px">schema</div><div class="lbl">节点状态输出的契约 [19:35]</div></div>
+  </div>
+
+  <div class="lane">
+    <div class="lane-head">
+      <span class="lane-tag" style="background:var(--warning)">Workflow · 发布变更（三阶段）</span>
+      <span class="lane-sub">触发条件：当范围与计划已有非常明确的定义 [19:15]；智能体写 JS、调用原语构建它想要的任何 graph [19:03]</span>
+    </div>
+    <div class="flow">
+      <div class="node">
+        <div class="top"><span class="seq">1</span><span class="method m-post">阶段一</span></div>
+        <span class="path">setup + implement</span>
+        <div class="use">设置和实施 [19:27]</div>
+        <div class="loc">[19:25]</div>
+      </div>
+      <div class="arrow"><span class="shaft"></span></div>
+      <div class="node">
+        <div class="top"><span class="seq">2</span><span class="method m-post">阶段二</span></div>
+        <span class="path">verify</span>
+        <div class="use">验证工作 [19:28]</div>
+        <div class="loc">[19:28]</div>
+      </div>
+      <div class="branch">
+        <div class="branch-row">
+          <span class="cond no">验证通过？</span>
+          <span style="font-size:12px;color:var(--muted)">↓ 进入阶段三</span>
+        </div>
+        <div class="branch-row">
+          <span class="cond yes">未通过</span>
+          <span style="font-size:12px;color:var(--muted)">→ 留在验证/实施环节</span>
+        </div>
+      </div>
+      <div class="node good">
+        <div class="top"><span class="seq">3</span><span class="method m-post">阶段三</span></div>
+        <span class="path">simplify + PR</span>
+        <div class="use">让智能体简化工作并提交 PR [19:31]</div>
+        <div class="loc">[19:30]</div>
+      </div>
+    </div>
+
+    <h2 style="margin:18px 0 8px;font-size:15px">schema 机制：节点间怎么传递状态 <small>[19:35]</small></h2>
+    <table>
+      <tbody>
+        <tr><td style="width:230px"><b>定义</b></td><td>在 JS 文件内部为不同节点定义 schema [19:35]；用提示词启动一个智能体会话时，同时定义模型和 schema [19:43]</td><td class="ts" style="width:80px">[19:35]</td></tr>
+        <tr><td><b>输出</b></td><td>智能体会话结束时，按特定 schema 输出结果——<b>相当于每个智能体节点的状态输出</b> [19:54]</td><td class="ts">[19:49]</td></tr>
+        <tr><td><b>收益</b></td><td>轻松为下一个节点构建包含重要上下文的提示词（引用上一个会话的输出详情）[19:58]；迷你例：写文章工作流 = 大纲（schema：标题+各章节要点）→ 按大纲撰文 [20:12]</td><td class="ts">[19:58]</td></tr>
+        <tr><td><b>生态</b></td><td>Dynamic Workflow 为开源项目 [20:43]；智能体节点可选 Claude Code、Codex 或任何其他类型的智能体 [20:50]；代码示例在 AI builder club 社区 [20:55]；SuperDesign AGI 用它实现可靠的代码发布 graph [21:01]</td><td class="ts">[20:43]</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout warn">
+    <b class="t">反模式警示（UP 主强调的「绝大多数人没做的最关键一步」）</b>
+    仅仅像这样分解任务是不够的——你实际上需要<b>给智能体工具，让它能正确地测试东西</b> [21:10]。
+    「这可能是我看到的绝大多数人都没有做的关键一步，他们还在纳闷为什么他们的循环不起作用」[21:17]。
+    解法：验证器设置 skill，在 AI builder club 公共仓库可直接获取 [21:28]。
+  </div>
+
+  <!-- ========== SECTION ⑧ 术语校准 ========== -->
+  <h2>转写噪声术语校准表 <small>AI 字幕的专有名词存在转写误差，本页按上下文校准</small></h2>
+  <table>
+    <thead>
+      <tr><th style="width:200px">原字幕转写</th><th style="width:220px">校准为</th><th>依据 / 说明</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="mono">line graph / lg graph</td><td class="mono">LangGraph</td><td>控制 graph 的典型框架，上下文并列 Dynamic Workflow [00:47][10:13]</td></tr>
+      <tr><td class="mono">NATN</td><td class="mono">n8n</td><td>「约3年前允许添加 LLM 作为节点」的工作流自动化平台 [06:51]</td></tr>
+      <tr><td class="mono">ANDREWNG</td><td class="mono">Andrew Ng（吴恩达）</td><td>发布构建巨大 knowledge graph 内容的人物 [01:27]</td></tr>
+      <tr><td class="mono">ANDREWCARPATHY / android carpathy</td><td class="mono">Andrej Karpathy</td><td>自动研究项目作者，program.md / train.py / results.tsv 实践 [07:39]</td></tr>
+      <tr><td class="mono">cloud code / code x</td><td class="mono">Claude Code / Codex</td><td>goal 功能载体与 Dynamic Workflow 节点选项 [07:10][20:50]</td></tr>
+      <tr><td class="mono">program m d</td><td class="mono">program.md</td><td>记录 SOP 的提示词文档 [07:58]</td></tr>
+      <tr><td class="mono">train p / train pi</td><td class="mono">train.py</td><td>被智能体反复修改的软件脚本 [08:04]</td></tr>
+      <tr><td class="mono">results t s v</td><td class="mono">results.tsv</td><td>记录所有待尝试事项的状态文件 [08:51]</td></tr>
+      <tr><td class="mono">RH循环</td><td class="mono">（存疑）agent 循环</td><td>goal 功能实现机制「___循环 + 停止钩子系统」[07:34]；专有名词无法确证，机制语义明确</td></tr>
+      <tr><td class="mono">RALPH循环</td><td class="mono">Ralph 循环</td><td>Karpathy 项目「没有用到的」持续循环机制之一 [09:04]</td></tr>
+      <tr><td class="mono">go功能 / go工</td><td class="mono">goal 功能</td><td>Claude Code / Codex 的目标模式 [07:10][09:04]</td></tr>
+      <tr><td class="mono">ski ma</td><td class="mono">schema</td><td>Dynamic Workflow 节点输出契约 [19:35]</td></tr>
+      <tr><td class="mono">智能体会化 / 会画</td><td class="mono">智能体会话（session）</td><td>Dynamic Workflow 启动/恢复会话的语境 [19:43][21:59]</td></tr>
+      <tr><td class="mono">serve up running</td><td class="mono">server up &amp; running</td><td>原则二中「把服务直接跑起来」[13:09]</td></tr>
+      <tr><td class="mono">源语 / 原与函数</td><td class="mono">原语（primitive）</td><td>框架提供的基础能力 [10:52][19:05]</td></tr>
+      <tr><td class="mono">peter / CARLOS / BORIS</td><td class="mono">Peter / Carlos / Boris</td><td>原文人名，字幕大写噪声；本页不作身份指认，以视频为准</td></tr>
+      <tr><td class="mono">super design a g i</td><td class="mono">SuperDesign AGI</td><td>状态追踪与知识库仓库 [14:59]</td></tr>
+    </tbody>
+  </table>
+
+  <footer>
+    <b>怎么选（UP 主的一手建议）[21:38]</b>：两种路线都有效 [21:45]；大多数情况选 <b>LLM 即 graph</b> [21:50]——因为 Dynamic Workflow / Codex code mode
+    每次启动新会话、无法恢复之前的对话 [21:55]；任务非常庞大时选 <b>代码即 graph</b> [22:06]。<br><br>
+    下期预告：graph of loops——当公司有这么多循环在运行时会发生什么，如何确保它们复利叠加 [22:11]。<br><br>
+    数据来源：视频 <a href="https://www.bilibili.com/video/BV1katc67EUN/">BV1katc67EUN</a>（AIJasonZ，22:26）；
+    字幕转录稿 <code>BV1katc67EUN_字幕提取.md</code>（2026-09-13 经 B站 AI 字幕轨 wbi/v2 提取，573 条）。
+    本页为同源多载体之 HTML 讲解版，锚点均可回源视频核对。生成于 2026-09-13。
+  </footer>
+</div>
+</body>
+</html>

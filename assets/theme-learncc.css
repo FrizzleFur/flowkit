@@ -1,0 +1,247 @@
+/* theme-learncc.css — 全站亮色主题层（2026-09-13 亮色转换: token 名不变值翻转, learncc 亮色适配 + 用户裁定暗→亮）
+ * 色板: bg0 #09090b · bg1 #18181b · border #27272a/#3f3f46
+ *       text #fafafa · text-body #d4d4d8(zinc-300 正文) · text2 #a1a1aa(zinc-400 meta) · text3 #71717a
+ *       代码区 #0f172a(slate-900) · inline code 底 #27272a
+ * 作用: 叠在 docsify dark.css 之上，把基调从「docsify 暗」校准到「learncc 锌」
+ * 五态语义系（G1）: 每色 5 个衍生态 —— 实色 / -300 亮字 / -900-30 暗 badge 底 / -border-30 / -border-60
+ *   九域（pathview A-I）: blue yellow violet pink green cyan red teal orange
+ *   芯片补充（replay 消息）: emerald amber —— 共 11 色 × 5 token
+ */
+:root {
+  --lc-bg0: #ffffff; --lc-bg1: #fafafa; --lc-card: #ffffff;
+  --lc-border: #e4e4e7; --lc-border2: #d4d4d8; --lc-border-hi: #a1a1aa;
+  --lc-text: #18181b; --lc-text-body: #3f3f46; --lc-text2: #71717a; --lc-text3: #a1a1aa;
+  --lc-link: #2563eb; --lc-link-deco: rgba(37,99,235,.35);
+  --lc-code-bg: #f6f8fa; --lc-code-inline-bg: #f4f4f5;
+  --lc-text-h3: #27272a; --lc-text-dim: #d4d4d8; --lc-surface-hover: rgba(0,0,0,.05);
+  --lc-indigo: #4f46e5; --lc-indigo-300: #3730a3; --lc-indigo-soft: rgba(79,70,229,.06);
+  --lc-blue: #2563eb;    --lc-blue-300: #1d4ed8;    --lc-blue-900-30: rgba(37,99,235,.08);    --lc-blue-border-30: rgba(37,99,235,.25);    --lc-blue-border-60: rgba(37,99,235,.5);
+  --lc-emerald: #059669; --lc-emerald-300: #047857; --lc-emerald-900-30: rgba(5,150,105,.08);   --lc-emerald-border-30: rgba(5,150,105,.3); --lc-emerald-border-60: rgba(5,150,105,.55);
+  --lc-amber: #d97706;   --lc-amber-300: #b45309;   --lc-amber-900-30: rgba(217,119,6,.1);   --lc-amber-border-30: rgba(217,119,6,.3);   --lc-amber-border-60: rgba(217,119,6,.55);
+  --lc-red: #dc2626;     --lc-red-300: #b91c1c;     --lc-red-900-30: rgba(220,38,38,.07);     --lc-red-border-30: rgba(220,38,38,.3);      --lc-red-border-60: rgba(220,38,38,.5);
+  --lc-purple: #7c3aed;  --lc-purple-300: #6d28d9;  --lc-purple-900-30: rgba(124,58,237,.08);  --lc-purple-border-30: rgba(139,92,246,.3);  --lc-purple-border-60: rgba(139,92,246,.5);
+  --lc-yellow: #ca8a04;  --lc-yellow-300: #a16207;  --lc-yellow-900-30: rgba(202,138,4,.1);   --lc-yellow-border-30: rgba(202,138,4,.3);   --lc-yellow-border-60: rgba(202,138,4,.6);
+  --lc-pink: #db2777;    --lc-pink-300: #be185d;    --lc-pink-900-30: rgba(219,39,119,.08);   --lc-pink-border-30: rgba(219,39,119,.3);    --lc-pink-border-60: rgba(219,39,119,.55);
+  --lc-green: #16a34a;   --lc-green-300: #15803d;   --lc-green-900-30: rgba(22,163,74,.08);    --lc-green-border-30: rgba(22,163,74,.3);    --lc-green-border-60: rgba(22,163,74,.55);
+  --lc-cyan: #0891b2;    --lc-cyan-300: #0e7490;    --lc-cyan-900-30: rgba(8,145,178,.08);    --lc-cyan-border-30: rgba(8,145,178,.3);    --lc-cyan-border-60: rgba(8,145,178,.55);
+  --lc-teal: #0d9488;    --lc-teal-300: #0f766e;    --lc-teal-900-30: rgba(13,148,136,.08);   --lc-teal-border-30: rgba(13,148,136,.3);   --lc-teal-border-60: rgba(13,148,136,.55);
+  --lc-orange: #ea580c;  --lc-orange-300: #c2410c;  --lc-orange-900-30: rgba(234,88,12,.08);  --lc-orange-border-30: rgba(234,88,12,.3);  --lc-orange-border-60: rgba(234,88,12,.55);
+}
+body { background: var(--lc-bg0); color: var(--lc-text-body); }
+h1, h2, h3, h4, h5, h6 { color: var(--lc-text); font-weight: 700; }
+h1 code, h2 code, h3 code { background: transparent !important; color: inherit !important; }
+a { color: var(--lc-link); transition: color .15s ease, background-color .15s ease, border-color .15s ease; }
+a:hover { color: var(--lc-blue-300); }
+p, li, td, th { color: var(--lc-text-body); }
+strong, b { color: var(--lc-text); }
+
+/* 侧栏（T13: 224px = learncc w-56; T9: active 底块 + hover 表面微亮 + 150ms 过渡）
+ * dark.css 侧栏几何是 300px 一族（sidebar/content/toggle/close transform 四处联动）, 须成组覆盖 */
+.sidebar { background: var(--lc-bg1) !important; border-right: 1px solid var(--lc-border) !important; width: 224px !important; }
+.content { left: 224px; background: var(--lc-bg0); }
+.sidebar-toggle { background-color: transparent; width: 224px; }
+.sidebar-toggle span { background-color: var(--lc-text3); }
+body.close .sidebar { transform: translateX(-224px); }
+body.close .sidebar-toggle { width: auto; }
+.sidebar ul li a { color: var(--lc-text2) !important; font-size: 14px; padding: 2px 10px; border-radius: 6px; text-decoration: none; transition: color .15s ease, background-color .15s ease; }
+.sidebar ul li a:hover { color: var(--lc-text) !important; background: var(--lc-surface-hover); text-decoration: none; }
+.sidebar ul li.active > a { color: var(--lc-text) !important; background: var(--lc-border); font-weight: 500; }
+.sidebar > h1 { color: var(--lc-text) !important; font-weight: 600; }
+.search input { background: var(--lc-bg0) !important; border: 1px solid var(--lc-border) !important; color: var(--lc-text) !important; }
+.search .results-panel { background: var(--lc-bg1) !important; border-color: var(--lc-border) !important; }
+@media screen and (max-width: 768px) {
+  .sidebar { left: -224px; }
+  body.close .sidebar { transform: translateX(224px); }
+  body.close .content { transform: translateX(224px); }
+  body.close .sidebar-toggle { width: auto; }
+}
+
+/* 正文容器（T5: 阅读列 768px = learncc max-w-3xl） */
+.markdown-section { max-width: 1040px; animation: fs-pagein .35s ease; }
+@keyframes fs-pagein { from { opacity: 0; transform: translateY(8px); } }
+/* T6: 仅 h2 带分隔线, 章题 h1 靠 header 组合建立身份 */
+.markdown-section h2 { border-bottom: 1px solid var(--lc-border); padding-bottom: .4em; }
+/* T7: 标题内部半档降 —— h3 zinc-200 / h4 zinc-300·15px */
+.markdown-section h3 { color: var(--lc-text-h3); }
+.markdown-section h4 { color: var(--lc-text-body); font-size: 15px; font-weight: 600; }
+/* T10: 普通引用回归 indigo 系（blue 渐变位让给 hero-callout） */
+.markdown-section blockquote { border-left: 3px solid var(--lc-indigo); background: var(--lc-indigo-soft); color: var(--lc-indigo-300); border-radius: 0 8px 8px 0; padding: 10px 16px 10px 20px; }
+.markdown-section blockquote p { color: var(--lc-indigo-300); }
+/* S6/G3: 引用三档之二 —— hero-callout 金句卡（渐变底 + 左 4px blue→emerald 竖条）
+ * 与 fs-quote-soft（说明引用, 弱档）分工; md 侧按 class 挂载 */
+.markdown-section .fs-callout { position: relative; border: none; border-radius: 12px; background: linear-gradient(135deg, #eff6ff, #f0fdf4); color: var(--lc-blue-300); padding: 14px 18px; }
+.markdown-section .fs-callout::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; border-radius: 12px 0 0 12px; background: linear-gradient(180deg, var(--lc-blue), var(--lc-emerald)); }
+.markdown-section .fs-callout p { color: var(--lc-blue-300); font-weight: 400; }
+.markdown-section .fs-callout strong, .markdown-section .fs-callout b { color: #1e40af; }
+.markdown-section blockquote.fs-quote-soft { background: transparent; border-left: 4px solid var(--lc-border2); color: var(--lc-text2); font-style: italic; }
+.markdown-section blockquote.fs-quote-soft p { color: var(--lc-text2); font-weight: 400; }
+/* S6/S15: 上下章导航行（border-t + 两端对齐）; md 侧箭头包 <span class="fs-arrow"> 获得位移微动效 */
+.fs-prevnext { border-top: 1px solid var(--lc-border); margin-top: 2.4em; padding-top: 24px; display: flex; justify-content: space-between; gap: 12px; }
+.fs-prevnext a { color: var(--lc-text2) !important; text-decoration: none; }
+.fs-prevnext a:hover { color: var(--lc-text) !important; }
+.fs-prevnext .fs-arrow { display: inline-block; transition: transform .15s ease; }
+.fs-prevnext a.fs-nav-next:hover .fs-arrow { transform: translateX(4px); }
+.fs-prevnext a.fs-nav-prev:hover .fs-arrow { transform: translateX(-4px); }
+
+/* 表格（SC5 锚点表等）——learncc 卡片语法（T3: 容器圆角 12px; T4: 表面收敛 zinc 阶） */
+.markdown-section table { border-collapse: separate; border-spacing: 0; background: var(--lc-card); border: 1px solid var(--lc-border); border-radius: 12px; overflow: hidden; }
+/* dark.css 残留校准: 先清掉 #ddd 四边框与 #ccc 行线, 再落 zinc 边框（顺序敏感, 不可与下行对调） */
+.markdown-section td, .markdown-section th { border: none; }
+.markdown-section tr { border: none; }
+.markdown-section th { background: var(--lc-surface-hover); color: var(--lc-text); border-bottom: 1px solid var(--lc-border); }
+.markdown-section td { border-bottom: 1px solid var(--lc-border); color: var(--lc-text-body); transition: background-color .15s ease; }
+.markdown-section tr:last-child td { border-bottom: none; }
+.markdown-section td code, .markdown-section th code { background: var(--lc-code-inline-bg) !important; color: #be185d !important; border-radius: 4px; font-variant-numeric: tabular-nums; }
+
+/* 代码块（T4: 代码区 #0f172a slate-900, 全页最深表面; T3: 容器圆角 12px） */
+.markdown-section pre { background: var(--lc-code-bg) !important; border: 1px solid var(--lc-border); border-radius: 12px; }
+.markdown-section pre > code { color: var(--lc-text-h3) !important; background: transparent !important; }
+/* T2: inline code 是全站唯一 pink 强调色, 与链接（blue 系）划清界限 */
+.markdown-section p code, .markdown-section li code { background: var(--lc-code-inline-bg) !important; color: #be185d !important; }
+
+/* T14: 代码卡 chrome —— 三点头 + 文件名 + 语言徽标（DOM 由 index.html codechrome 注入） */
+.fs-codecard { border: 1px solid var(--lc-border); border-radius: 12px; overflow: hidden; margin: 1.2em 0; }
+.fs-codehead { display: flex; align-items: center; gap: 10px; padding: 7px 12px; background: var(--lc-bg1); border-bottom: 1px solid var(--lc-border); }
+.fs-codedots { display: inline-flex; gap: 6px; flex: 0 0 auto; }
+.fs-codedots i { width: 10px; height: 10px; border-radius: 50%; opacity: .7; }
+.fs-codedots i:nth-child(1) { background: var(--lc-red); }
+.fs-codedots i:nth-child(2) { background: var(--lc-yellow); }
+.fs-codedots i:nth-child(3) { background: var(--lc-green); }
+.fs-codefile { font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: var(--lc-text2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fs-codelang { margin-left: auto; flex: 0 0 auto; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; line-height: 1; padding: 3px 7px; border-radius: 4px; background: var(--lc-blue); color: #fff; }
+.fs-codelang.fs-lang-sh { background: var(--lc-emerald); }
+.fs-codecard > pre { margin: 0 !important; border: none !important; border-radius: 0 !important; }
+.fs-codecard pre:after { display: none; } /* dark.css 自带 data-lang 角标, 与徽标二选一 */
+
+/* 提示/警告 —— dark.css 的 p.tip 是亮底 #f8f8f8 + #f66 红条, 特异性 (0,2,1) 需同形覆盖 */
+.markdown-section p.tip { background: var(--lc-card); border-left-color: var(--lc-blue); }
+.markdown-section p.tip:before { background: var(--lc-blue); color: var(--lc-bg1); }
+.markdown-section p.tip code { background: var(--lc-code-inline-bg); color: var(--lc-pink-300); }
+.markdown-section p.tip em { color: var(--lc-text2); }
+.markdown-section p.warn { background: rgba(245,158,11,.08); }
+
+/* 封面 */
+.cover { background: linear-gradient(160deg, #ffffff 0%, #f8fafc 55%, #eff6ff 100%) !important; color: var(--lc-text); }
+.cover .cover-main h1 { color: var(--lc-text); font-weight: 700; }
+.cover .cover-main blockquote { color: var(--lc-text2); border: none; background: transparent; }
+.cover .cover-main a { color: var(--lc-text); border: 1px solid var(--lc-border2); background: rgba(255,255,255,.04); border-radius: 8px; }
+.cover .cover-main a:hover { border-color: var(--lc-border-hi); color: var(--lc-text); }
+.cover .cover-main a.fs-cta { background: var(--lc-text); border-color: var(--lc-text); color: var(--lc-bg0); font-weight: 600; }
+.cover .cover-main a.fs-cta:hover { background: var(--lc-text-h3); color: var(--lc-bg0); }
+
+/* GitHub 角标弱化 */
+.gh-corner, .github-corner { display: none; }
+
+/* 滚动条 */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--lc-border2); border-radius: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* ===== dark.css 基底残留校准（2026-09-12 审计 F3） =====
+ * dark.css 用 .markdown-section a (0,1,1) 定义链接色, 裸 a (0,0,1) 压不过 → 正文链接实为 docsify 橙红 #ea6f5a
+ * T11: 链接 blue-400 + 淡一档下划线装饰 + 2px offset, hover 下划线变实
+ */
+.markdown-section a { color: var(--lc-link); font-weight: 500; text-decoration: underline; text-decoration-color: var(--lc-link-deco); text-underline-offset: 2px; }
+.markdown-section a:hover { color: var(--lc-blue-300); text-decoration-color: var(--lc-blue-300); }
+
+/* T12: 分割线两端消隐 */
+.markdown-section hr { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--lc-border2), transparent); }
+
+/* 标题锚点 # 符号: dark.css #c8c8c8 → text3 */
+.anchor span { color: var(--lc-text3); }
+
+/* 搜索残留: dark.css .search .search-keyword / .search a:hover 为 #ea6f5a;
+ * .matching-post 分隔线 #eee 由 search 插件运行时注入（晚于本文件, 需更高特异性压过） */
+.search .search-keyword { color: var(--lc-blue-300); font-style: normal; font-weight: 700; }
+.search a:hover { color: var(--lc-blue-300); }
+.search .results-panel .matching-post { border-bottom-color: var(--lc-border); }
+.search .clear-button svg { fill: var(--lc-text3); }
+
+/* T15: reduce-motion 用户关闭页面入场动画 */
+@media (prefers-reduced-motion: reduce) {
+  .markdown-section { animation: none; }
+  a, .sidebar ul li a, .markdown-section td { transition: none; }
+}
+
+/* 打印: 深底白字直接打印不可读, 反转为纸面配色（dark.css 仅隐藏侧栏, 未反转正文） */
+@media print {
+  body, .content { background: #fff !important; color: #333 !important; }
+  h1, h2, h3, h4, h5, h6, strong, b { color: #111 !important; }
+  p, li, td, th, em { color: #333 !important; }
+  a { color: #0366d6 !important; }
+  .markdown-section pre { background: #f6f8fa !important; border-color: #ddd; }
+  .markdown-section pre > code { color: #24292f !important; }
+  .markdown-section p code, .markdown-section li code, .markdown-section td code, .markdown-section th code { background: #eff1f3 !important; color: #be185d !important; }
+  .markdown-section table { background: #fff; border-color: #ddd; }
+  .markdown-section td { border-bottom-color: #e2e2e6 !important; }
+  .markdown-section blockquote { background: transparent; border-left-color: #0366d6; }
+  .markdown-section blockquote p { color: #333; }
+  .markdown-section .fs-callout { background: #eff6ff !important; }
+  .markdown-section .fs-callout p { color: #1e40af; }
+  .fs-codecard { border-color: #ddd; }
+  .fs-codehead { background: #f1f3f5; border-bottom-color: #ddd; }
+  .cover, .sidebar, .sidebar-toggle, .gh-corner, .github-corner { display: none !important; }
+}
+
+/* ===== 交互基建（sweep P0: 焦点环 / hover 提亮统一 / 过渡常态声明） ===== */
+/* 焦点环: 键盘可达（focus 用 blue=强调语义, 与 hover 反馈 zinc 分层——议点 2 的分层原则） */
+:focus-visible { outline: 2px solid var(--lc-blue); outline-offset: 2px; }
+/* hover 反馈统一: 边框提亮一档（--lc-border-hi）; transition 声明在常态（修复「进有出无」半程过渡） */
+.fs-grid3-card, .fs-pv-card { transition: border-color .15s ease, background-color .15s ease, color .15s ease; }
+.fs-cta-ghost { transition: opacity .15s ease; }
+/* 阅读进度: 侧栏/path 完成标记 + 重置钮 */
+.sidebar ul li a[data-done]::after { content: '✓'; color: var(--lc-emerald-300); margin-left: 6px; font-size: 12px; }
+.fs-pv-card[data-done] { border-color: var(--lc-emerald-border-60); }
+.fs-progress-reset { margin-top: 2em; text-align: right; }
+
+/* ===== 代码高亮主题（2026-09-13 对齐 learncc: Tailwind-400 系 hljs 色板逐类映射 Prism; .markdown-section 前缀提特异性压过 docsify 运行时注入主题; nagdy github-dark 佐证「低饱和深底浅字」方向） ===== */
+.markdown-section pre code { color: #1f2328; }
+.markdown-section .token.keyword, .markdown-section .token.important, .markdown-section .token.atrule, .markdown-section .token.rule { color: #7c3aed; font-weight: 500; }
+.markdown-section .token.string, .markdown-section .token.char, .markdown-section .token.attr-value, .markdown-section .token.regex, .markdown-section .token.template-variable, .markdown-section .token.variable { color: #059669; }
+.markdown-section .token.number, .markdown-section .token.boolean, .markdown-section .token.constant, .markdown-section .token.symbol { color: #ea580c; }
+.markdown-section .token.comment, .markdown-section .token.prolog, .markdown-section .token.cdata, .markdown-section .token.doctype { color: #6b7280; font-style: italic; }
+.markdown-section .token.function, .markdown-section .token.class-name, .markdown-section .token.section { color: #2563eb; font-weight: 600; }
+.markdown-section .token.builtin { color: #db2777; }
+.markdown-section .token.attr-name { color: #b45309; }
+.markdown-section .token.tag, .markdown-section .token.deleted { color: #dc2626; }
+.markdown-section .token.selector, .markdown-section .token.selector .token.operator { color: #7c3aed; }
+.markdown-section .token.operator, .markdown-section .token.entity, .markdown-section .token.punctuation, .markdown-section .token.meta { color: #6b7280; }
+.markdown-section .token.inserted { color: #15803d; }
+.markdown-section .token.deleted { background-color: rgba(239, 68, 68, .08); }
+.markdown-section .token.inserted { background-color: rgba(34, 197, 94, .1); }
+/* ===== 代码高亮补全（2026-09-13: 覆盖 docsify dark.css 残留——property 金黄 c08b30/keyword 暗橙 e96900/灰底 282828 是「黄色突兀」根因） ===== */
+.markdown-section pre { background: transparent; }
+.markdown-section pre>code { background: transparent; color: #e2e8f0; }
+.markdown-section pre:after { color: var(--lc-text3); }
+.markdown-section .token.property, .markdown-section .token.attr-value, .markdown-section .token.directive, .markdown-section .token.unit { color: #fbbf24; }
+.markdown-section .token.statement { color: #34d399; }
+.markdown-section .token.placeholder { color: #94a3b8; }
+.markdown-section .token.important { color: #f87171; font-weight: 700; }
+.markdown-section .token.inserted { border-bottom: none; }
+.markdown-section .token.namespace { opacity: .7; }
+.markdown-section pre[data-lang]:after { content: attr(data-lang); }
+
+/* ===== 标题颜色夺回（docsify 亮色主题类选择器压过元素选择器——特异性升级） ===== */
+.markdown-section h1, .markdown-section h2, .markdown-section h3, .markdown-section h4, .markdown-section h5, .markdown-section h6 { color: var(--lc-text); }
+
+/* ===== 排版阶梯对齐 + docsify 浅色残留清零（三角色讨论 2026-09-13） ===== */
+/* A. 表格: 杀斑马白条（tr:nth-child #f8f8f8 为可读性事故根因）+ 行 hover 微亮 */
+.markdown-section tr:nth-child(2n) { background-color: transparent; }
+.markdown-section tr { background: transparent; }
+.markdown-section tr:hover { background: rgba(0, 0, 0, .03); }
+.markdown-section td, .markdown-section th { color: var(--lc-text-body); }
+.markdown-section p.tip { background: var(--lc-bg1); color: var(--lc-text-body); }
+.markdown-section p.tip code { background: var(--lc-code-inline-bg); color: var(--lc-text-h3); }
+/* B. 封面排版（learncc hero 级七折适配: 标题下有演示区, 不满幅 60px） */
+section.cover .cover-main { max-width: 640px; margin: 0 auto; padding-top: 8vh; }
+section.cover .cover-main h1 { font-size: clamp(40px, 5vw, 56px); font-weight: 700; letter-spacing: -0.02em; color: var(--lc-text); margin: .4em 0 .6em; }
+section.cover .cover-main blockquote { font-size: 20px; line-height: 1.6; font-weight: 400; color: var(--lc-text2); }
+section.cover .cover-main ul { font-size: 15.5px; line-height: 1.9; color: var(--lc-text-body); }
+section.cover .cover-main p:last-child { margin-top: 1.6em; }
+/* C. 阅读区正文（中文 ≥15.5px / 行高 1.75; 行长仍受 768px 管束） */
+.markdown-section p, .markdown-section li { font-size: 16px; line-height: 1.8; }
+/* C2. 封面残留修正: h1 锚点去盒（line-128 全链接规则的泄漏）+ CTA 按钮化 + 副标断行 */
+section.cover .cover-main h1 a { border: none; background: transparent; display: block; }
+section.cover .cover-main a.fs-cta, section.cover .cover-main a.fs-cta-ghost { display: inline-block; font-size: 16px; letter-spacing: .04em; padding: .7em 1.8em; margin: .4em .6em; border-radius: 10px; text-decoration: none; }
+section.cover .cover-main { max-width: 720px; }
+section.cover .cover-main blockquote { font-size: 19px; }

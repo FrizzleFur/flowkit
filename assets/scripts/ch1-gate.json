@@ -1,0 +1,47 @@
+{
+  "title": "复杂度闸门分岔——任务滑进哪条管道",
+  "version": 2,
+  "layout": "flow+messages",
+  "flow": {
+    "nodes": [
+      { "id": "task", "label": "任务进来", "x": 170, "y": 6, "w": 120, "h": 32, "type": "rect" },
+      { "id": "gate", "label": "复杂度闸门", "x": 155, "y": 74, "w": 150, "h": 46, "type": "diamond" },
+      { "id": "flow", "label": "flow 轻管道", "x": 30, "y": 168, "w": 130, "h": 34, "type": "rect" },
+      { "id": "deep", "label": "flow-deep 全管道", "x": 290, "y": 168, "w": 150, "h": 34, "type": "rect" }
+    ],
+    "edges": [
+      { "from": "task", "to": "gate" },
+      { "from": "gate", "to": "flow", "label": "低风险" },
+      { "from": "gate", "to": "deep", "label": "高风险" }
+    ]
+  },
+  "messagesPanels": [
+    { "id": "main", "title": "任务流 messages[]" }
+  ],
+  "steps": [
+    { "title": "一个任务进来",
+      "desc": "一切从任务书开始——但第一道关不在管道里，在进管道之前。",
+      "on": ["task"],
+      "append": { "main": [ { "role": "user", "label": "任务：重构支付系统，支持多币种" } ] } },
+    { "title": "闸门先问三件事",
+      "desc": "复杂度闸门只问影响面、风险、可逆性——不是所有任务都值得全套管道。",
+      "on": ["task", "gate"],
+      "edgesOn": ["task>gate"],
+      "append": { "main": [ { "role": "system", "label": "闸门三问：影响面多大？风险多高？改错了多难恢复？" } ] } },
+    { "title": "分岔左：便宜任务走轻管道",
+      "desc": "单文件、低风险、可逆 → flow 轻管道：最小 Goal + 简单计划 + 串行执行，不被流程绑架。",
+      "on": ["task", "gate", "flow"],
+      "edgesOn": ["gate>flow"],
+      "append": { "main": [ { "role": "task", "label": "「修个错别字」→ flow：单文件单点改动" } ] } },
+    { "title": "分岔右：贵的任务不裸奔",
+      "desc": "跨模块、高风险、难逆转 → flow-deep 全管道：契约-评审-验证-沉淀一样不缺。",
+      "on": ["task", "gate", "deep"],
+      "edgesOn": ["gate>deep"],
+      "append": { "main": [ { "role": "task", "label": "「重构支付系统」→ flow-deep：Goal Contract + 双评审 + Goal Verification" } ] } },
+    { "title": "闸门是分流器，不是门槛",
+      "desc": "选对管道 = 便宜的任务不被流程绑架，贵的任务不裸奔。本站机制篇讲的，就是右岔那条管道的内部。",
+      "on": ["task", "gate", "flow", "deep"],
+      "edgesOn": ["task>gate", "gate>flow", "gate>deep"],
+      "append": { "main": [ { "role": "final", "label": "判定产出：管道选择 + 理由（写进 plan 可追溯）" } ] } }
+  ]
+}

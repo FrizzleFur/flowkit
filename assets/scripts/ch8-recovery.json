@@ -1,0 +1,75 @@
+{
+  "title": "断点恢复——STATE.md 交接与无损续接",
+  "version": 2,
+  "messagesPanels": [
+    { "id": "main", "title": "会话 A（中断）messages[]" },
+    { "id": "child", "title": "会话 B（新接手）messages[]" }
+  ],
+  "steps": [
+    {
+      "title": "会话 A: 深度工作中",
+      "desc": "跑到 Stage 4: 前三个 Phase 已完成并 commit, 第四个在改。每步都在加长 messages[]——上下文是只涨不缩的账本, 窗口有限, 矛盾必在某边界爆发。",
+      "append": {
+        "main": [
+          { "role": "user", "label": "任务: 重构支付回调模块 (Run ID: flow-deep-0912-1030-pay)" },
+          { "role": "assistant", "label": "Stage 4 推进: Phase 1-3 完成并 git commit" },
+          { "role": "tool_call", "label": "Edit: refund.py 重试逻辑" },
+          { "role": "tool_result", "label": "12 tests passed, diff +64/-22" },
+          { "role": "assistant", "label": "进入 Phase 4: 对账单生成模块" },
+          { "role": "tool_call", "label": "Read: ledger.py 现有实现" }
+        ]
+      }
+    },
+    {
+      "title": "容量告警: 边界实测 75%",
+      "desc": "边界实测: 取 transcript 末条 usage 四项之和除以窗口, 75% armed 阈值留出 spawn 余量, 跑在 auto-compact 之前。",
+      "append": {
+        "main": [
+          { "role": "system", "label": "Context Guard: 边界实测 75% ≥ 75% —— 触发自动交接" }
+        ]
+      }
+    },
+    {
+      "title": "主动 Checkpoint: 五件套落盘",
+      "desc": "跳过弹窗直接执行 b: 五件套（task_plan / findings / progress / STATE / HANDOFF）落盘。HANDOFF 只引导按序读, 不复制。",
+      "append": {
+        "main": [
+          { "role": "assistant", "label": "Checkpoint 完成: 五件套落盘, HANDOFF.md 已生成" }
+        ]
+      }
+    },
+    {
+      "title": "会话 A 中断: 窗口关闭",
+      "desc": "左侧面板没有清空动作——也不需要: 窗口关闭, messages[] 随进程一起消失。内存必然失去, 写进文件的才带得走——checkpoint 的分界就在这里。",
+      "append": {
+        "main": [
+          { "role": "system", "label": "session ended —— 窗口关闭, messages[] 随进程消失" }
+        ]
+      }
+    },
+    {
+      "title": "新会话 B 启动: 从 HANDOFF 进入",
+      "desc": "右侧面板从 0 开始, 首条消息是 HANDOFF.md——初始 prompt 引导 B 按序读三件套, Next Action 写明断点: 不用问『上次做到哪』。",
+      "append": {
+        "child": [
+          { "role": "user", "label": "读 .plan/HANDOFF.md 接手继续" }
+        ]
+      }
+    },
+    {
+      "title": "B 按续接清单工作: 零重复劳动",
+      "desc": "B 重做的只有『读三份文件』: A 已完成 Phase 已 commit, Phase Progress 表即对账单——已完成的直接算数。从 Next Action 直达断点续写。",
+      "append": {
+        "child": [
+          { "role": "assistant", "label": "恢复协议: 检测到 STATE.md, 从 Next Action 继续 (Phase 4)" },
+          { "role": "tool_call", "label": "Read: STATE.md → task_plan.md → findings.md" },
+          { "role": "tool_call", "label": "Edit: ledger.py 对账单生成（断点续写）" }
+        ]
+      }
+    },
+    {
+      "title": "闭环: 交接的是状态, 不是历史",
+      "desc": "对比两面板 len: A 攒的 9 条随窗口消失, B 从 0 开始却无损继续——承重信息已写进文件, B 不需要 A 的历史。长任务跨会话不断线, 就是 75% 自动交接的承诺。"
+    }
+  ]
+}
