@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>deer-flow 对照调研 · flowkit 演进与推广</title>
+<!-- ============================================================
+  竞品调研报告页（2026-09-14）
+  对象：bytedance/deer-flow（star 82,329，GitHub API 实测 2026-09-13）
+  方法：双分片 fan-out（本地仓深读 explorer + web-access 生态 eco-scout）
+        → 主会话整合；证据编号 E1.x-nn 可回源 findings 底稿
+  模版裁剪：ex-web 四件套为代码讲解设计，本页裁剪为调研报告六段形态
+============================================================= -->
+<style>
+  :root {
+    --primary: #0f62be; --success: #198038; --warning: #ff832b; --danger: #da1e28;
+    --ink: #161616; --muted: #6f6f6f; --line: #d8d8d8;
+    --bg: #f4f5f7; --card: #fff; --code-bg: #eef1f6;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif; background: var(--bg); color: var(--ink); padding: 40px 24px 64px; line-height: 1.65; }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  .eyebrow { display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: .12em; color: var(--primary); background: rgba(15,98,190,.08); border: 1px solid rgba(15,98,190,.25); border-radius: 999px; padding: 2px 12px; margin-bottom: 10px; }
+  h1 { font-size: 25px; font-weight: 700; }
+  .meta { color: var(--muted); font-size: 13px; margin: 6px 0 20px; }
+  h2 { font-size: 18px; margin: 34px 0 12px; }
+  h2 small { font-size: 12px; color: var(--muted); font-weight: 400; margin-left: 8px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 16px; margin-bottom: 24px; font-size: 12.5px; color: var(--muted); }
+  .badge { font-size: 10.5px; font-weight: 700; border-radius: 4px; padding: 1px 7px; color: #fff; }
+  .b-first { background: var(--primary); } .b-self { background: var(--warning); } .b-inf { background: #7889a4; }
+  .stats { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+  .stat-card { flex: 1; min-width: 150px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; text-align: center; }
+  .stat-card .num { font-size: 21px; font-weight: 700; color: var(--primary); }
+  .stat-card .lbl { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+  table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; font-size: 13px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+  th { background: #e8ecf2; text-align: left; padding: 9px 14px; font-size: 12px; color: #3d3d3d; }
+  td { padding: 9px 14px; border-top: 1px solid #eceff3; vertical-align: top; }
+  td code { font-family: "SF Mono", Menlo, monospace; font-size: 11.5px; background: var(--code-bg); border-radius: 4px; padding: 1px 5px; }
+  tr:hover td { background: #f7f9fc; }
+  .callout { border-radius: 10px; padding: 12px 16px; margin: 14px 0 0; font-size: 12.5px; }
+  .callout.good { background: rgba(25,128,56,.06); border: 1px solid rgba(25,128,56,.3); }
+  .callout.warn { background: rgba(218,30,40,.05); border: 1px solid rgba(218,30,40,.28); }
+  .callout b.t { display: block; margin-bottom: 2px; }
+  .callout.good b.t { color: var(--success); } .callout.warn b.t { color: var(--danger); }
+  .pill { font-size: 10.5px; font-weight: 700; border-radius: 4px; padding: 1px 7px; color: #fff; white-space: nowrap; }
+  .p-a { background: var(--primary); } .p-b { background: var(--warning); } .p-c { background: #7889a4; }
+  .p-ok { background: var(--success); } .p-no { background: #7889a4; }
+  footer { margin-top: 26px; color: var(--muted); font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="eyebrow">竞品调研 · bytedance/deer-flow × flowkit</span>
+    <h1>82K star 的 SuperAgent harness，与我们的编排方法论：一次证据分级的对照</h1>
+    <div class="meta">star <b>82,329</b> <span class="badge b-first">一手</span>（GitHub API 2026-09-13 实测）· 本地仓实读 + web-access 生态双分片 · 证据编号 E1.x-nn 可回源 <code>.plan-feat-deer-flow/findings.md</code> · 生成 2026-09-14</div>
+  </header>
+
+  <div class="legend"><b>证据分级</b>
+    <span><span class="badge b-first">一手</span> 页面/API 直读</span>
+    <span><span class="badge b-self">自述</span> 官方或用户陈述</span>
+    <span><span class="badge b-inf">推断</span> 分析推测</span>
+    <span>判定体系：三选一（借鉴/不动）+ 三问行为契约 + 三轴同类性校准</span>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card"><div class="num">82,329</div><div class="lbl">star（API 实测）<span class="badge b-first">一手</span></div></div>
+    <div class="stat-card"><div class="num">~76%</div><div class="lbl">star 来自 2.0 发布后<span class="badge b-inf">推断</span></div></div>
+    <div class="stat-card"><div class="num">≈24K</div><div class="lbl">同赛道头部中位（6 样本）<span class="badge b-first">一手</span></div></div>
+    <div class="stat-card"><div class="num">12</div><div class="lbl">功能面逐项对照</div></div>
+    <div class="stat-card"><div class="num">8</div><div class="lbl">深度同构面（含数字级收敛）</div></div>
+    <div class="stat-card"><div class="num">3 借鉴</div><div class="lbl">演进建议（零机制侵入）</div></div>
+  </div>
+
+  <h2>一、它是什么 <small>仓库详梳（读者导向成稿）</small></h2>
+  <table>
+    <tr><td style="width:150px"><b>产品形态</b></td><td>四服务拓扑：Nginx(2026) → Gateway API(FastAPI + 内嵌 LangGraph) + Next.js 前端 + 可选 K8s Provisioner <span class="badge b-first">一手</span>（AGENTS.md:23-48，E1.1-01）。安装主推「把 <code>Install.md</code> 丢给 Claude Code/Codex 自动装」——Install.md 本身是写给 coding agent 的执行剧本（幂等/停止边界/成功判据，E1.3-01）</td></tr>
+    <tr><td><b>skills/ 是真机制</b></td><td>五层设施：三激活路径（被动注入/延迟发现保 prompt-cache/slash 收权）→ per-thread 沙箱投影树（写隔离复制+签名 manifest）→ SkillScan 确定性 AST 扫描 → LLM 扫描 → CI waiver 双 merge（SHA 绑定+过期日+永不豁免 blocker，E2.1~E2.4）<span class="badge b-first">一手</span></td></tr>
+    <tr><td><b>plans/ 证伪</b></td><td>全目录仅 1 个 2026-07 的 PRD 过程文件，<b>运行时零消费者</b>（E2.5-01）<span class="badge b-first">一手</span>——真正的运行时「计划」是 Plan Mode（TodoList 中间件）</td></tr>
+    <tr><td><b>工程重心</b></td><td>不在编排花式，在<b>验证与边界</b>：subagent receipt 双层验证（确定性 receipts + acceptance_checks 代码级验收，验收不过判 <b>UNVERIFIED 不误判</b>，E8.4-01）；fail-closed 密度极高；诚实自曝边界（"Local sandbox <b>not a secure boundary</b>"、"Gateway Admin = Code Execution"，E4.5/E4.8）<span class="badge b-first">一手</span></td></tr>
+    <tr><td><b>资源结构</b></td><td>≈2 年 4900+ PR、核心作者 2 人、后端 693 测试文件、16 CI workflow、K8s Helm 全套（E5.2/E8.1/E8.2）<span class="badge b-first">一手</span>——字节专人投入的公司级开源</td></tr>
+    <tr><td><b>用户真相</b></td><td>官方亲口：「大家真正在用的不是 Research 能力——而是底下那套让 Agent 真正做事的<b>运行时基础设施</b>」（E1.2-04）<span class="badge b-self">自述-官方</span>；高频抱怨 top1 = 部署安装（E1.2-04）<span class="badge b-first">一手</span></td></tr>
+  </table>
+
+  <h2>二、可比吗 <small>三轴校准 + 意图裁定</small></h2>
+  <table>
+    <tr><td style="width:130px"><b>层级轴</b></td><td>它是<b>产品框架</b>（运行时 harness + Web UI + K8s）；flowkit 是<b>编排方法论</b>（会话内 skill 集，约定级不上引擎）→ <b>不同档</b></td></tr>
+    <tr><td><b>受众轴</b></td><td>应用开发者/自托管玩家/企业部署方 vs Claude Code 重度个人用户——交集仅「把 agent 编排当正经工程做」的开发者，场景不重叠</td></tr>
+    <tr><td><b>意图裁定</b></td><td>flowkit 经三源校准（README 自述 + 设计宪法 + CHANGELOG 行为偏好）并<b>用户 sign-off</b>：方法论自用为主 + 同行可见为辅，从未以大众 star 为 KPI → 「为什么它 82K 我们没有」按字面对照是<b>伪命题</b>；真命题 = 次要目标上哪些动作可迁移</td></tr>
+  </table>
+
+  <h2>三、概念同构判定 <small>三问行为契约：解决什么/状态存哪/失败怎样</small></h2>
+  <table>
+    <thead><tr><th style="width:190px">概念对</th><th>三问摘要</th><th style="width:110px">判定</th></tr></thead>
+    <tbody>
+    <tr><td><b>skills ↔ skills</b></td><td>三激活路径↔description 触发+Skill tool；SKILL.md+投影树↔SKILL.md+安装副本；SkillScan 阻断↔lint error+sync-check——<b>三问全同向，连「确定性脚本守门」都同款</b></td><td><span class="pill p-ok">真同构</span></td></tr>
+    <tr><td><b>plans ↔ .plan-feat-*/</b></td><td>死档（无消费者无状态）↔活契约（STATE.md 活记忆+恢复协议+游标）</td><td><span class="pill p-no">同名异构</span></td></tr>
+    <tr><td><b>subagent 约束</b></td><td>FIFO 准入并发 3 + 三轴帽 ↔ 同消息 ≤3 + 规模档位——<b>并发默认 3 数字级独立收敛</b></td><td><span class="pill p-ok">真同构</span></td></tr>
+    <tr><td><b>loop（cron）</b></td><td>lease-fenced scheduler ↔ loops 层 CI cron + signal 登记——成熟度分叉（它多实例 lease 更深，我们登记体系更全）</td><td><span class="pill p-ok">同构</span></td></tr>
+    </tbody>
+  </table>
+  <div class="callout good"><b class="t">最大发现不是差异，是同频</b>
+    两个仓在毫无互通的情况下，于四个价值观独立收敛：<b>验证是合同要件</b>（acceptance UNVERIFIED ↔ IL-2 无新鲜证据不宣布完成）、<b>诚实标注自身边界</b>、<b>拒绝默认并行</b>（benefit-based ↔ 复杂度闸门）、<b>记忆需要验证器</b>（LongMemEval ↔ check_integrity）。上下两层栈，同一套工程伦理。<span class="badge b-inf">推断</span></div>
+
+  <h2>四、12 功能面对比矩阵 <small>机制设计层（精选呈现，全表见 findings）</small></h2>
+  <table>
+    <thead><tr><th style="width:150px">功能面</th><th>判定</th><th>一句话对照</th></tr></thead>
+    <tbody>
+    <tr><td>核心抽象</td><td><span class="pill p-ok">同向不同形态</span></td><td>40+ middleware 运行时链 ↔ Stage 确定性管道 + references 按需加载</td></tr>
+    <tr><td>Subagent 验收</td><td><span class="pill p-ok">深度同构</span></td><td>receipt 双层 + acceptance_checks ↔ Spot-check + GV Evidence 表 + IL-2</td></tr>
+    <tr><td>Skills 系统</td><td><span class="pill p-ok">真同构</span></td><td>运行时强制（投影/扫描）↔ 约定级 + lint；深度差 = 层级差</td></tr>
+    <tr><td>记忆/跨会话</td><td><span class="pill p-ok">同构</span></td><td>DeerMem 写门+驱逐评测 ↔ auto-skill 双库准则 + check_integrity 体检</td></tr>
+    <tr><td>计划/任务管理</td><td><span class="pill p-no">同名异构</span></td><td>plans/ 死档 ↔ planning-with-files 四件套活契约</td></tr>
+    <tr><td>验证/质量体系</td><td><span class="pill p-ok">哲学级同频</span></td><td>693 测试+16 CI ↔ evals 三层 + IL 铁律 + Rationalization 表</td></tr>
+    <tr><td>边界自律</td><td><span class="pill p-ok">罕见同频</span></td><td>三句自曝 ↔ 宪法四问 + ch11 批判小节自我披露</td></tr>
+    <tr><td>Agent 向文档</td><td><span class="pill p-ok">同构</span></td><td>AGENTS.md 树就近原则 ↔ references 渐进披露 + L5 断链 lint</td></tr>
+    </tbody>
+  </table>
+
+  <h2>五、演进吸收建议 <small>三选一判据 + 成本双栏（实现/长期维护）</small></h2>
+  <table>
+    <thead><tr><th style="width:210px">机制（证据）</th><th style="width:76px">判定</th><th>flowkit 落点</th><th style="width:150px">成本（实现/维护）</th></tr></thead>
+    <tbody>
+    <tr><td><b>Install.md agent 剧本</b>（E1.3-01）</td><td><span class="pill p-b">B 借鉴</span></td><td>仓根 Install.md：环境检测→clone→symlink→sync-check 验证→报告；README 加「丢给你的 Claude Code」安装卡</td><td>半天 / 近零——<b>性价比第一</b></td></tr>
+    <tr><td><b>CI waiver 机制</b>（E2.4-01）</td><td><span class="pill p-b">B 借鉴</span></td><td>lint L1 豁免从注释升为 waiver 文件（SHA+过期日+双 merge）</td><td>~1 天 / 年度级</td></tr>
+    <tr><td><b>support-bundle 诊断包</b>（E9.2-01）</td><td><span class="pill p-b">B 借鉴</span></td><td>scripts/ 聚合 lint+sync+git+环境 → 单文件报告供报障</td><td>半天 / 近零</td></tr>
+    <tr><td>AGENTS.md 树 / acceptance / sandbox 族（E3.3/E8.4/E2.2）</td><td><span class="pill p-c">C 不动</span></td><td>已有等价物（references+L5 / GV+IL-2 / 约定级形态）或属运行时层——违反宪法「不上引擎」</td><td>—</td></tr>
+    </tbody>
+  </table>
+  <div class="callout good"><b class="t">演进总结论</b>
+    3 借鉴全是「流程与分发面」动作（零机制侵入、单人可养）+ 4 不动（机制面已有等价物）——<b>方向不是变成它，是借它的产品化动作守住方法论深度</b>。印证意图 sign-off。</div>
+
+  <h2>六、推广策略 <small>双路线 + 幸存者分母（强制引用）</small></h2>
+  <div class="callout warn"><b class="t">背景数据（勿忽略）</b>
+    赛道头部常态 10K-60K、中位 ≈24K（6 样本 API 实测 <span class="badge b-first">一手</span>）；deer-flow 82K ≈ 中位 3.4 倍，超额来自 2.0 转型事件 + Trending 榜首 + 字节系导流（事件-拐点强耦合 <span class="badge b-inf">推断</span>）；HN 历史最高 4 pts 全程冷清 <span class="badge b-first">一手</span>——主战场在中文社区 + GitHub 自身流量。</div>
+  <table>
+    <thead><tr><th style="width:60px">#</th><th style="width:190px">路线甲：窄众深耕（推荐）</th><th>第一步</th><th style="width:110px">成本</th></tr></thead>
+    <tbody>
+    <tr><td>P-1</td><td><b>装机摩擦清零</b>（承接 E-1）</td><td>写 Install.md + README 安装卡</td><td>半天</td></tr>
+    <tr><td>P-2</td><td><b>教程站主打展示</b></td><td>README 首屏教程站卡片；补 EN 段</td><td>1 小时</td></tr>
+    <tr><td>P-3</td><td><b>事件驱动发布</b>：发版/大机制当传播事件（README 战报+社区文）</td><td>loops 层发版补一篇 LINUX DO 发布文</td><td>每事件 1-2h</td></tr>
+    <tr><td>P-4</td><td><b>渠道单点深耕</b> LINUX DO + 知乎长文</td><td>教程站走查文发 LINUX DO 原创区</td><td>每篇 2-3h</td></tr>
+    <tr><td>P-5</td><td><b>i18n 英文化</b>（Install.md 双语起步）</td><td>与 E-1 同批做双语</td><td>1 天</td></tr>
+    </tbody>
+  </table>
+  <table style="margin-top:10px">
+    <tr><td style="width:190px"><b>路线乙：产品化大众</b></td><td>pip 安装器 / Web 配置台 / demo 墙——需对照其资源结构（2 核心 + 4900 PR <span class="badge b-first">一手</span>），远超单人预算且与 sign-off 意图相悖；<b>呈现不推荐</b>，意图变更再启</td></tr>
+    <tr><td><b>预期校准（诚实）</b></td><td>窄众路线现实天花板参考赛道中位；flowkit 受众更窄（Claude Code 重度用户子集），合理预期为数百到低千级 star 的「同行认可」量级——定位使然，非失败 <span class="badge b-inf">推断</span></td></tr>
+  </table>
+
+  <footer>
+    <b>方法声明</b>：双分片 fan-out（本地仓深读不联网 + web-access 生态采集）→ 主会话五步整合（详梳成稿→意图 sign-off→三轴校准→对比→演进/推广）；同构判定用三问行为契约（两问不同 = 同名异构）；全部建议引用 E1.x-nn 证据编号，底稿存 <code>.plan-feat-deer-flow/findings.md</code>。<br><br>
+    数据来源：GitHub API（star/fork/赛道 6 样本，2026-09-13 实测）；本地 clone 实读（AGENTS.md 树/源码结构/CI 配置）；生态数据 web-access CDP 直读（star-history SVG 坐标反演、知乎官方文、issue 聚类）。star 时间线精度 ±400/±半个月（stargazers 明细 API 已被 GitHub 全平台关闭，SVG 反演为保守口径）。快照 2026-09-14。
+  </footer>
+</div>
+</body>
+</html>

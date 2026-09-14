@@ -7,6 +7,9 @@ FlowKit 全量版本历史。格式遵循 [Keep a Changelog](https://keepachange
 ### flow-deep
 - 新增 **Context Guard 机械化**（2026-09-14 事故复盘）—— UserPromptSubmit hook（`scripts/context_guard_hook.py`，settings.json 已注册）每次用户输入自动检测容量并超阈值注入警告：静默失败不阻塞、去抖 5pp、阈值 `FLOWKIT_CONTEXT_GUARD_THRESHOLD` 可调；check_context.py 新增 `needs_calibration` 字段（窗口来自模型名推断时亮明猜测身份——实测 GLM `[1m]` 推断 1M 而真实 ≈490K，同一会话 41.7% vs 85%）；SKILL.md 补窗口校准纪律（以状态栏为准，差异 >15pp 即 `export FLOWKIT_CONTEXT_WINDOW` 校准）。验证：resume 后实测注入预警 79.8%
 
+### 仓库基础设施
+- 新增 **deer-flow 对照调研报告**（`res/deer-flow-research.html`）—— 单文件零依赖 HTML：四部分交付（仓库详梳/三轴校准+12 面对比+概念同构三问判定/演进三选一（3 借鉴 4 不动）/推广双路线含幸存者分母）；证据分级徽章 20 处、E1.x-nn 编号可回源 findings 底稿；star 82,329 API 实测锚定
+
 ### 教程站
 - **封面 CTA 目标 md 预取**（hero.js `fs-cta-prefetch`）—— 封面在场时 idle 预取「开始阅读/30 秒导览」指向的 md 进浏览器 HTTP 缓存，首击零网络渲染，消除冷缓存点击时「先 404/空白再刷出」窗口（线上实测点击后 ch1 来源 disk-cache）
 - **修复 GitHub Pages 下划线路径拒发** —— `_sidebar.md`→`sidebar.md`、`_coverpage.md`→`coverpage.md`，index.html `loadSidebar/coverpage` 用自定义文件名（文件在 Pages 仓 git 里但 HTTP 404，`.nojekyll` 未解除 legacy 流水线拒发；改名彻底绕开。线上症状：封面空白+侧栏目录消失）
