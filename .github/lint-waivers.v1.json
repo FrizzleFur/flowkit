@@ -1,0 +1,5 @@
+{
+  "_doc": "lint L1 豁免登记（借鉴 deer-flow skill-review waiver 机制）。四约束：①条目绑定被豁免行的 SHA-256（内容漂移即失效）②过期日强制（expires，YYYY-MM-DD，到期自动恢复 warning）③只作用于 warning 级发现（error 级永不豁免）④变更本文件必须独立 commit 且说明理由（多人协作时双 merge 生效；单人仓退化为显式声明）。格式：[{file, line, sha256, reason, expires}]。",
+  "v": 1,
+  "waivers": []
+}

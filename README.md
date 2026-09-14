@@ -253,6 +253,10 @@ cp -r skills/prompt ~/.claude/skills/
 cp -r skills/auto-skill ~/.claude/skills/
 ```
 
+### 交给你的 Claude Code 装（源仓用户）
+
+clone 本仓后对 agent 说一句「**按 Install.md 装好 flowkit**」即可——[Install.md](Install.md) 是写给 coding agent 的执行剧本（环境检测 → symlink 安装 → 冲突即停 → sync-check/lint 双验证 → 固定格式报告），幂等可重复执行，报障时先跑 `bash scripts/support_bundle.sh` 生成一键诊断包。
+
 在 Claude Code 中调用：
 
 ```

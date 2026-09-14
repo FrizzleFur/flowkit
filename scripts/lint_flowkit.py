@@ -24,6 +24,9 @@
 退出码：0 = 无 error（warning/info 不阻塞）；1 = 存在 error。
 """
 import argparse
+import datetime
+import hashlib
+import json
 import re
 import sys
 from pathlib import Path
@@ -33,6 +36,7 @@ CID_ENTRY = re.compile(r"^### (C\d+):", re.M)
 MERMAID_NODE = re.compile(r"\b(C\d+)\[")
 TIER_ROW = re.compile(r"\| (C\d+)(?:-(C\d+))? \|")
 VERIFY_CMD = re.compile(r"grep\s+-[a-zA-Z]*E?\s+[\"'`][^\"'`]+[\"'`]")
+WAIVER_FILE = Path(".github") / "lint-waivers.v1.json"
 REF_FILE = re.compile(
     # 跨技能引用三种写法：~/.claude/skills/<n>/... 、skills/<n>/... 、<n>/references|scripts/...
     # （仓内或安装副本可解析即通过）
@@ -45,14 +49,40 @@ REF_FILE = re.compile(
 SIZE_BUDGET = {"flow-deep": 800}
 
 
-def lint_deprecated(root: Path) -> list[tuple[str, str, str]]:
-    """L1: 废弃 API。修复指引内联。"""
-    finds = []
+def load_waivers(root: Path) -> list[dict]:
+    """读取 L1 豁免登记（.github/lint-waivers.v1.json）。四约束见该文件 _doc：
+    SHA-256 绑定 + 过期日强制 + 仅 warning 级 + 变更须独立 commit。"""
+    try:
+        return json.loads((root / WAIVER_FILE).read_text(encoding="utf-8")).get("waivers", [])
+    except Exception:
+        return []  # 文件缺失/损坏 = 无豁免，L1 全量照常
+
+
+def _waiver_matches(w: dict, rel: str, loc: str, line_sha: str) -> bool:
+    """命中条件：file+line+行内容 SHA 三匹配且未过期（过期/内容漂移自动失效）。"""
+    if w.get("file") != rel or w.get("line") != loc.lstrip("L") or w.get("sha256") != line_sha:
+        return False
+    try:
+        return datetime.date.today() <= datetime.date.fromisoformat(w["expires"])
+    except (KeyError, ValueError):
+        return False
+
+
+def lint_deprecated(root: Path, waivers: list[dict] | None = None):
+    """L1: 废弃 API。修复指引内联。返回 (finds, waived_count)——waiver 命中者静默。"""
+    waivers = waivers if waivers is not None else load_waivers(root)
+    finds, waived = [], 0
     for f in [*root.glob("skills/*/SKILL.md"), *root.glob("skills/*/references/*.md")]:
-        for i, line in enumerate(f.read_text(encoding="utf-8").splitlines(), 1):
+        lines = f.read_text(encoding="utf-8").splitlines()
+        rel = str(f.relative_to(root))
+        for i, line in enumerate(lines, 1):
             if DEPRECATED.search(line):
-                finds.append((str(f.relative_to(root)), f"L{i}", line.strip()[:100]))
-    return finds
+                loc, sha = f"L{i}", hashlib.sha256(line.encode()).hexdigest()[:16]
+                if any(_waiver_matches(w, rel, loc, sha) for w in waivers):
+                    waived += 1
+                else:
+                    finds.append((rel, loc, line.strip()[:100]))
+    return finds, waived
 
 
 def lint_registry(root: Path) -> dict[str, list]:
@@ -193,8 +223,8 @@ def main() -> int:
     print("=" * 66)
     has_error = False
 
-    l1 = lint_deprecated(root)
-    print(f"\n[L1] 废弃 API 残留（{len(l1)}）——修复：改为 TaskStop(task_id=<name>) / Agent(name=...)；若为说明性文字可忽略")
+    l1, waived = lint_deprecated(root)
+    print(f"\n[L1] 废弃 API 残留（{len(l1)}，waiver 豁免 {waived}）——修复：改为 TaskStop(task_id=<name>) / Agent(name=...)；说明性文字可登记 .github/lint-waivers.v1.json（SHA+过期日绑定，漂移即失效）")
     for f, loc, txt in l1:
         print(f"  ⚠ {f}:{loc}  {txt}")
 

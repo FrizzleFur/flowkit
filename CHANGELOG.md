@@ -8,6 +8,8 @@ FlowKit 全量版本历史。格式遵循 [Keep a Changelog](https://keepachange
 - 新增 **Context Guard 机械化**（2026-09-14 事故复盘）—— UserPromptSubmit hook（`scripts/context_guard_hook.py`，settings.json 已注册）每次用户输入自动检测容量并超阈值注入警告：静默失败不阻塞、去抖 5pp、阈值 `FLOWKIT_CONTEXT_GUARD_THRESHOLD` 可调；check_context.py 新增 `needs_calibration` 字段（窗口来自模型名推断时亮明猜测身份——实测 GLM `[1m]` 推断 1M 而真实 ≈490K，同一会话 41.7% vs 85%）；SKILL.md 补窗口校准纪律（以状态栏为准，差异 >15pp 即 `export FLOWKIT_CONTEXT_WINDOW` 校准）。验证：resume 后实测注入预警 79.8%
 
 ### 仓库基础设施
+- 吸收 deer-flow 三借鉴落地（调研报告 E-1/E-2/E-3）：**Install.md agent 剧本**（环境检测→symlink 安装→冲突即停→sync-check/lint 双验证→固定格式报告，幂等；README 快速上手加「交给你的 Claude Code 装」入口）；**lint L1 waiver 机制**（`.github/lint-waivers.v1.json`——SHA-256 行绑定+过期日强制+仅 warning 级+变更须独立 commit，漂移/过期自动恢复 warning；四场景功能测试全绿：命中/过期/防漂移/还原）；**support_bundle.sh 一键诊断包**（聚合环境版本/双仓状态/安装形态/lint/evals 快照，脱敏原则只打设置不打值）
+
 - 新增 **deer-flow 对照调研报告**（`res/deer-flow-research.html`）—— 单文件零依赖 HTML：四部分交付（仓库详梳/三轴校准+12 面对比+概念同构三问判定/演进三选一（3 借鉴 4 不动）/推广双路线含幸存者分母）；证据分级徽章 20 处、E1.x-nn 编号可回源 findings 底稿；star 82,329 API 实测锚定
 
 ### 教程站
