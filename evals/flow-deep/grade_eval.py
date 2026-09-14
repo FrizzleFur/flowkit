@@ -84,8 +84,16 @@ def check(run_dir: Path, eval_id: int = 0) -> list[dict]:
     return results
 
 
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
 def main() -> int:
     run_dir = Path(sys.argv[1]).resolve()
+    try:
+        run_dir.relative_to(REPO_ROOT)
+    except ValueError:
+        print(f"拒绝：run_dir 必须位于仓库目录 {REPO_ROOT} 内（收到 {run_dir}）", file=sys.stderr)
+        return 2
     eval_id = int(sys.argv[2]) if len(sys.argv) > 2 else 0
     results = check(run_dir, eval_id)
     passed = sum(r["passed"] for r in results)
