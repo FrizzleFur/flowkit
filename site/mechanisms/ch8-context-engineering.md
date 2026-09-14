@@ -4,7 +4,7 @@
 
 *Hand Off Before You Rot*
 
-`20 anchors` · `252` · 组件 `replay`×3（threelines 9 / autohandoff 10 / recovery 7）· 约 30 分钟
+`23 anchors` · `272` · 组件 `replay`×3（threelines 9 / autohandoff 10 / recovery 7）· 约 30 分钟
 
 **本章位置**: 横切层 · 上下文工程（贯穿全程）· 承[第 7 章 · 并发执行](ch7-concurrent-execution.md)的并发现场 · 启[第 9 章 · 验证与迭代](ch9-verification-loop.md)
 
@@ -15,7 +15,7 @@
 **机制定位**: 上下文工程的工程细节层——理论坐标系见[原理篇第 2 章](../principles/ch2-context-three-axes.md)，本章每个操作都能对回主源 context-management.md。
 
 
-**快用**: 默认自动运行——每 Stage/Phase 边界容量检测，超 70% 弹窗四选项; `--no-context-guard` 关检测（不推荐）; `--handoff-max N` 接力上限（默认 3 代）; `--no-auto-handoff` 退自动交接; 1M 窗口加 `--window 1000000`。
+**快用**: 默认自动运行——UserPromptSubmit hook 每次输入自动检测 + 每 Stage/Phase 边界复核，超 70% 弹窗四选项; `--no-context-guard` 关检测（不推荐）; `--handoff-max N` 接力上限（默认 3 代）; `--no-auto-handoff` 退自动交接; 第三方模型窗口失真时以状态栏为准校准 `FLOWKIT_CONTEXT_WINDOW`。
 
 </div>
 
@@ -97,6 +97,22 @@ exit code 三态，各对应一条操作分支:
 | 任意时刻 | > 85% | 警告用户，建议 `/compact` |
 
 表里藏着分级哲学: 越往后（越接近收尾）的中间产物容忍阈值越高——离终点越近的内容值得多忍一忍; 而边界点上的 70% 弹窗**永远先于压缩**，把「换不换窗」的选择权先交给用户。
+
+### 机械化升级: 从自觉级到机械级（2026-09-14 复盘）
+
+上面这套边界检测，在 2026-09-14 之前有一个本章批判小节亲口承认的软肋: 「每个 Stage/Phase 完成点运行一条命令」是**写进 SKILL.md 的自觉级纪律**——没有任何机械拦截，执行者（模型）遗忘即整体失效。事故实录: 一个 flow-deep 全程运行的长会话，状态栏 Context 已达 85%，Guard 一次都没触发; grep settings.json 实证 `NO_HOOK_WIRING`，且执行者诚实自报在所有边界都没跑过脚本。这正是第 11 章批判小节点名的缺口类型——「写下来的纪律，跳过它没有机械拦截」。
+
+复盘还挖出第二层隐藏 bug: **第三方模型窗口推断失真**。脚本的窗口口径按 `ANTHROPIC_MODEL` 的 `[1m]` 后缀推断为 1M，但该 GLM 端点的真实有效窗口 ≈490K（真实窗口经 API 速率限头只对 CC 运行时可见，状态栏 Context 行即据此渲染）——同一会话脚本报 41.7% 而状态栏 85%，70% 阈值**永不命中**: 就算每个边界都忠实跑了检测，触发线 70 万 tokens 在 49 万的真实窗口里到爆仓都够不着。
+
+修复三件套（对应两层根因）:
+
+| 件 | 修复 | 针对的根因 |
+|---|---|---|
+| hook 机械化 | 新增 `context_guard_hook.py` 注册进 settings.json `UserPromptSubmit`——每次用户输入自动检测，超阈值经 `additionalContext` 注入警告拉回纪律; 静默失败不阻塞输入、去抖 5pp、阈值 `FLOWKIT_CONTEXT_GUARD_THRESHOLD` 可调 | 自觉级纪律无机械拦截 |
+| 窗口校准标志 | check_context.py 新增 `needs_calibration` 字段——窗口来自模型名推断时亮明「猜测」身份，注入文本附带校准指令（以状态栏为准，差异 >15pp 即 `export FLOWKIT_CONTEXT_WINDOW=<tokens_used÷状态栏%>`） | 推断失真静默采信 |
+| 纪律固化 | SKILL.md 上下文管理节写入机械化护栏说明与校准纪律 | 双保险 |
+
+验证是活的: 修复当晚 resume 同一会话，用户第一条消息即收到注入 `[Context Guard 预警] 会话 context 约 79.8%（阈值 70%）`——hook 武装、490K 校准口径、预警档措辞三件事一次确认。两个工程注脚: CC 对 hooks 配置做**启动期快照**（新 hook 从下一个新会话/resume 起武装，当前会话不生效）; settings env 同为启动快照（校准值写入后须重开会话才被 hook 读到）。
 
 ### 决策层: 四选项弹窗——一次只问一个问题
 
@@ -232,14 +248,18 @@ recovery 7 步对照: 步 2 容量告警 ↔ 边界实测 75%（armed 动作链�
 | 不可压缩清单四类 | `skills/flow-deep/references/context-management.md:380-387` |
 | PreCompact hook 官方语义（stdout 不进上下文，默认不配） | `skills/flow-deep/references/context-management.md:370-378` |
 | Context Guard 阈值分层表与「模型无法自感」论断 | `skills/flow-deep/SKILL.md:156-174` |
+| 机械化护栏说明与窗口校准纪律（2026-09-14 加装） | `skills/flow-deep/SKILL.md`「上下文管理」节机械化护栏段 |
+| hook 全文（UserPromptSubmit 注入 / 去抖 5pp / 静默失败） | `skills/flow-deep/scripts/context_guard_hook.py` |
+| needs_calibration 字段与窗口口径优先级 | `skills/flow-deep/scripts/check_context.py`（窗口校准注释段） |
 | 启动恢复检查与多 feature 检测 | `skills/flow-deep/SKILL.md:195-199` |
 | check_context.py 真值原理（transcript 最后一条 usage 四项之和） | `skills/flow-deep/scripts/check_context.py:2-16`（头注释） |
 | Auto Handoff 通俗图解与四设计点 | `README.md:140-163` |
 
 <div class="fs-tabsep" data-label="批判小节（深挖: 局限与成本）"></div>
 
-- **检测是采样式的**: 边界点之外的 context 暴涨抓不到，P1 系统警告兜底时「通常已晚」; PreCompact hook 这条兜底路又被官方语义封死（stdout 不进上下文），目前防护依赖 75% 前置余量
-- **约定级约束**: 协议写在 references 里，约束的是「遵循 skill 的会话」——执行者不更新 STATE.md，锚点就是旧的，恢复协议救不回来
+- **检测是采样式的**: 边界点之外的 context 暴涨抓不到，P1 系统警告兜底时「通常已晚」; PreCompact hook 这条兜底路又被官方语义封死（stdout 不进上下文），目前防护依赖 75% 前置余量（hook 化后检测粒度已细到每次用户输入，但 Stage 中段的暴涨仍依赖 P1 兜底）
+- **约定级约束**: 协议写在 references 里，约束的是「遵循 skill 的会话」——执行者不更新 STATE.md，锚点就是旧的，恢复协议救不回来（2026-09-14 起**检测本身**已升机械级 hook 值守，但 STATE.md 更新仍是自觉级——机械化的下一站）
+- **窗口真值只对运行时可见**: 脚本侧永远拿不到 API 速率限头里的真实窗口，`needs_calibration` 只能亮明失真风险、指引对照状态栏校准——第三方模型每换一家就要人工校一次 `FLOWKIT_CONTEXT_WINDOW`，无自动通道
 - **交接有真实损耗**: `--handoff-max` 默认 3 代的上限本身就说明交接不能无限续; 每代新会话要重读三件套，固定成本客观存在
 - **压缩率是约定不是实测**: 矩阵里的 70%/90% 是设计约定（文档示例里的 ~73% 是单例），没有系统性 evals 度量「压缩后质量损失了多少」——这是改进空间
 - **改进输入（承接第 2 章）**: 五件套是手工定义的交接物，尚无 ContextPacket 式统一抽象（带 relevance/timestamp/token_count 元数据的信息包）与 GSSC 选择评分——理论侧的未吸收物是这套机制下一步演进的候选方向

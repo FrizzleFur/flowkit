@@ -4,7 +4,11 @@ FlowKit 全量版本历史。格式遵循 [Keep a Changelog](https://keepachange
 
 ## [Unreleased]
 
-（暂空——v1.8.0 刚发版）
+### flow-deep
+- 新增 **Context Guard 机械化**（2026-09-14 事故复盘）—— UserPromptSubmit hook（`scripts/context_guard_hook.py`，settings.json 已注册）每次用户输入自动检测容量并超阈值注入警告：静默失败不阻塞、去抖 5pp、阈值 `FLOWKIT_CONTEXT_GUARD_THRESHOLD` 可调；check_context.py 新增 `needs_calibration` 字段（窗口来自模型名推断时亮明猜测身份——实测 GLM `[1m]` 推断 1M 而真实 ≈490K，同一会话 41.7% vs 85%）；SKILL.md 补窗口校准纪律（以状态栏为准，差异 >15pp 即 `export FLOWKIT_CONTEXT_WINDOW` 校准）。验证：resume 后实测注入预警 79.8%
+
+### 教程站
+- ch8 上下文工程章新增「机械化升级: 从自觉级到机械级」节（事故实录 + 双层根因 + 修复三件套 + 启动期快照注脚）+ 锚点表 3 条 + 批判小节 2 条更新（检测粒度已细到每次输入 / 窗口真值无自动通道）；章头与 anchors.md 行数同步（252→272 / 20→23 锚点）
 
 ## [v1.8.0] - 2026-09-10
 
