@@ -51,6 +51,7 @@ cd /Users/new/Documents/Repos/BlogBackUp && git add -f source/.nojekyll && git c
 
 ## 剩余队列（修完 P1/P2 后）
 
+- **flow-deep 续接能力升级（用户 2026-09-14 提出, 用 skill-creator 执行）**: ①恢复协议升级双源——SKILL.md 前置处理「恢复检查」现只认 STATE.md, 应合并仓根 HANDOFF.md（诊断/纪律/队列都在那）; ②触发词补「继续/恢复/接着上次」语境; ③零输入自动发现（SessionStart hook 扫 .plan-feat-*/STATE.md 注入活跃任务摘要）超出 skill 边界, 属 update-config 领域, 单独立项。注意: skills 仓有并行会话在改 flow-deep（check_context.py）, 动手前先看工作树
 - quiz 二批: 其余 8 章出题（fs-quiz 组件已就绪, 模板 `site/assets/quiz/ch4.json`, 挂载范式见 ch4 机制 pane 尾）
 - 中优: ch2 三斧同屏回放（A 线设计现成, ch2-rules 已建可作参考）
 - 微挂账: S6 quote-soft / S13 coarse 指针
