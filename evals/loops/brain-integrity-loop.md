@@ -30,6 +30,7 @@ no-op 是有效 run。永续监守。
 ## Logs
 
 （每 run 一行——REC-8 健康分趋势的原始数据。首条：contract 立档 2026-09-10，尚未挂载）
+- 2026-09-14 | 手动首跑（基线建立）| new=46 断链绝对路径（主因：FDNote worktree 清理后的历史条目残留）+ 0 wikilink 断链 + 索引对称 | 报告落盘 `.plan/integrity-report.md`；launchd plist 草案就绪（`.plan/com.flowkit.brain-integrity.plist`，周一 09:17，未 load——挂载由用户执行）
 
 ## 挂载命令（用户决定时机）
 
