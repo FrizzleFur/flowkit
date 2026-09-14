@@ -171,6 +171,8 @@ Stage -1: 跨会话经验召回 → Stage 0: Superpowers 检查 (强制) → Sta
 
 弹窗决策先于压缩：用户选「保存并继续」时先做 checkpoint（更新 STATE.md/progress.md/task_plan.md）再按压缩矩阵处理。同一 Stage 边界最多弹一次，选「跳过」则下个边界重新检测。保存与 HANDOFF.md 协议见 `references/context-management.md` 的「主动 Checkpoint 与 Handoff」。检测脚本失败（exit 2）时静默降级为原压缩矩阵，不阻塞管道。`--no-context-guard` 禁用。
 
+**交接即续接（Handoff Relay, 2026-09-14 加装）**: 「保存并交接」分支在 HANDOFF.md 落盘**之后**追加一问——「立即开新会话续接？」。用户选「是」才执行（控制权在用户：交接是点头过的，开新会话是新的动作，不能替用户决定；宪法第 3/4 问依据）。执行序: ①`bash ~/.claude/skills/multi-agent/scripts/pretrust-cwd.sh <仓根>`（防新会话 trust 弹窗）②在 tmux（`[ -n "$TMUX" ]` 判定）则 `tmux new-window -n <feature> 'cd <仓根> && claude "继续上次任务: 先读 HANDOFF.md, 再 /flow-deep 恢复"'`——`claude "<初始指令>"` 位置参数启动 TUI 即自动发送，新会话是用户可见可交互的真会话; 无 tmux 则**打印等价命令让用户自贴**（不开系统终端窗口——越权，环境自适应同 multi-agent 降级哲学）。初始指令双保险设计: 自然语言「先读 HANDOFF.md」保证诊断/纪律/队列必被加载（恢复协议的 STATE.md 只含位置不含这些），skill 触发词交由 description 兜底。禁用: `--no-relay`。全自动 Stop hook 版（会话结束检测 HANDOFF mtime 自动 spawn）为 L2 挂账，未过宪法四问前不实施。
+
 **机械化护栏（2026-09-14 加装，起因：本会话 85% 全程未触发的事故复盘）**: UserPromptSubmit hook（`~/.claude/skills/flow-deep/scripts/context_guard_hook.py`，settings.json 已注册）在每次用户输入时自动运行检测并超阈值注入警告——上表「Stage/Phase 边界运行」仍保留作第二道（hook 会静默失败，不阻塞输入，去抖 5pp）。**窗口校准纪律（必修）**: 脚本输出 `needs_calibration=true`（窗口来自模型名推断）时，百分比为猜测值——真实窗口经 API 速率头只对 CC 运行时可见（状态栏 Context 行即据此渲染）。实测案例：GLM 端点 `[1m]` 推断 1M，真实 ≈490K，同一会话脚本报 41.7% 而状态栏 85%。凡 needs_calibration=true：以状态栏为准；差异 >15pp 时立即 `export FLOWKIT_CONTEXT_WINDOW=<tokens_used÷状态栏%>` 校准。
 
 STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协议见 `references/context-management.md`。
@@ -194,9 +196,9 @@ flow-deep 默认在有用户在环的交互式会话运行，但真实执行环�
    - 若任务是单文件、单点、低风险、可逆改动 → 提示降级为 `/flow` 或轻量串行处理
    - 若用户坚持继续使用 `/flow-deep` → 仅保留 Goal Contract、Minimal Plan、Verification，不默认进入 Stage 2 全开、Plan Review、Panel Review 和 multi-agent
    - 若任务复杂、重要、高风险、跨模块、多步骤或需要审查/验证闭环 → 继续完整流程
-3. **恢复检查**: 检查 `--plan-dir` (默认 `.plan`；多 feature 项目用 `.plan-feat-<name>/`) 下是否存在 `STATE.md`:
+3. **恢复检查（双源）**: 检查 `--plan-dir` (默认 `.plan`；多 feature 项目用 `.plan-feat-<name>/`) 下是否存在 `STATE.md`，**并同查仓根 `HANDOFF.md`**（若在）:
    - **多 feature 检测**: 若项目根有多个 `.plan-feat-*/` 目录，询问用户本次属于哪个 feature，用对应目录作为 `--plan-dir`（参见 planning-with-files 的 Plan Directory Strategy；feature 名来源：用户指定 > git 分支名 > 任务关键词）
-   - 若存在 STATE.md → 读取 STATE.md，向用户展示上次中断位置，询问"恢复上次进度"还是"重新开始"
+   - 若存在 STATE.md → 读取 STATE.md **+ HANDOFF.md（若有：其中含诊断结论/修复命令/关键纪律/剩余队列，是交接的完整体，只读 STATE 会丢这些）**，向用户展示上次中断位置，询问"恢复上次进度"还是"重新开始"
    - 若恢复 → 跳到 STATE.md 中记录的 `next_action` 对应的 Stage
    - 若重新开始 → 备份旧 STATE.md 为 `STATE.md.bak`，继续正常流程
 4. **确认任务**: 向用户展示解析结果，确认任务范围、复杂度判断和参数配置
