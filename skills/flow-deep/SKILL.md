@@ -171,6 +171,8 @@ Stage -1: 跨会话经验召回 → Stage 0: Superpowers 检查 (强制) → Sta
 
 弹窗决策先于压缩：用户选「保存并继续」时先做 checkpoint（更新 STATE.md/progress.md/task_plan.md）再按压缩矩阵处理。同一 Stage 边界最多弹一次，选「跳过」则下个边界重新检测。保存与 HANDOFF.md 协议见 `references/context-management.md` 的「主动 Checkpoint 与 Handoff」。检测脚本失败（exit 2）时静默降级为原压缩矩阵，不阻塞管道。`--no-context-guard` 禁用。
 
+**机械化护栏（2026-09-14 加装，起因：本会话 85% 全程未触发的事故复盘）**: UserPromptSubmit hook（`~/.claude/skills/flow-deep/scripts/context_guard_hook.py`，settings.json 已注册）在每次用户输入时自动运行检测并超阈值注入警告——上表「Stage/Phase 边界运行」仍保留作第二道（hook 会静默失败，不阻塞输入，去抖 5pp）。**窗口校准纪律（必修）**: 脚本输出 `needs_calibration=true`（窗口来自模型名推断）时，百分比为猜测值——真实窗口经 API 速率头只对 CC 运行时可见（状态栏 Context 行即据此渲染）。实测案例：GLM 端点 `[1m]` 推断 1M，真实 ≈490K，同一会话脚本报 41.7% 而状态栏 85%。凡 needs_calibration=true：以状态栏为准；差异 >15pp 时立即 `export FLOWKIT_CONTEXT_WINDOW=<tokens_used÷状态栏%>` 校准。
+
 STATE.md 活记忆（< 80 行）维护在 `.plan/STATE.md`，模板和恢复协议见 `references/context-management.md`。
 
 ## 执行流程

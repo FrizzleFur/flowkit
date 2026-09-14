@@ -205,11 +205,17 @@ def main():
 
     pct = tokens_used / args.window * 100
     exceeded = pct > args.threshold
+    # 窗口校准标志（2026-09-14）：explicit/env 是可信窗口；模型名推断与默认值都是猜测——
+    # 真实窗口经 API 速率头只对 CC 运行时可见（状态栏 Context 行即据此渲染）。
+    # 实测教训：GLM 端点 ANTHROPIC_MODEL 带 [1m] 推断 1M，真实有效窗口 ≈490K，
+    # 导致同一会话脚本报 41.7% 而状态栏 85%——推断口径必须触发校准而非静默采信。
+    needs_calibration = window_source not in ("explicit", "env")
     result = {
         "context_pct": round(pct, 1),
         "tokens_used": tokens_used,
         "window": args.window,
         "window_source": window_source,
+        "needs_calibration": needs_calibration,
         "threshold": args.threshold,
         "exceeded": exceeded,
         "session": os.path.basename(transcript),
@@ -223,7 +229,8 @@ def main():
     else:
         print(
             f"context_pct={result['context_pct']} tokens_used={tokens_used} "
-            f"window={args.window}({window_source}) threshold={args.threshold} exceeded={str(exceeded).lower()} "
+            f"window={args.window}({window_source}) needs_calibration={str(needs_calibration).lower()} "
+            f"threshold={args.threshold} exceeded={str(exceeded).lower()} "
             f"session={result['session']} fallback={str(fallback).lower()} mtime={result['mtime']} first_msg={result['first_msg']}"
         )
     sys.exit(0 if not exceeded else 1)
