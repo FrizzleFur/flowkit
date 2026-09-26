@@ -213,6 +213,18 @@ flow-deep 默认在有用户在环的交互式会话运行，但真实执行环�
   思考模式: Sequential Thinking (4K) + Mermaid + 三角色讨论
 ```
 
+### 迭代轮轻量档位（同任务后续轮 · 2026-09-26 审计加装）
+
+> 实测背景：wiki 建设任务第二/三轮（按 SOP 扩产模块页）四件套逐字节冻结、豁免 3.5/3.6，流程真实合理但**零留痕**——独立审计判「事实脱管」。本档位让扩产轮合法化而非脱管。
+
+同一任务的后续迭代轮（如 wiki 逐模块扩展、批量同类改动），经用户以明确指令授权（「继续第 N 模块」级）后，可豁免 Stage 2 全开 / 3.5 / 3.6，但**三件必备不可省**：
+
+1. **Goal Contract 增量节**：spec.md 追加本轮目标（哪怕三行——轮次、对象、完成标准）
+2. **验证断言落盘**：命令与输出记入 findings.md（禁止只留对话/STATE 一行——「做了但没落盘」在审计中等于证据链断裂）
+3. **授权留痕一行**：findings/STATE 记「本轮按迭代轮轻量档位走，授权来源 = 用户 <原话>，豁免 2/3.5/3.6」
+
+另：tmux 真进程子代理（split-window + claude CLI 形态）与主会话共享 .plan/ 时的写入协调——**先读后写或限定追加区**，禁止盲写整文件（多写者并发覆盖隐患）。
+
 ### Stage 0: Superpowers 前置检查 + 能力发现
 
 **调用**: `using-superpowers` 技能
@@ -274,6 +286,7 @@ flow-deep 默认在有用户在环的交互式会话运行，但真实执行环�
 2. 若 Objective 或 Success Criteria 不清晰，优先使用 AskUserQuestion 澄清，不直接进入 Stage 1
 3. 将 Goal Contract 写入 `--plan-dir/spec.md` 或 findings.md 的开头，供后续 Stage 3/4/5 复用
 4. 后续计划、执行和验证必须回看该契约；如果目标变化，回到 Stage 0.5 更新契约后再继续
+5. **裁定写回机械化（2026-09-26 审计加装）**: 任何 AskUserQuestion 用户裁定的结果，必须在**下一动作之前**写回 spec.md（无 Clarifications 节先建节），并把「grep 复核已写入」并入该 Task 的完成判定。实测失守模式（2026-09-26 process-reviewer 独立审计发现）：B1 形态裁定当日 Edit 写回失败被后续动作岔开，progress.md 误报「已记录」——决策执行了、记录没落、进度却虚报，且复盘页引用失实。写回失败（如目标节不存在）时**当场建节重写，禁止留待稍后**。
 
 **不可跳过**，但低风险小任务可使用最小 Goal Contract（1 个 Objective + 1-3 条 Success Criteria + Verification Plan）。
 
@@ -561,6 +574,8 @@ Phase 间不应销毁 team，应复用空闲 Agent。检测 TaskList + tmux list
 
 > 完整清理脚本（即时清理 + 孤儿清理 + 全局清理）见 `~/.claude/skills/flow/references/cleanup-procedure.md`
 
+**执行器 fail-fast 纪律（2026-09-26 审计加装）**: 同一工具调用**连续 2 次返回同类错误**（如 TaskStop "No task found"）即停手——不得第三次重复同参调用。实测失守模式：收尾阶段对已回收 agent 重复 TaskStop 十余次（每次同错仍继续），严重浪费调用且污染记录。停手后二选一：换路径（如 bash 直接处理）或报告用户。此纪律适用于全部工具，不限 TaskStop。
+
 - 即时清理: Agent completed 且不被复用 → `TaskStop <name>`（NO_TMUX 唯一动作）/ shutdown → kill pane（IN_TMUX 附加）
 - Phase 间孤儿清理: 检测残留 pane 并 kill
 - 全局清理: 全部 Phase 完成 → TaskStop 全部（本体）→ 倒序 kill pane（TeamDelete 已废弃，无需调用）
@@ -595,6 +610,8 @@ Phase 间不应销毁 team，应复用空闲 Agent。检测 TaskList + tmux list
 > 完整验证协议（含行为步骤、铁律、证据要求）见 `~/.claude/skills/flow/references/stage5-verification.md`
 
 **铁律**: No completion claims without fresh verification evidence. 禁止 "should work"、"probably"。
+
+**自审落盘要求（2026-09-26 审计加装）**: 流程回顾/自审的结论与改进建议**必须有物质载体**（写入 .plan/findings.md 或 analyze/ 快照）——只存在于对话展示或 thinking 中的建议等于不存在（实测：自审 R1-R4 建议零落盘，后续独立审计员无法评判且建议险些失传）。复盘页引用「.plan/ N 轮验证记录」类声明前，先验证该记录存在。
 
 Stage 5 不只验证命令是否通过，还必须逐条核对 Stage 0.5 Goal Contract 的 Success Criteria。最终总结前必须输出：
 
