@@ -167,12 +167,12 @@ No other community framework (GSD, GStack) has this capability.
 
 ### 4. Auto Handoff — Automatic Context Relay at 75%
 
-The enemy of long tasks is context rot: quality degrades as the window fills, until auto-compact crudely compresses or the session overflows. Auto Handoff proactively relays to a fresh window at **75%** — triggered by `scripts/check_context.py` reading real API usage from the session transcript (precise measurement, not model self-estimation):
+The enemy of long tasks is context rot: quality degrades as the window fills, until auto-compact crudely compresses or the session overflows. Auto Handoff proactively relays to a fresh window at **75%** — detection is mechanized: a UserPromptSubmit hook (`scripts/context_guard_hook.py`) runs automatically on every user input, based on real API usage read from the session transcript by `scripts/check_context.py` (precise measurement, not model self-estimation):
 
 ```
   Old session (context ≥ 75%)                  New session (context ≈ 14%)
   ┌───────────────────────────┐                ┌───────────────────────────┐
-  │ check_context.py measures │                │ HANDOFF.md is the prompt  │
+  │ context_guard_hook guards │                │ HANDOFF.md is the prompt  │
   │          │                │                │          │                │
   │ Five plan files +         │   tmux window  │ Reads STATE.md etc.       │
   │ HANDOFF.md written        │ ───spawn────▶  │ in order                  │
@@ -182,12 +182,14 @@ The enemy of long tasks is context rot: quality degrades as the window fills, un
   └───────────────────────────┘                └───────────────────────────┘
 ```
 
-Four design points:
+Six design points:
 
 - **User control**: automation is opt-in — pick "hand off and remember" in the dialog; the preference is written to STATE.md and inherited by the successor; `--no-auto-handoff` exits anytime
+- **Mechanized detection**: the UserPromptSubmit hook checks on every user input (upgraded 2026-09-14 — the original stage-boundary self-discipline never fired in practice); fails silently without blocking input, re-warns only on ≥5pp jumps, threshold tunable via `FLOWKIT_CONTEXT_GUARD_THRESHOLD`
+- **Window calibration**: the context-window size has no runtime read channel; detection emits `needs_calibration` to flag inferred windows — trust the status bar, and calibrate with `export FLOWKIT_CONTEXT_WINDOW` when the gap exceeds 15pp (measured: GLM `[1m]` infers 1M vs ≈490K real; without calibration the threshold judgment is skewed)
 - **Runaway guard**: `--handoff-max` (default 3) caps relay generations, preventing infinite relay loops
 - **Traceable**: the nested session starts with `CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1` so it stays resumable via `--resume`
-- **Verified end-to-end**: real tmux spawn → new session reads HANDOFF.md → resumes from Next Action
+- **Verified end-to-end**: real tmux spawn → new session reads HANDOFF.md → resumes from Next Action; after the hook was armed, a resumed session measured a 79.8% injection warning
 
 It is the proactive sibling of STATE.md recovery: STATE.md answers "how to resume after a crash", Auto Handoff answers "when to proactively switch windows".
 

@@ -141,12 +141,12 @@ GSD、GStack 等社区框架均无此能力。
 
 ### 4. Auto Handoff —— 75% 上下文自动交接，长任务不断线
 
-长任务最大的敌人是 context rot：上下文越满质量越差，直到 auto-compact 粗暴压缩或直接溢出。Auto Handoff 让管道在 **75%** 处主动换窗续命——触发依据是 `scripts/check_context.py` 从 transcript 读到的 API usage 真值（精确检测，非模型自估）：
+长任务最大的敌人是 context rot：上下文越满质量越差，直到 auto-compact 粗暴压缩或直接溢出。Auto Handoff 让管道在 **75%** 处主动换窗续命——检测已机械化：UserPromptSubmit hook（`scripts/context_guard_hook.py`）在每次用户输入时自动运行，依据 `scripts/check_context.py` 从 transcript 读到的 API usage 真值（精确检测，非模型自估）：
 
 ```
   旧会话（context ≥ 75%）                        新会话（context ≈ 14%）
   ┌───────────────────────────┐                 ┌───────────────────────────┐
-  │ check_context.py 边界实测 │                 │ HANDOFF.md 即初始 prompt  │
+  │ context_guard_hook 实测  │                 │ HANDOFF.md 即初始 prompt  │
   │          │                │                 │          │                │
   │ 五件套 + HANDOFF.md 落盘  │    tmux 窗口    │ 按序读 STATE.md 等三件套  │
   │          │                │ ───spawn────▶   │          │                │
@@ -155,12 +155,14 @@ GSD、GStack 等社区框架均无此能力。
   └───────────────────────────┘                 └───────────────────────────┘
 ```
 
-四个设计点：
+六个设计点：
 
 - **用户控制权**：弹窗选「交接并记住自动」才进入自动状态（opt-in），偏好写入 STATE.md 由续接会话继承；`--no-auto-handoff` 随时退出
+- **机械化检测**：UserPromptSubmit hook 每次用户输入自动检测（2026-09-14 升级——原 Stage 边界自觉检测实测全程未触发），静默失败不阻塞输入、涨幅 <5pp 去抖、阈值 `FLOWKIT_CONTEXT_GUARD_THRESHOLD` 可调
+- **窗口校准**：上下文窗口尺寸无运行时读取通道，检测输出 `needs_calibration` 亮明推断身份；以状态栏真值为准，差异 >15pp 即 `export FLOWKIT_CONTEXT_WINDOW` 校准（实测 GLM `[1m]` 推断 1M 而真实 ≈490K，不校准则阈值判断失真）
 - **防失控护栏**：`--handoff-max`（默认 3 代）接力上限，杜绝无限接力环
 - **可追溯**：嵌套会话以 `CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1` 启动，续接会话可被 `--resume` 追溯
-- **实测闭环**：真实 tmux spawn → 新会话读 HANDOFF.md → 从 Next Action 恢复，全链路验证通过
+- **实测闭环**：真实 tmux spawn → 新会话读 HANDOFF.md → 从 Next Action 恢复，全链路验证通过；hook 武装后 resume 实测注入预警 79.8%
 
 它是 STATE.md 恢复机制的主动版：STATE.md 解决"断了怎么接"，Auto Handoff 解决"在最佳时机主动断"。
 
